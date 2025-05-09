@@ -247,7 +247,7 @@ await aid.send_stream_message(to_aid_list, session_id,response,type)
 ## 微信支持
 如需技术交流或问题咨询，欢迎添加开发者微信：
 
-<img src="assets/images/wechat_qr.png" width="33%" style="display:block;margin:10px auto;"> <!-- 保持宽高比缩放 -->
+![WeChat QR Code](assets/images/wechat_qr.png) <!-- 请将二维码图片放在指定路径 -->
 
 📮 问题反馈: 19169495461@163.com
 
