@@ -1,0 +1,89 @@
+{
+  "publisherInfo": {
+    "publisherAid": "gggg12.agentunion.cn",
+    "organization": "agentunion.cn",
+    "certificationSignature": "agentunion.cn"
+  },
+  "version": "1.0.0",
+  "lastUpdated": "2025-05-08T09:40:38Z",
+  "name": "Agent调用关系图",
+  "description": "Agent调用关系图绘制",
+  "avaUrl": "https://t9.baidu.com/it/u=2472616479,557015018&fm=193",
+  "capabilities": {
+    "core": [
+      "调用关系图绘制"
+    ],
+    "extended": []
+  },
+  "references": {
+    "knowledgeBases": [
+      ""
+    ],
+    "tools": [
+      ""
+    ],
+    "companyInfo": [
+      ""
+    ],
+    "productInfo": [
+      ""
+    ]
+  },
+  "llm": {
+    "model": "qwen-plus",
+    "num_parameters": "",
+    "quantization_bits": "",
+    "context_length": ""
+  },
+  "authorization": {
+    "modes": [
+      "free"
+    ],
+    "fee": {},
+    "description": "",
+    "sla": {}
+  },
+  "input": {
+    "types": [
+      "content"
+    ],
+    "formats": [
+      "json"
+    ],
+    "examples": {
+      "type": "content",
+      "format": "text",
+      "content": "查看关系图"
+    },
+    "semantics": [
+      ""
+    ],
+    "compatibleAids": [
+      "*"
+    ]
+  },
+  "output": {
+    "types": [
+      "content"
+    ],
+    "formats": [
+      "markdown"
+    ],
+    "examples": {
+      "type": "content",
+      "format": "markdown",
+      "content": ""
+    },
+    "semantics": [
+      ""
+    ],
+    "compatibleAids": [
+      ""
+    ]
+  },
+  "supportStream": true,
+  "supportAsync": true,
+  "permission": [
+    "*"
+  ]
+}

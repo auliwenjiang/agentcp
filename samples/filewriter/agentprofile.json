@@ -1,0 +1,91 @@
+{
+  "publisherInfo": {
+    "publisherAid": "w212.agentunion.cn",
+    "organization": "agentunion.cn",
+    "certificationSignature": "agentunion.cn"
+  },
+  "version": "1.0.0",
+  "lastUpdated": "2025-05-08T09:28:08Z",
+  "name": "文件读写",
+  "description": "读写agent目录下的文件",
+  "avaUrl": "https://t8.baidu.com/it/u=655275816,1648044724&fm=193",
+  "capabilities": {
+    "core": [
+      "读取文件",
+      "写入文件",
+      "查询文件列表"
+    ],
+    "extended": []
+  },
+  "llm": {
+    "model": "qwen-plus",
+    "num_parameters": "",
+    "quantization_bits": "",
+    "context_length": ""
+  },
+  "references": {
+    "knowledgeBases": [
+      ""
+    ],
+    "tools": [
+      ""
+    ],
+    "companyInfo": [
+      ""
+    ],
+    "productInfo": [
+      ""
+    ]
+  },
+  "authorization": {
+    "modes": [
+      "free"
+    ],
+    "fee": {},
+    "description": "",
+    "sla": {}
+  },
+  "input": {
+    "types": [
+      "content"
+    ],
+    "formats": [
+      "json"
+    ],
+    "examples": {
+      "type": "content",
+      "format": "text",
+      "content": "查询文件列表"
+    },
+    "semantics": [
+      ""
+    ],
+    "compatibleAids": [
+      "*"
+    ]
+  },
+  "output": {
+    "types": [
+      "content"
+    ],
+    "formats": [
+      "markdown"
+    ],
+    "examples": {
+      "type": "content",
+      "format": "markdown",
+      "content": ""
+    },
+    "semantics": [
+      ""
+    ],
+    "compatibleAids": [
+      ""
+    ]
+  },
+  "supportStream": true,
+  "supportAsync": true,
+  "permission": [
+    "*"
+  ]
+}

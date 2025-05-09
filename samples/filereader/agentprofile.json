@@ -1,0 +1,90 @@
+{
+  "version": "1.0.0",
+  "publisherInfo": {
+    "publisherAid": "122asad.agentunion.cn",
+    "organization": "agentunion.cn",
+    "certificationSignature": "agentunion.cn"
+  },
+  "lastUpdated": "2025-05-08T09:26:53Z",
+  "name": "文件读取",
+  "description": "读取agent目录下的文件",
+  "avaUrl": "https://t8.baidu.com/it/u=3471576641,3316469023&fm=193",
+  "capabilities": {
+    "core": [
+      "读取文件",
+      "查询文件列表"
+    ],
+    "extended": []
+  },
+  "llm": {
+    "model": "qwen-plus",
+    "num_parameters": "",
+    "quantization_bits": "",
+    "context_length": ""
+  },
+  "references": {
+    "knowledgeBases": [
+      ""
+    ],
+    "tools": [
+      ""
+    ],
+    "companyInfo": [
+      ""
+    ],
+    "productInfo": [
+      ""
+    ]
+  },
+  "authorization": {
+    "modes": [
+      "free"
+    ],
+    "fee": {},
+    "description": "当前智能体免费使用，无费用",
+    "sla": {}
+  },
+  "input": {
+    "types": [
+      "content"
+    ],
+    "formats": [
+      "json"
+    ],
+    "examples": {
+      "type": "content",
+      "format": "text",
+      "content": "查询文件列表"
+    },
+    "semantics": [
+      ""
+    ],
+    "compatibleAids": [
+      "*"
+    ]
+  },
+  "output": {
+    "types": [
+      "content"
+    ],
+    "formats": [
+      "markdown"
+    ],
+    "examples": {
+      "type": "content",
+      "format": "markdown",
+      "content": ""
+    },
+    "semantics": [
+      ""
+    ],
+    "compatibleAids": [
+      ""
+    ]
+  },
+  "supportStream": true,
+  "supportAsync": true,
+  "permission": [
+    "*"
+  ]
+}

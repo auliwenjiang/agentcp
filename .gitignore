@@ -1,0 +1,24 @@
+build/
+/aid/
+/__pycache__/
+venv/
+data/mu/
+*.db  # 新增：忽略所有.db文件
+agentid_data.db
+*.pyc
+__pycache__/
+dist/
+agentid.egg-info/top_level.txt
+agentid.egg-info/PKG-INFO
+agentid.egg-info/dependency_links.txt
+agentid.egg-info/requires.txt
+agentid.egg-info/SOURCES.txt
+agentcp.egg-info/
+simple_agent.py
+test.py
+.env
+weather.json
+weather_agent.py
+备注.txt
+服务架构
+agentcp/aid/
