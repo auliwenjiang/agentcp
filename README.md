@@ -244,12 +244,14 @@ await aid.send_stream_message(to_aid_list, session_id,response,type)
 | `get_session_member_list(session_id)` | 获取指定会话的成员列表 |
 | `update_aid_info(aid, avaUrl, name, description)` | 更新 Agent 的信息 |
 
-## 开发指南
+## 微信支持
+如需技术交流或问题咨询，欢迎添加开发者微信：
 
+![WeChat QR Code](assets/images/wechat_qr.png) <!-- 请将二维码图片放在指定路径 -->
 
 ## 许可证
 
-MIT © 2023
+MIT © 2025
 
 ---
 
