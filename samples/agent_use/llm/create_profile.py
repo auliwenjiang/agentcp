@@ -7,15 +7,23 @@ import agentcp
 
 def create_financial_analyzer_json(publisherInfo):
     """创建智能体能力、权限描述"""
+    name = "模拟大模型调用Agent"
     profile_json_data = {
         "publisherInfo": publisherInfo,
+        "avaUrl": "https://pic.rmb.bdstatic.com/bjh/news/6b87d6906492735a3b03aa7d0aa9cb02.jpeg",
         "version": "1.0.0",
         "lastUpdated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "name": "串并行调用",
-        "description": "实现智能体搜索 调用大模型Agent，实现工具选择，多个工具并行调用获取结果。",
+        "name": name,
+        "description": name,
         "capabilities": {
-            "core": ["智能体搜索", "工具选择", "工具调用"],
+            "core": [name],
             "extended": []
+        },
+        "llm":{
+            "model":"", #模型名称，或使用aid
+            "num_parameters":"",  #模型参数量（如"7B"表示70亿参数）
+            "quantization_bits":"",  #量化位数（如Q4表示4位量化）
+            "context_length":"",  #上下文长度（如"4096"表示4096个token）
         },
         "references": {
             "knowledgeBases": [""],
@@ -35,7 +43,7 @@ def create_financial_analyzer_json(publisherInfo):
             "examples": {
                 "type": "content",
                 "format": "text",
-                "content": "查询明天上海的天气，并规划一条去北京的路线"
+                "content": "搜索智能体：xxx"
             },
             "semantics": [""],
             "compatibleAids": ["*"]
@@ -51,8 +59,6 @@ def create_financial_analyzer_json(publisherInfo):
             "semantics": [""],
             "compatibleAids": [""]
         },
-        "surportFind": False, # 是否支持智能体发现
-        "avaUrl": "https://bkimg.cdn.bcebos.com/pic/5d6034a85edf8db1dd6336220023dd54564e7422",
         "supportStream": True, # False代表当前智能体不支持流式输出
         "supportAsync": True,
         "permission": ["*"]
@@ -76,7 +82,7 @@ def write_agent_profile_json(json_data):
 if __name__ == "__main__":
     # 创建JSON数据
     # 将加密种子修改为自己的加密种子，可以是随机字符串，也可以是固定字符串，只要保证一致即可。
-    acp = agentcp.AgentCP("../../../data","",debug=False)
+    acp = agentcp.AgentCP("../../../../data","",debug=False)
     agentid_list = acp.get_aid_list()
     agentid:agentcp.AgentID = None
     while agentid is None:
@@ -109,7 +115,7 @@ if __name__ == "__main__":
     write_agent_profile_json(json_data)
     select_result = input("是否将文件拷贝到agent公有数据目录下（Y/N）: ")
     if select_result.upper() != "Y":
-        # print("程序运行结束")
+        print("程序运行结束")
         exit(1)
     agentid.create_agent_profile(json_data)
     select_result = input("拷贝成功，是否同步到接入服务器（Y/N）: ")

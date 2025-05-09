@@ -11,15 +11,11 @@ def chatWithLLM(prompt):
                 "messages": [
                     {
                         "role": "system", 
-                        "content": 'no_think'
-                    },
-                    {
-                        "role": "system", 
                         "content": '使用中文输出内容'
                     },
                     {
                         "role": "user", 
-                        "content": prompt
+                        "content": prompt + '/no_think'
                     }],
                 "stream": False
             })
