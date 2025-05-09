@@ -227,8 +227,8 @@ class FileAgent:
 
 if __name__ == "__main__":
     # 配置参数
-    ENDPOINT = "aid.pub"
-    AGENT_NAME = ""  # 请输入你的agent名称
+    ENDPOINT = "agentunion.cn"
+    AGENT_NAME = "122asad"  # 请输入你的agent名称
 
     # 创建并运行Agent
     agent = FileAgent(

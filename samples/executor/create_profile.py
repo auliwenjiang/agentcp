@@ -93,7 +93,7 @@ if __name__ == "__main__":
                 raise ValueError
             if choice == len(agentid_list):
                 aid = input("请输入名称: ")
-                agentid = acp.create_aid("aid.pub", aid)
+                agentid = acp.create_aid("agentunion.cn", aid)
                 if agentid is None:
                     print("创建身份（aid）失败，请打开日志查看原因")
                     exit(1)
