@@ -10,8 +10,9 @@ import agentcp
 class Agent:
     def __init__(self):
         self.agentid = None
-        self.acp = agentcp.AgentCP("../data")
-        self.llm_agent_id = "lwj9999.agentunion.cn"
+        self.acp = agentcp.AgentCP("../../../data",seed_password="")
+        self.llm_agent_id = "llmdemo007.agentunion.cn"
+        self.search_agent_id = "search007.agentunion.cn"
     async def async_message_handler(self, msg):
         try:
             receiver = self.agentid.get_receiver_from_message(msg)
@@ -47,79 +48,75 @@ class Agent:
         return
 
     def mult_tool_choose(self,llm_content,session_id,to_aid_list):
-        tools = []
-        agents = self.agentid.get_all_public_data()
-        for ainfo in agents:
-            aid =ainfo.get("agent_id",None)
-            if aid is None or aid == "":
-                continue
-            public_data = ainfo.get("public_data",None)
-
-            if public_data is None:
-                continue
-            # public_data_json = json.loads(public_data)
-            name = public_data.get('name',None)
-            if name is None or name == "":
-                continue
-            description = public_data.get('description',None)
-            if description is None or description == "":
-                continue
-            description = f"我是{name}，我能提供[{description}[服务，我的aid是{aid}"
-            tools.append({
-                "type": "function",
-                "function": {
-                    "name": "agent_" + aid,
-                    "description": description,
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "aid": {
-                                "type": "string",
-                                "description": "",
+        def search_agent_handler(search_msg):
+            result = self.agentid.get_content_from_message(search_msg)
+            print(f"search result={result}")
+            agents = json.loads(result)
+            tools = []
+            for ainfo in agents:
+                description = f"我是{ainfo['agent_id']}，我能提供[{ainfo['description']}]服务，我的aid是{ainfo['agent_id']}"
+                tools.append({
+                    "type": "function",
+                    "function": {
+                        "name": "agent_" + ainfo['agent_id'],
+                        "description": description,
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "aid": {
+                                    "type": "string",
+                                    "description": "",
+                                },
+                                "text": {
+                                    "type": "string",
+                                    "description": ""
+                                }
                             },
-                            "text": {
-                                "type": "string",
-                                "description": ""
-                            }
-                        },
-                        "required": ["aid", "text"]
+                            "required": ["aid", "text"]
+                        }
                     }
-                }
-            })
-        msg_block = {
-            "type": "content",
-            "status": "success",
-            "timestamp": int(time.time() * 1000),
-            "content": llm_content,
-            "tools":tools,
-            "prompt":""
-        }
-        self.agentid.quick_send_messsage(self.llm_agent_id, msg_block, lambda reply_msg: self.reply_message_handler(reply_msg,session_id,to_aid_list))
+                })
+
+            msg_block = {
+                "type": "content",
+                "status": "success",
+                "timestamp": int(time.time() * 1000),
+                "content": llm_content,
+                "tools": tools,
+                "prompt": ""
+            }
+            self.agentid.quick_send_messsage(self.llm_agent_id, msg_block,
+                                             lambda reply_msg: self.reply_message_handler(reply_msg, session_id,
+                                                                                          to_aid_list))
+
+        self.agentid.quick_send_messsage_content(self.search_agent_id, llm_content,search_agent_handler)
 
     async def mult_tool_call(self,content,session_id, to_aid_list) :
         for tool_call in content:
             tool = json.loads(tool_call.get("content"))
-            tool_name = tool.get("tool_name")
             tool_args = tool.get("tool_args")
+            print(f"aiddddddd={tool_args['aid']} text={tool_args['text']}")
             async def async_func_call_result(message):
                 tool_result = self.agentid.get_content_from_message(message)
-                self.agentid.quick_send_messsage_content(self.llm_agent_id, tool_result,
-                    lambda reply_msg: self.reply_message_handler(reply_msg,session_id,to_aid_list))
+                print(f"工具返回的结果={tool_result}")
+                self.agentid.send_message_content(session_id,to_aid_list, tool_result)
+                # self.agentid.quick_send_messsage_content(self.llm_agent_id, tool_result,
+                #     lambda reply_msg: self.reply_message_handler(reply_msg,session_id,to_aid_list))
                 return
             self.agentid.quick_send_messsage_content(tool_args["aid"], tool_args["text"], async_func_call_result)
 
 if __name__ == "__main__":
-    _endpoint = "agentunion.cn"
-    _name = "mc57001"
+    _my_aid = "mc58009.agentunion.cn"
 
     agent = Agent()
-    agent.agentid =agent.acp.create_aid(_endpoint, _name)
+    agent.agentid =agent.acp.load_aid(_my_aid)
     async def sync_message_handler(msg):
         print(f"收到消息数据: {msg}")
         await agent.async_message_handler(msg)  # 添加await关键字
         return True
     try:
         agent.agentid.online()
+        # agent.agentid.sync_public_files()
         agent.agentid.add_message_handler(sync_message_handler)
         agent.acp.serve_forever()
     except Exception as e:
