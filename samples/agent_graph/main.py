@@ -144,7 +144,7 @@ class AgentGraph:
 
 
 if __name__ == "__main__":
-    ENDPOINT = "agentunion.cn"
-    AGENT_NAME = "gggg12"
+    ENDPOINT = "aid.pub"
+    AGENT_NAME = ""
     agent = AgentGraph(AGENT_NAME, ENDPOINT)
     agent.online()

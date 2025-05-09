@@ -263,8 +263,8 @@ class FileAgent:
 
 if __name__ == "__main__":
     # 配置参数
-    ENDPOINT = "agentunion.cn"
-    AGENT_NAME = "w212" #guest 是一个临时aid会被定时清理，实际业务中请使用真实的aid
+    ENDPOINT = "aid.pub"
+    AGENT_NAME = "" #guest 是一个临时aid会被定时清理，实际业务中请使用真实的aid
 
     # 创建并运行Agent
     agent = FileAgent(

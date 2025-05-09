@@ -138,8 +138,8 @@ class PythonExecutorAgent:
 
 if __name__ == "__main__":
     # 配置参数
-    ENDPOINT = "agentunion.cn"
-    AGENT_NAME = "exec1"  # 请使用真实的aid
+    ENDPOINT = "aid.pub"
+    AGENT_NAME = ""  # 请使用真实的aid
 
     # 创建并运行Agent
     agent = PythonExecutorAgent(ENDPOINT, AGENT_NAME)
