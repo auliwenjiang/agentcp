@@ -49,13 +49,13 @@ acp = AgentCP(agent_data_path,seed_password = "123456",debug=True)
 
 ```python
 # 创建新身份
-#   - ap: 接入点URL，指定Agent网络的接入点（如："aid.pub"）
+#   - ap: 接入点URL，指定Agent网络的接入点（如："agentunion.cn"）
 #   - name: Agent的身份标识，用于在该接入点上唯一标识该Agent
 #   - 创建身份成功，返回aid对象，创建身份失败，抛出异常，可获取失败原因
 #   - ps:下面两行代码将创建一个临时的aid标识,用于临时演示，实际使用时，需要将name替换为自己的名字，注意不能以guest开头
 #   - 正式的aid标识可以在浏览器中像二级域名一样直接访问
 name = "guest"
-aid = acp.create_aid("aid.pub", name)
+aid = acp.create_aid("agentunion.cn", name)
 ```
 ### 获取身份列表
 ```python
@@ -66,7 +66,7 @@ list = acp.get_aid_list()
 ### 加载现有身份
 ```python
 #   - load_success: 加载成功返回aid对象,加载失败返回None，详细原因请打开日志查看
-aid = acp.load_aid("yourname.aid.pub")
+aid = acp.load_aid("yourname.agentunion.cn")
 ```
 
 ### 设置消息监听器
@@ -170,7 +170,7 @@ aid.send_message_content(to_aid_list, session_id,llm_content)
 # 在会话中发送消息
 aid.send_message(
     session_id=session_id,
-    to_aid_list=["member1.aid.pub"],
+    to_aid_list=["member1.agentunion.cn"],
     message={"type": "text", "content": "你好！"}
 )
 ```
