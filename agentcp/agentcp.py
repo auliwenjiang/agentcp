@@ -242,7 +242,7 @@ class AgentID(abc.ABC):
     def send_chunk_to_stream(self,session_id, stream_url, chunk):
         self.session_manager.send_chunk_to_stream(session_id, stream_url, chunk)
         
-    def __quick_send_messsage_base(self,to_aid,asnyc_message_result):
+    def __quick_send_message_base(self,to_aid,asnyc_message_result):
         session_id = self.create_session("quick session", "")
         if session_id is None:
             raise Exception("failed to create session")
@@ -253,7 +253,7 @@ class AgentID(abc.ABC):
         self.add_message_handler(__asnyc_message_result,session_id=session_id)
         return session_id
         
-    def quick_send_messsage_content(self,to_aid:str, message_content:str,asnyc_message_result):
+    def quick_send_message_content(self,to_aid:str, message_content:str,asnyc_message_result):
         session_id = self.__quick_send_messsage_base(to_aid,asnyc_message_result)
         self.send_message_content(session_id,[to_aid],message_content)
         
@@ -266,8 +266,8 @@ class AgentID(abc.ABC):
         ref_msg_id = msg.get("message_id","")
         self.send_message(session_id,to_aid_list,message,ref_msg_id)
     
-    def quick_send_messsage(self,to_aid:str, message: Union[AssistantMessageBlock, list[AssistantMessageBlock], dict],asnyc_message_result):
-        session_id = self.__quick_send_messsage_base(to_aid,asnyc_message_result)
+    def quick_send_message(self,to_aid:str, message: Union[AssistantMessageBlock, list[AssistantMessageBlock], dict],asnyc_message_result):
+        session_id = self.__quick_send_message_base(to_aid,asnyc_message_result)
         self.send_message(session_id,[to_aid],message)
         
     def send_message_content(self,session_id: str,to_aid_list: list,llm_content: str,ref_msg_id: str="",message_id:str=""):

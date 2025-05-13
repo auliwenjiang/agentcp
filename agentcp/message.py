@@ -13,7 +13,7 @@
 # limitations under the License.
 from dataclasses import dataclass
 from typing import Dict, List, Literal, Optional, Union
-
+from agentcp.open_ai_message import OpenAIMessage
 
 @dataclass
 class Artifact:
@@ -31,11 +31,8 @@ class Artifact:
 
 @dataclass
 class AssistantMessageBlock:
-    type: Literal["content", "search", "reasoning_content", "error", 'file', 'image','tool_call']
+    type: Literal["llm","content", "search", "reasoning_content", "error", 'file', 'image','tool_call']
     status: Literal["success", "loading", "cancel", "error", "reading", "optimizing"]
     timestamp: int    
-    content: Optional[str] = None
+    content: Optional[Union[str,OpenAIMessage]] = None
     type_format: str = ""
-    stream: bool = False
-    tools: Optional[List[Dict]] = None
-    prompt: Optional[str] = None

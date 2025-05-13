@@ -7,6 +7,6 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from agentcp.agentcp import AgentCP, AgentID
 from agentcp.log import logger
 
-__version__ = "0.1.30"
+__version__ = "0.1.35"
 
 __all__ = ["VERSION", "AgentCP", "AgentID"]

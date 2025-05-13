@@ -1,5 +1,3 @@
-
-```markdown README.md
 # AgentCP - 基于ACP协议的Agent标准通信库
 
 ## Agent Communication Protocol(智能体通信协议,简称ACP)

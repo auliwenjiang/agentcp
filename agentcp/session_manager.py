@@ -250,7 +250,7 @@ class Session:
             # elif cmd == "member_list":
             #     return self.on_member_list_receive(js["data"])
                     
-            elif cmd == "chat_group_create_stream_ack":
+            elif cmd == "session_create_stream_ack":
                 log_info("收到创建流成功的消息")
                 self.message_client.queue.put(js["data"])
         except Exception as e:
@@ -290,7 +290,7 @@ class Session:
         try:
             receiver = ','.join(to_aid_list)
             data = {
-                "cmd" : "chat_session_stream_req",
+                "cmd" : "session_create_stream_req",
                 "data" : {
                     "session_id": self.session_id,
                     "request_id": f"{int(time.time() * 1000)}",
@@ -305,7 +305,7 @@ class Session:
             #self.ws.send(msg)
             self.message_client.send_msg(msg)  # 发送消息到 WebSocket 服务器
             log_info(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] 发送消息: {msg}")
-            ack = self.message_client.queue.get(timeout=4)
+            ack = self.message_client.queue.get(timeout=3)
             log_info("等待ack响应")
             if "session_id" in ack and "push_url" in ack and "pull_url" in ack and "message_id" in ack:
                 push_url = ack["push_url"]

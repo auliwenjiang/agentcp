@@ -1,12 +1,12 @@
 {
   "publisherInfo": {
-    "publisherAid": "search.agentunion.cn",
+    "publisherAid": "qwenstream.agentunion.cn",
     "organization": "agentunion.cn",
     "certificationSignature": "agentunion.cn"
   },
   "avaUrl": "https://img0.baidu.com/it/u=727206602,4114969606&fm=253&fmt=auto&app=138&f=JPEG?w=285&h=285",
   "version": "1.0.0",
-  "lastUpdated": "2025-05-08T07:13:27Z",
+  "lastUpdated": "2025-05-12T07:37:26Z",
   "name": "智能体搜索",
   "description": "搜索网络中存在的各种能力的智能体",
   "capabilities": {
