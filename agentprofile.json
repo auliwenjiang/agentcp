@@ -1,17 +1,17 @@
 {
   "publisherInfo": {
-    "publisherAid": "qwenstream.agentunion.cn",
+    "publisherAid": "weather.agentunion.cn",
     "organization": "agentunion.cn",
     "certificationSignature": "agentunion.cn"
   },
-  "avaUrl": "https://img0.baidu.com/it/u=727206602,4114969606&fm=253&fmt=auto&app=138&f=JPEG?w=285&h=285",
+  "avaUrl": "https://img1.baidu.com/it/u=4196730940,2454447876&fm=253&fmt=auto&app=120&f=JPEG?w=933&h=800",
   "version": "1.0.0",
-  "lastUpdated": "2025-05-12T07:37:26Z",
-  "name": "智能体搜索",
-  "description": "搜索网络中存在的各种能力的智能体",
+  "lastUpdated": "2025-05-15T04:22:30Z",
+  "name": "ACP 天气问答智能体",
+  "description": "智能查询天气信息，提供准确的天气数据。",
   "capabilities": {
     "core": [
-      "搜索智能体"
+      "智能查询天气信息，提供准确的天气数据。"
     ],
     "extended": []
   },

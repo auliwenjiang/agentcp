@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2025 AgentUnion Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import sqlite3
-import hashlib
 import os
+from agentcp.base.log import log_debug, log_error, log_exception, log_info
 class DBManager:
     
     def __init__(self,aid_path,aid):
@@ -23,28 +24,87 @@ class DBManager:
         
         self.conn = sqlite3.connect(db_file_path, check_same_thread=False)
         self.aid = aid
-        self.create_table(self.aid)
+        self.create_table()
             
-    def add_friend_agent(self,aid,friend_aid,name,avaUrl,description):
+    def add_friend_agent(self,friend_aid,name,avaUrl,description):
         try:
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            friend_table = f"friend_{aid_md5}"
-            # 修改为使用动态生成的friend_table表名
+            friend_table = f"friend"
             cursor = self.conn.cursor()
-            cursor.execute(f'''INSERT INTO {friend_table} (aid, name, avaurl, description) VALUES (?, ?, ?, ?)''', 
-                              (friend_aid, name, avaUrl, description))
+            # 使用INSERT OR REPLACE来实现upsert功能
+            # 如果aid存在就更新，不存在就插入
+            cursor.execute(f'''INSERT OR REPLACE INTO {friend_table} (aid, name, avaurl, description) VALUES (?, ?, ?, ?)''', 
+                            (friend_aid, name, avaUrl, description))
             self.conn.commit()
             result = cursor.rowcount > 0
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"add_friend_agent数据库操作失败: {str(e)}")
+            log_error(f"add_friend_agent数据库操作失败: {str(e)}")
+            return False
+
+    def set_friend_agent(self,friend_aid,name):
+        try:
+            friend_table = f"friend"
+            cursor = self.conn.cursor()
+            
+            # 首先检查aid是否存在
+            cursor.execute(f'''SELECT avaurl, description FROM {friend_table} WHERE aid = ?''', (friend_aid,))
+            existing_record = cursor.fetchone()
+            
+            if existing_record:
+                # 如果存在，只更新name，保持avaurl和description不变
+                cursor.execute(f'''UPDATE {friend_table} SET name = ? WHERE aid = ?''', 
+                            (name, friend_aid))
+            else:
+                # 如果不存在，插入新记录，avaurl和description设为空或默认值
+                cursor.execute(f'''INSERT INTO {friend_table} (aid, name, avaurl, description) VALUES (?, ?, ?, ?)''', 
+                            (friend_aid, name, '', ''))
+            
+            self.conn.commit()
+            result = cursor.rowcount > 0
+            cursor.close()  # 关闭cursor对象
+            return result
+        except sqlite3.Error as e:
+            log_error(f"set_friend_agent数据库操作失败: {str(e)}")
+            return False
+
+    def delete_friend_agent(self,friend_aid):
+        try:
+            friend_table = f"friend"
+            # 修改为使用动态生成的friend_table表名
+            cursor = self.conn.cursor()
+            cursor.execute(f'''DELETE FROM {friend_table} WHERE aid = ?''', (friend_aid,))
+            self.conn.commit()
+            result = cursor.rowcount > 0
+            cursor.close()  # 关闭cursor对象
+            return result
+        except sqlite3.Error as e:
+            log_error(f"delete_friend_agent数据库操作失败: {str(e)}")
+            return False
+    
+    def delete_session(self,session_id):
+        try:
+            conversation_table = f"conversation"
+            messages_table = f"messages"
+            chat_config_table = f"chat_config"
+            # 修改为使用动态生成的friend_table表名
+            cursor = self.conn.cursor()
+            cursor.execute(f'''DELETE FROM {conversation_table} WHERE session_id = ?''', (str(session_id),))
+            self.conn.commit()
+            cursor.execute(f'''DELETE FROM {messages_table} WHERE session_id =?''', (session_id,))
+            self.conn.commit()
+            cursor.execute(f'''DELETE FROM {chat_config_table} WHERE session_id =?''', (session_id,))
+            self.conn.commit()
+            result = cursor.rowcount > 0
+            cursor.close()  # 关闭cursor对象
+            return result
+        except sqlite3.Error as e:
+            log_error(f"delete_session数据库操作失败: {str(e)}")
             return False
 
     def get_friend_agent_list(self,aid):
         try:
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            friend_table = f"friend_{aid_md5}"
+            friend_table = f"friend"
             # 修改为使用动态生成的friend_table表名
             cursor = self.conn.cursor()
             cursor.execute(f'''SELECT * FROM {friend_table}''')
@@ -63,7 +123,7 @@ class DBManager:
             cursor.close()
             return result
         except sqlite3.Error as e:
-            print(f"get_friend_agent_list数据库操作失败: {str(e)}")
+            log_error(f"get_friend_agent_list数据库操作失败: {str(e)}")
             return []
         
     
@@ -83,19 +143,18 @@ class DBManager:
         self.conn.commit()
         cursor.close()
     
-    def create_table(self,aid):
+    def create_table(self):
         # 生成aid的MD5哈希作为表名前缀
         cursor = self.conn.cursor()
-        aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-        conversation_table = f"conversation_{aid_md5}"
-        messages_table = f"messages_{aid_md5}"
-        friend_table = f"friend_{aid_md5}"
-        chat_config_table = f"chat_config_{aid_md5}"
+        conversation_table = f"conversation"
+        messages_table = f"messages"
+        friend_table = f"friend"
+        chat_config_table = f"chat_config"
         # cursor.execute(f"DROP TABLE IF EXISTS {conversation_table}")
 
         cursor.execute(f'''CREATE TABLE IF NOT EXISTS {conversation_table} (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            session_id TEXT NOT NULL,
+            session_id TEXT NOT NULL, 
             identifying_code TEXT NOT NULL,
             main_aid TEXT NOT NULL,
             name TEXT NOT NULL,
@@ -103,7 +162,7 @@ class DBManager:
             timestamp DATETIME DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime'))
         )''')
         
-        # cursor.execute(f"DROP TABLE IF EXISTS {messages_table}")
+        #cursor.execute(f"DROP TABLE IF EXISTS {messages_table}")
         
         cursor.execute(f'''CREATE TABLE IF NOT EXISTS {messages_table} (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -114,6 +173,7 @@ class DBManager:
             parent_message_id INTEGER,  -- 关联到父消息的id
             to_aids TEXT NOT NULL,  -- 消息发送者,
             content TEXT NOT NULL,  -- 消息内容,
+            instruction Text,  -- 指令,
             type TEXT NOT NULL,  -- 消息状态，如"sent", "received",
             status TEXT NOT NULL,  -- 消息状态，如"error", "success",
             timestamp DATETIME DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime'))
@@ -139,6 +199,18 @@ class DBManager:
         self.conn.commit()
         cursor.close()
         
+    def load_session_history(self, session_id):
+        try:
+            cursor = self.conn.cursor()
+            sesion_table = f"conversation"
+            cursor.execute(f'''SELECT * FROM {sesion_table} WHERE session_id =?''', (session_id,))
+            columns = ['id','session_id','identifying_code','main_aid','name','type','timestamp']
+            results = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            cursor.close()
+            return results
+        except sqlite3.Error as e:
+            log_error(f"load_session_history数据库操作失败: {str(e)}")
+            return None
     
     
     def update_aid_info(self, aid, avaUrl, name, description):
@@ -150,32 +222,27 @@ class DBManager:
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"update_aid_info数据库操作失败: {str(e)}")
+            log_error(f"update_aid_info数据库操作失败: {str(e)}")
             return False
     
-    def create_conversation(self, aid,session_id,identifying_code,name, type,to_aid_list:list):
+    def create_session(self, aid,session_id,identifying_code,name, type):
         try:
             cursor = self.conn.cursor()
-            import hashlib
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            conversation_table = f"conversation_{aid_md5}"
-            main_aid = ""      
+            conversation_table = f"conversation"    
             # 修正参数数量，确保5个值对应5个占位符
             cursor.execute(f'''INSERT INTO {conversation_table} (session_id,identifying_code,main_aid,name,type) VALUES (?,?,?,?,?)''', 
-                              (session_id, identifying_code, main_aid, name, type))
+                              (session_id, identifying_code, "", name, type))
             self.conn.commit()
             result = cursor.lastrowid
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"create_conversation数据库操作失败: {str(e)}")
+            log_error(f"create_conversation数据库操作失败: {str(e)}")
             
     def invite_member(self, aid, session_id, invite_aid:str):
         try:
             cursor = self.conn.cursor()
-            import hashlib
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            chat_config_table = f"chat_config_{aid_md5}"
+            chat_config_table = f"chat_config"
             cursor.execute(f'''INSERT INTO {chat_config_table} (session_id,aid,avaurl,description, post_data) VALUES (?,?,?,?,?)''', 
                                     (session_id,invite_aid,"","",""))
             self.conn.commit()
@@ -183,18 +250,16 @@ class DBManager:
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"invite_member数据库操作失败: {str(e)}")
+            log_error(f"invite_member数据库操作失败: {str(e)}")
             return False
         except Exception as e:
-            print(f"invite_member数据库操作失败: {str(e)}")
+            log_error(f"invite_member数据库操作失败: {str(e)}")
             return False
     
     def get_message_by_id(self, aid, session_id,message_id):
         try:
             cursor = self.conn.cursor()
-            import hashlib
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            messages_table = f"messages_{aid_md5}"
+            messages_table = f"messages"
             cursor.execute(f'''SELECT * FROM {messages_table} WHERE session_id =? AND message_id =?''', (session_id,message_id))
             columns = ['id','session_id','message_id','role','message_aid', 'parent_message_id', 'to_aids', 'content', 'type', 'status', 'timestamp']
             results = [dict(zip(columns, row)) for row in cursor.fetchall()]
@@ -202,7 +267,7 @@ class DBManager:
             # 返回JSON格式字符串
             return results
         except sqlite3.Error as e:
-            print(f"get_message_by_id数据库操作失败: {str(e)}")
+            log_error(f"get_message_by_id数据库操作失败: {str(e)}")
             return []
 
     def save_message(message):
@@ -214,39 +279,43 @@ class DBManager:
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"save_message数据库操作失败: {str(e)}")
+            log_error(f"save_message数据库操作失败: {str(e)}")
             return None
         
-    def update_message(self, aid, message):
+    def update_message(self, message):
         try:
             cursor = self.conn.cursor()
-            import hashlib
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            messages_table = f"messages_{aid_md5}"
-            cursor.execute(f'''UPDATE {messages_table} SET content =?,status =? WHERE id =?''', (message["content"], message["status"], message["id"]))
+            import json
+            messages_table = f"messages"
+            content_str = message["content"]
+            if message["content"] is not None:
+                # 添加类型判断，仅转换字典和列表类型
+                if isinstance(message["content"], (dict, list)):
+                    content_str = json.dumps(message["content"])
+                else:  # 保留原始字符串类型
+                    content_str = str(message["content"])
+            cursor.execute(f'''UPDATE {messages_table} SET content =?,status =? WHERE id =?''', (content_str, message["status"], message["id"]))
             self.conn.commit()
             result = cursor.rowcount > 0
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"update_message数据库操作失败: {str(e)}")
+            log_error(f"update_message数据库操作失败: {str(e)}")
             return False
     
-    def insert_message(self, role,aid,conversation_id, message_aid, parent_message_id, to_aids, content, type, status,message_id=''):
+    def insert_message(self, role,aid,conversation_id, message_aid, parent_message_id, to_aids, instruction,content, type, status,message_id=''):
         try:
-            import hashlib
             cursor = self.conn.cursor()
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            messages_table = f"messages_{aid_md5}"
+            messages_table = f"messages"
             # 将json.dump改为json.dumps
-            cursor.execute(f'''INSERT INTO {messages_table} (session_id, role,message_id,message_aid, parent_message_id, to_aids, content, type, status) VALUES (?,?,?,?,?,?,?,?,?)''',
-                                (conversation_id, role,message_id,message_aid, parent_message_id, to_aids, content, type, status))
+            cursor.execute(f'''INSERT INTO {messages_table} (session_id, role,message_id,message_aid, parent_message_id, to_aids, instruction,content, type, status) VALUES (?,?,?,?,?,?,?,?,?,?)''',
+                                (conversation_id, role,message_id,message_aid, parent_message_id, to_aids, instruction,content, type, status))
             self.conn.commit()
             result = cursor.lastrowid
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"insert_message数据库操作失败: {str(e)}")
+            log_error(f"insert_message数据库操作失败: {str(e)}")
     
     def load_aid(self, aid):
         try:
@@ -259,7 +328,7 @@ class DBManager:
             else:
                 return None, None,None,None,None
         except sqlite3.Error as e:
-            print(f"load_aid数据库操作失败: {str(e)}")
+            log_error(f"load_aid数据库操作失败: {str(e)}")
             return None, None,None,None,None
 
     def create_aid(self, aid,ep_aid = "",ep_url = "",avaUrl = "",name = "",description=""):
@@ -273,7 +342,7 @@ class DBManager:
             cursor.close()  # 关闭cursor对象
             return ""
         except sqlite3.Error as e:
-            print(f"save_aid数据库操作失败: {str(e)}")
+            log_error(f"save_aid数据库操作失败: {str(e)}")
             raise RuntimeError(f"save_aid数据库操作失败: {str(e)}")
             
     def update_aid(self, aid, ep_aid, ep_url):
@@ -285,7 +354,7 @@ class DBManager:
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"update_aid数据库操作失败: {str(e)}")
+            log_error(f"update_aid数据库操作失败: {str(e)}")
             return False
     
     def get_agentid_list(self):
@@ -296,15 +365,13 @@ class DBManager:
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"get_agentid_list数据库操作失败: {str(e)}")
+            log_error(f"get_agentid_list数据库操作失败: {str(e)}")
             return []
 
     def get_conversation_by_id(self, aid, conversation_id):
         try:
-            import hashlib
             cursor = self.conn.cursor()
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            conversation_table = f"conversation_{aid_md5}"
+            conversation_table = f"conversation"
             cursor.execute(f'''SELECT id, session_id,identifying_code,main_aid,name,type FROM {conversation_table} WHERE id =?''', (conversation_id,))
             result = cursor.fetchone()
             cursor.close()  # 关闭cursor对象
@@ -320,16 +387,14 @@ class DBManager:
             else:
                 return None
         except sqlite3.Error as e:
-            print(f"get_conversation_by_id数据库操作失败: {str(e)}")
+            log_error(f"get_conversation_by_id数据库操作失败: {str(e)}")
             return None
           
     def get_conversation_list(self, aid, main_aid, page=1, page_size=10):
         try:
             offset = (page - 1) * page_size
-            import hashlib
             cursor = self.conn.cursor()
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            conversation_table = f"conversation_{aid_md5}"
+            conversation_table = f"conversation"
             if main_aid == "" or main_aid == None:
                 cursor.execute(
                     f'''SELECT id, session_id, identifying_code, name, type, timestamp
@@ -355,7 +420,7 @@ class DBManager:
             return results
             
         except sqlite3.Error as e:
-            print(f"get_conversation_list数据库操作失败: {str(e)}")
+            log_error(f"get_conversation_list数据库操作失败: {str(e)}")
             return []
     
     def get_conversation_messages(self, conversation_id):
@@ -366,7 +431,7 @@ class DBManager:
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"get_conversation_messages数据库操作失败: {str(e)}")
+            log_error(f"get_conversation_messages数据库操作失败: {str(e)}")
             return []
     
     def get_conversation_config(self, conversation_id):
@@ -377,7 +442,7 @@ class DBManager:
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"get_conversation_config数据库操作失败: {str(e)}")
+            log_error(f"get_conversation_config数据库操作失败: {str(e)}")
             return []
 
     def add_conversation_config(self, conversation_id, aid, avaurl, description, post_data):
@@ -389,7 +454,7 @@ class DBManager:
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"add_conversation_config数据库操作失败: {str(e)}")
+            log_error(f"add_conversation_config数据库操作失败: {str(e)}")
             return None
 
     def update_conversation_config(self, config_id, avaurl, description, post_data):
@@ -401,52 +466,51 @@ class DBManager:
             cursor.close()  # 关闭cursor对象
             return result
         except sqlite3.Error as e:
-            print(f"update_conversation_config数据库操作失败: {str(e)}")
+            log_error(f"update_conversation_config数据库操作失败: {str(e)}")
             return False
     
     def get_message_list(self, aid, session_id, page=1, page_size=10):
         try:
+            page_size = 100
             offset = (page - 1) * page_size
-            import hashlib
             cursor = self.conn.cursor()
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            messages_table = f"messages_{aid_md5}"
+            messages_table = f"messages"
             
             # 修正SQL语句，移除多余的括号
             cursor.execute(
-                f'''SELECT id, session_id,message_id,role,message_aid, parent_message_id, to_aids, content, type, status, timestamp
+                f'''SELECT id, session_id,message_id,role,message_aid, parent_message_id, to_aids,instruction, content, type, status, timestamp
                     FROM {messages_table}
                     WHERE session_id = ? 
                     ORDER BY timestamp ASC LIMIT ? OFFSET ?''', 
                 (session_id, page_size, offset))
             
             # 将查询结果转换为字典列表
-            columns = ['id','session_id','message_id','role','message_aid', 'parent_message_id', 'to_aids', 'content', 'type', 'status', 'timestamp']
+            columns = ['id','session_id','message_id','role','message_aid', 'parent_message_id', 'to_aids', 'instruction','content', 'type', 'status', 'timestamp']
             results = [dict(zip(columns, row)) for row in cursor.fetchall()]
             cursor.close()  # 关闭cursor对象
             # 返回JSON格式字符串
             return results
         except sqlite3.Error as e:
-            print(f"get_message_list数据库操作失败: {str(e)}")
+            log_error(f"get_message_list数据库操作失败: {str(e)}")
             return []
         # return [dict(row) for row in cursor.fetchall(
     
-    def get_session_member_list(self,aid,session_id):
+    def get_session_member_list(self,session_id):
         try:
-            aid_md5 = hashlib.md5(aid.encode('utf-8')).hexdigest()
-            chat_config_table = f"chat_config_{aid_md5}"
-            # 修改为使用动态生成的friend_table表名
             cursor = self.conn.cursor()
+            chat_config_table = f"chat_config"
             cursor.execute(f'''SELECT * FROM {chat_config_table} WHERE session_id =?''', (session_id,))
             columns = [column[0] for column in cursor.description]  # 获取列名
             rows = cursor.fetchall()
             result = []
             for row in rows:
+                if len(row) != len(columns):  # 添加长度校验
+                    continue
                 row_dict = {columns[i]: row[i] for i in range(len(columns))}
                 result.append(row_dict)
-            cursor.close()  # 关闭cursor对象
+            cursor.close()
             return result
         except sqlite3.Error as e:
-            print(f"get_session_member_list数据库操作失败: {str(e)}")
-            return False
+            log_error(f"get_session_member_list数据库操作失败: {str(e)}")
+            return []
     

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2025 AgentUnion Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,23 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import enum
-import os
+from .context import AtomicErrorContext
 
-class Environ(enum.Enum):
-    """
-    Environment for the agent.
-    """
-    # Define the environments
-    ENTRY_SERVER = "ENTRY_SERVER"
-    LOG_LEVEL = "LOG_LEVEL"
-    CA_SERVER = "CA_SERVER"
-    
-    def __str__(self):
-        return self.value
+ErrorContext = AtomicErrorContext()
 
-    def get(self, default=None):
-        """
-        Get the environment variable value.
-        """
-        return os.environ.get(self.value, default)
+
+__all__ = ["ErrorContext"]
