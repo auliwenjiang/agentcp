@@ -641,11 +641,11 @@ class SessionManager:
             return True
 
     def init_his_session(self, session_id: str, session: Session):
+        session.session_id = session_id
         result = self.db_mananger.load_session_history(session_id)
         if not result:
             log_error(f"load session history failed: {session_id}")
             return False
-        session.session_id = session_id
         session.identifying_code = result[0]["identifying_code"]
 
     def set_on_message_receive(self, on_message_recive):

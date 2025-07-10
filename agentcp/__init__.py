@@ -8,6 +8,6 @@ from agentcp.agentcp import AgentCP, AgentID
 from agentcp.mermaid import Mermaid
 from agentcp.workflow import Workflow
 
-__version__ = "0.1.90"
+__version__ = "0.1.93"
 
 __all__ = ["__version__", "AgentCP", "AgentID","Mermaid","Workflow"]
