@@ -1,0 +1,31 @@
+{
+  "received_total": 11,
+  "dispatched_success": 11,
+  "dispatched_failed": 0,
+  "handler_success": 10,
+  "handler_failed": 0,
+  "dispatch_queue_size": 0,
+  "dispatch_success_rate": "100.00%",
+  "handler_success_rate": "90.91%",
+  "dispatch_latency": {
+    "avg_ms": "0.90",
+    "p50_ms": "0.53",
+    "p95_ms": "1.97",
+    "p99_ms": "1.97"
+  },
+  "handler_latency": {
+    "avg_ms": "5026.83",
+    "p50_ms": "4824.77",
+    "p95_ms": "21972.03",
+    "p99_ms": "21972.03"
+  },
+  "throughput": {
+    "messages_per_second": "0.09",
+    "dispatched_per_second": "0.09"
+  },
+  "uptime_seconds": "120",
+  "agent_id": "claude_code_proxy.aid.pub",
+  "agent_name": "",
+  "timestamp": 1762966733.0209625,
+  "timestamp_str": "2025-11-13 00:58:53"
+}
