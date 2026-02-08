@@ -1,0 +1,89 @@
+{
+  "publisherInfo": {
+    "publisherAid": "weather.agentunion.cn",
+    "organization": "agentunion.cn",
+    "certificationSignature": "agentunion.cn"
+  },
+  "avaUrl": "https://img1.baidu.com/it/u=4196730940,2454447876&fm=253&fmt=auto&app=120&f=JPEG?w=933&h=800",
+  "version": "1.0.0",
+  "lastUpdated": "2025-05-15T04:22:30Z",
+  "name": "ACP 天气问答智能体",
+  "description": "智能查询天气信息，提供准确的天气数据。",
+  "capabilities": {
+    "core": [
+      "智能查询天气信息，提供准确的天气数据。"
+    ],
+    "extended": []
+  },
+  "llm": {
+    "model": "qwen-plus",
+    "num_parameters": "",
+    "quantization_bits": "",
+    "context_length": ""
+  },
+  "references": {
+    "knowledgeBases": [
+      ""
+    ],
+    "tools": [
+      ""
+    ],
+    "companyInfo": [
+      ""
+    ],
+    "productInfo": [
+      ""
+    ]
+  },
+  "authorization": {
+    "modes": [
+      "free"
+    ],
+    "fee": {},
+    "description": "当前智能体免费使用，无费用",
+    "sla": {}
+  },
+  "input": {
+    "types": [
+      "content"
+    ],
+    "formats": [
+      "json"
+    ],
+    "examples": {
+      "type": "content",
+      "format": "text",
+      "content": "搜索智能体：xxx"
+    },
+    "semantics": [
+      ""
+    ],
+    "compatibleAids": [
+      "*"
+    ]
+  },
+  "output": {
+    "types": [
+      "content"
+    ],
+    "formats": [
+      "markdown"
+    ],
+    "examples": {
+      "type": "content",
+      "format": "markdown",
+      "content": ""
+    },
+    "semantics": [
+      ""
+    ],
+    "compatibleAids": [
+      ""
+    ]
+  },
+  "supportStream": true,
+  "supportAsync": true,
+  "permission": [
+    "*"
+  ]
+}

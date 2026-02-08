@@ -1,0 +1,89 @@
+{
+  "publisherInfo": {
+    "publisherAid": "exec1.agentunion.cn",
+    "organization": "agentunion.cn",
+    "certificationSignature": "agentunion.cn"
+  },
+  "version": "1.0.0",
+  "lastUpdated": "2025-05-08T09:44:33Z",
+  "name": "代码执行器",
+  "description": "Python代码执行器，支持Python代码的执行和调试。",
+  "avaUrl": "https://imgapi.imooc.com/66ebdca0091376a110241024.jpg",
+  "capabilities": {
+    "core": [
+      "Python代码执行"
+    ],
+    "extended": []
+  },
+  "llm": {
+    "model": "qwen-plus",
+    "num_parameters": "",
+    "quantization_bits": "",
+    "context_length": ""
+  },
+  "references": {
+    "knowledgeBases": [
+      ""
+    ],
+    "tools": [
+      ""
+    ],
+    "companyInfo": [
+      ""
+    ],
+    "productInfo": [
+      ""
+    ]
+  },
+  "authorization": {
+    "modes": [
+      "free"
+    ],
+    "fee": {},
+    "description": "",
+    "sla": {}
+  },
+  "input": {
+    "types": [
+      "content"
+    ],
+    "formats": [
+      "json"
+    ],
+    "examples": {
+      "type": "content",
+      "format": "text",
+      "content": ""
+    },
+    "semantics": [
+      ""
+    ],
+    "compatibleAids": [
+      "*"
+    ]
+  },
+  "output": {
+    "types": [
+      "content"
+    ],
+    "formats": [
+      "markdown"
+    ],
+    "examples": {
+      "type": "content",
+      "format": "markdown",
+      "content": ""
+    },
+    "semantics": [
+      ""
+    ],
+    "compatibleAids": [
+      ""
+    ]
+  },
+  "supportStream": true,
+  "supportAsync": true,
+  "permission": [
+    "*"
+  ]
+}
