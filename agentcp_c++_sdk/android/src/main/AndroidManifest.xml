@@ -1,0 +1,19 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.agentcp">
+
+    <!-- Network permissions for IM communication -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Storage permissions: only needed for CUSTOM mode with public paths (Android 6-10) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <!--
+        CUSTOM mode on Android 11+ may require MANAGE_EXTERNAL_STORAGE.
+        SDK does not declare it to avoid Google Play compliance issues.
+        If needed, the host app should declare it in its own manifest.
+    -->
+
+</manifest>

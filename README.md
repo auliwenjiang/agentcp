@@ -1,260 +1,141 @@
-# AgentCP - 基于ACP协议的Agent标准通信库
+# AgentCP — 智能体通信协议 SDK
 
-## Agent Communication Protocol(智能体通信协议,简称ACP)
-    ACP是一个开放协议,用于解决Agent互相通信协作的问题
-    ACP定义了agent的数据规范、agent之间的通信以及agent之间的授权规范
-    ACP Python SDK
-        ACP Python SDK是一个基于ACP协议的Agent标准通信库，用于解决Agent间的身份认证及通信问题。
-        ACP Python SDK提供了一系列API，用于创建AID、连接入网、构建会话，收发消息等。
-        ACP Python SDK支持多Agent协作，异步消息处理，支持内网穿透，支持Agent访问的负载均衡
+AgentCP（Agent Communication Protocol）是一套跨平台的智能体通信协议 SDK，提供智能体身份管理、实时 P2P 通信和群组消息等核心能力。项目包含 C++、TypeScript、Python 三种语言的 SDK 实现，以及一个基于 Flutter 的移动端应用。
 
-## 功能特性
+## 项目结构
 
-- 🔐 Agent之间采用对等网络通信
-- 🛡️ 基于https安全通信及PKI体系的安全身份认证、连接管理
-- 🔄 异步消息处理，支持全链路流式输入输出
-- 🤖 多 Agent 协作模式支持
-- 📦 简洁易用的 API 设计
-- 📊 支持Agent的高并发场景
-- 📚 支持多种消息类型，包括文本、图片、文件等
-- 🔗 支持内网部署，全网服务
-- 🌐 异构兼容：标准化通信接口支持不同架构的Agent互联
+```
+agentcp/
+├── agentcp_c++_sdk/    # C++ 核心 SDK（含 Android/iOS 原生绑定）
+├── agentcp_node/       # TypeScript/Node.js SDK（npm: acp-ts）
+├── agentcp_python/     # Python SDK
+├── app/                # Flutter 移动应用（Evol）
+└── apk/                # Android 安装包
+```
 
+## 核心能力
 
-## 开始使用 AgentCP 吧！
-## 安装
+- **身份管理** — 基于证书的智能体身份（AID）创建、加载、导入、删除，支持访客身份
+- **P2P 通信** — 基于 WebSocket 的实时消息收发、会话管理、邀请机制
+- **群组消息** — 50+ 群组操作，涵盖创建/加入/消息收发/成员管理/管理员操作等
+- **值班调度** — 支持固定模式和轮换模式（轮询/随机），可配置班次时长和消息上限
+- **文件同步** — 公共文件同步、agent.md 上传
+- **监控指标** — 消息性能追踪、同步状态监控
+
+## SDK 一览
+
+| SDK | 语言 | 并发模型 | 消息存储 | 特点 |
+|-----|------|---------|---------|------|
+| **agentcp_c++_sdk** | C++17 | 多线程（mutex） | SQLite（Android） | 底层原语，跨平台原生绑定 |
+| **agentcp_node** | TypeScript | 单线程（Promise） | JSONL + 内存缓存 | 高层会话管理，自动心跳 |
+| **agentcp_python** | Python | asyncio | 内置数据库管理 | 丰富示例，LLM 集成 |
+
+## 快速开始
+
+### TypeScript / Node.js
 
 ```bash
-pip install agentcp
+npm install acp-ts
 ```
-## 快速入门
 
-### 初始化ACP实例
+```typescript
+import { AgentManager } from 'acp-ts';
+
+const manager = AgentManager.getInstance();
+const acp = await manager.initACP("aid.pub");
+
+// 创建智能体身份
+const aid = await acp.createAid("my-agent");
+
+// 初始化 WebSocket 通信
+const ws = await manager.initWS();
+await ws.connect();
+```
+
+### Python
 
 ```python
 from agentcp import AgentCP
 
-# 创建 AgentCP 实例
-#   - agent_data_path: agent数据存储路径，必须外部指定,"."为当前目录
-#   - seed_password: 加密种子，用于私有证书加密
-#   - debug: 是否开启调试模式，默认为False
-#   - 注意：日志默认输出在控制台&当前路径下log.txt文件中
-agent_data_path = "."
-acp = AgentCP(agent_data_path,seed_password = "123456",debug=True)
+acp = AgentCP()
+acp.init("aid.pub")
+
+# 创建智能体身份
+aid = acp.create_aid("my-agent")
+
+# 上线并开始通信
+acp.go_online()
 ```
 
-### 创建新身份
+### C++
 
-```python
-# 创建新身份
-#   - ap: 接入点URL，指定Agent网络的接入点（如："agentunion.cn"）
-#   - name: Agent的身份标识，用于在该接入点上唯一标识该Agent
-#   - 创建身份成功，返回aid对象，创建身份失败，抛出异常，可获取失败原因
-#   - ps:下面两行代码将创建一个临时的aid标识,用于临时演示，实际使用时，需要将name替换为自己的名字，注意不能以guest开头
-#   - 正式的aid标识可以在浏览器中像二级域名一样直接访问
-name = "guest"
-aid = acp.create_aid("agentunion.cn", name)
-```
-### 获取身份列表
-```python
-# 获取身份列表
-list = acp.get_aid_list()
+```cpp
+#include <agentcp/agentcp.h>
+
+AgentCP acp;
+acp.init("aid.pub", "/path/to/storage");
+
+// 创建身份并上线
+acp.createAid("my-agent");
+acp.goOnline();
 ```
 
-### 加载现有身份
-```python
-#   - load_success: 加载成功返回aid对象,加载失败返回None，详细原因请打开日志查看
-aid = acp.load_aid("yourname.agentunion.cn")
+## 群组消息
+
+群组功能覆盖完整生命周期，按阶段划分：
+
+| 阶段 | 功能 | 说明 |
+|------|------|------|
+| Phase 0 | 生命周期 | 注册上线、心跳保活 |
+| Phase 1 | 基础操作 | 创建/加入群组、收发消息、拉取/确认/同步 |
+| Phase 2 | 成员管理 | 移除/封禁成员、加入审核 |
+| Phase 3 | 管理员 | 群元信息、规则、公告、邀请码、广播锁、值班配置 |
+| Phase 4 | SDK 工具 | 同步状态、校验、搜索、摘要 |
+| Phase 5 | 首页索引 | 群列表、角色变更、文件/摘要/指标获取 |
+
+## Flutter 移动应用（Evol）
+
+基于 Flutter 构建的跨平台客户端，通过 4 层桥接架构调用 C++ 核心 SDK：
+
+```
+Flutter (Dart UI)  ↔  Kotlin Plugin  ↔  Java Wrapper (JNI)  ↔  C++ AgentCP SDK
 ```
 
-### 设置消息监听器
-#### 方式1：通过装饰器方式
-```python
-#   - msg: 当有消息
-@aid.message_handler()
-async def sync_message_handler(msg):
-    #print(f"收到消息数据: {msg}")
-    return True
-```
+支持平台：Android / iOS / Linux / macOS / Windows / Web
 
-#### 方式2：通过方法灵活设置
-```python
-#   - msg: 当有消息
-async def sync_message_handler(msg):
-    #print(f"收到消息数据: {msg}")
-    return True
-aid.add_message_handler(sync_message_handler)
-```
+主要功能：
+- AID 管理（创建、加载、删除、列表展示）
+- P2P 实时聊天，会话管理
+- 群组消息
+- 连接状态指示
 
-#### 方式3：绑定sesion_id和方法监听器，指定监听某个会话的消息，该消息将不会被其他监听器监听
-```python
-#   - msg: 当有消息
-async def sync_message_handler(msg):
-    #print(f"收到消息数据: {msg}")
-    return True
-aid.add_message_handler(sync_message_handler,session_id = session_id)
-```
+## Python 示例
 
-### 移除消息监听器
+`agentcp_python/samples/` 目录下提供了 20+ 示例项目：
 
-```python
-#   - msg: 当有消息
-async def sync_message_handler(msg):
-    #print(f"收到消息数据: {msg}")
-    return True
-aid.remove_message_handler(sync_message_handler,session_id = session_id)
-```
-
-### 连接到网络
-
-```python
-# aid上线，开始监听消息
-aid.online()
-```
-
-
-### 快速回复消息
-
-```python
-# msg  收到的消息dict
-# message 发送的消息对象或者消息文本
-aid.reply_message(msg,message)
-```
-
-### 快速发送文本消息
-
-```python
-# to_aid = "" 快速给aid发送消息
-# message_content 消息文本
-# asnyc_message_result 快速消息回调
-aid.quick_send_messsage_content(to_aid,message_content,asnyc_message_result)
-```
-
-
-### 快速发送消息
-
-```python
-# to_aid = "" 快速给aid发送消息
-# message 消息对象
-# asnyc_message_result 快速消息回调
-aid.quick_send_messsage(to_aid,message,asnyc_message_result)
-```
-
-
-
-### 创建会话
-
-```python
-# 创建会话
-session_id = aid.create_session(
-    name="",
-    subject=""
-)
-```
-
-
-### 再会话中发送文本消息
-
-```python
-# to_aid_list = [] 指定多人接收处理
-# session_id 会话id
-# llm_content 大模型处理结果 
-aid.send_message_content(to_aid_list, session_id,llm_content)
-```
-
-### 在会话中发送消息
-
-```python
-# 在会话中发送消息
-aid.send_message(
-    session_id=session_id,
-    to_aid_list=["member1.agentunion.cn"],
-    message={"type": "text", "content": "你好！"}
-)
-```
-
-
-
-### 在会话中发送流式消息
-
-```python
-# to_aid_list = [] 指定多人接收处理
-# session_id 会话id
-# llm_content 大模型处理结果 
-# 大模型调用流式response
-#type默认为text/event-stream
-await aid.send_stream_message(to_aid_list, session_id,response,type)
-```
-
-## 核心 API
-
-### `AgentCP` 类
-主要负责信号处理和程序持续运行的控制。
-
-| 方法 | 描述 |
+| 示例 | 说明 |
 |------|------|
-| `__init__()` | 初始化信号量和退出钩子函数，可传入app_path |
-| `get_aid_list()` | 获取aid列表，返回aid字符串列表 |
-| `create_aid("ep_point,name")` | 创建aid,返回aid实例|
-| `load_aid(aid_str)` | 加载aid,返回aid实例 |
-| `register_signal_handler(exit_hook_func=None)` | 注册信号处理函数，处理 `SIGTERM` 和 `SIGINT` 信号 |
-| `serve_forever()` | 使程序持续运行，直到关闭标志被设置 |
-| `signal_handle(signum, frame)` | 信号处理函数，设置关闭标志并调用退出钩子函数 |
+| `helloworld` | 最简入门示例 |
+| `deepseek` / `qwen3` | 接入大模型 |
+| `dify_chat` / `dify_workflow` | Dify 平台集成 |
+| `query_weather_api_agent` | 天气 API 查询智能体 |
+| `ali_amap` | 高德地图集成 |
+| `agent_graph` | 智能体图编排 |
+| `executor` / `filereader` / `filewriter` | 执行器与文件操作 |
+| `compute_agent` | PowerShell / 软件工具调用 |
+| `wrapper_agently_to_agent` | Agently 框架封装 |
 
-### `AgentID` 类
-核心的 Agent 身份管理类，提供身份创建、消息处理、会话管理等功能。
+## 技术栈
 
-#### 连接管理
-| 方法 | 描述 |
+| 组件 | 技术 |
 |------|------|
-| `__init__(id, app_path, ca_client, ep_url)` | 初始化 AgentID 实例 |
-| `online()` | 初始化入口点客户端、心跳客户端和会话管理器，并建立连接 |
-| `offline()` | 使 Agent 下线，关闭心跳客户端和入口点客户端 |
-| `get_aid_info()` | 获取 Agent 的基本信息 |
-
-#### 会话管理
-| 方法 | 描述 |
-|------|------|
-| `create_session(name, subject, *, type='public')` | 创建会话，返回会话 ID 或 `None` |
-| `invite_member(session_id, to_aid)` | 邀请成员加入指定会话 |
-| `get_online_status(aids)` | 获取指定 Agent 的在线状态 |
-| `get_conversation_list(aid, main_aid, page, page_size)` | 获取会话列表 |
-
-#### 消息处理
-| 方法 | 描述 |
-|------|------|
-| `add_message_handler(handler: Callable[[dict], Awaitable[None]], session_id: str = "")` | 添加消息监听器 |
-| `send_message(to_aid_list: list, session_id: str, message: Union[AssistantMessageBlock, list[AssistantMessageBlock], dict], ref_msg_id: str = "", message_id: str = "")` | 发送消息 |
-| `async send_stream_message(to_aid_list: list, session_id: str, response: AsyncGenerator[bytes, None], type: str = "text/event-stream", ref_msg_id: str = "")` | 发送流式消息 |
-| `remove_message_handler(handler: typing.Callable[[dict], typing.Awaitable[None]], session_id:str="")` | 移除消息监听器 |
-| `send_message_content(to_aid_list: list, session_id: str, llm_content: str, ref_msg_id: str="", message_id:str="")` | 发送文本消息 |
-| `send_message(to_aid_list: list, sessionId: str, message: Union[AssistantMessageBlock, list[AssistantMessageBlock], dict], ref_msg_id: str="", message_id:str="")` | 发送消息，可以处理不同类型的消息对象 |
-| `async send_stream_message(to_aid_list: list, session_id: str, response, type="text/event-stream", ref_msg_id:str="")` | 发送流式消息 |
-
-#### 其他功能
-| 方法 | 描述 |
-|------|------|
-| `post_public_data(json_path)` | 发送数据到接入点服务器 |
-| `add_friend_agent(aid, name, description, avaUrl)` | 添加好友 Agent |
-| `get_friend_agent_list()` | 获取好友 Agent 列表 |
-| `get_agent_list()` | 获取所有 AgentID 列表 |
-| `get_all_public_data()` | 获取所有 AgentID 的公共数据 |
-| `get_session_member_list(session_id)` | 获取指定会话的成员列表 |
-| `update_aid_info(aid, avaUrl, name, description)` | 更新 Agent 的信息 |
-
-## 微信支持
-如需技术交流或问题咨询，欢迎添加开发者微信：
-
-![WeChat QR Code](assets/images/wechat_qr.png) <!-- 请将二维码图片放在指定路径 -->
-
-📮 问题反馈: 19169495461@163.com
+| C++ SDK | C++17, CMake, OpenSSL 3.0, IXWebSocket, nlohmann/json |
+| Node.js SDK | TypeScript, axios, ws, jsrsasign, mitt |
+| Python SDK | Python 3, asyncio, WebSocket |
+| 移动端 | Flutter 3.8+, Dart, Kotlin, JNI |
+| 存储 | SQLite (Android), JSONL (Node.js), JSON (游标持久化) |
+| 测试 | GoogleTest 1.12.1 (C++) |
 
 ## 许可证
 
-MIT © 2025
-
----
-
-📮 问题反馈: 19169495461@163.com
-
-        
+MIT License

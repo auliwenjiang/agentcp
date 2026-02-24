@@ -1,0 +1,9 @@
+// This is a placeholder header.
+// The actual nlohmann/json.hpp is fetched via CMake FetchContent.
+// If you see compile errors, ensure CMake has downloaded the dependency.
+//
+// Alternatively, download from:
+//   https://github.com/nlohmann/json/releases
+// and place the single-header json.hpp in this directory.
+
+#error "nlohmann/json.hpp not found. Run CMake to fetch dependencies, or download json.hpp manually."
