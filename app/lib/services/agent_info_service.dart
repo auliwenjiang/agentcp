@@ -35,10 +35,31 @@ class AgentInfo {
   );
 }
 
+/// agent.md 生成选项
+class AgentMdOptions {
+  final String aid;
+  final String? name;
+  final String type;
+  final String version;
+  final String description;
+  final List<String> tags;
+
+  AgentMdOptions({
+    required this.aid,
+    this.name,
+    this.type = 'human',
+    this.version = '1.0.0',
+    this.description = '',
+    this.tags = const ['human', 'acp'],
+  });
+}
+
 class AgentInfoService {
   static final AgentInfoService _instance = AgentInfoService._internal();
   factory AgentInfoService() => _instance;
   AgentInfoService._internal();
+  static const String _defaultHumanType = 'human';
+  static const List<String> _defaultHumanTags = ['human', 'acp'];
 
   static const int _cacheTtl = 24 * 60 * 60 * 1000; // 24 hours
   final Map<String, AgentInfo> _cache = {};
@@ -148,6 +169,71 @@ class AgentInfoService {
     return 'assets/agent.png';
   }
 
+  /// 从 AID 中提取显示名称
+  /// 例如: "alice.agentcp.io" -> "alice"
+  static String extractDisplayName(String aid) {
+    const suffixes = ['.agentcp.io', '.agentid.pub'];
+    for (final suffix in suffixes) {
+      if (aid.endsWith(suffix)) {
+        return aid.substring(0, aid.length - suffix.length);
+      }
+    }
+    // fallback: 取第一个 '.' 之前的部分
+    final dotIndex = aid.indexOf('.');
+    if (dotIndex > 0) return aid.substring(0, dotIndex);
+    return aid;
+  }
+
+  /// 生成 agent.md 内容（参考 node-ws-acp agentmd.ts）
+  static String generateAgentMd(AgentMdOptions options) {
+    final displayName = options.name ?? extractDisplayName(options.aid);
+    final desc = options.description.isNotEmpty
+        ? options.description
+        : '$displayName 的个人主页';
+    final tagsYaml = options.tags.map((t) => '  - $t').join('\n');
+
+    return '---\n'
+        'aid: "${options.aid}"\n'
+        'name: "$displayName"\n'
+        'type: "${options.type}"\n'
+        'version: "${options.version}"\n'
+        'description: "$desc"\n'
+        'tags:\n'
+        '$tagsYaml\n'
+        '---\n'
+        '\n'
+        '# $displayName\n'
+        '\n'
+        '> $desc\n'
+        '\n'
+        '## About\n'
+        '\n'
+        'This is the agent profile for **$displayName** (${options.aid}).\n'
+        '\n'
+        '- Type: ${options.type}\n'
+        '- Version: ${options.version}\n';
+  }
+
+  /// Create and save a default "human" agent.md for the given AID.
+  static Future<String> createDefaultHumanAgentMd({
+    required String aid,
+    String? name,
+    String description = '',
+  }) async {
+    final normalizedName = name?.trim();
+    final mdContent = generateAgentMd(
+      AgentMdOptions(
+        aid: aid,
+        name: (normalizedName?.isNotEmpty ?? false) ? normalizedName : null,
+        type: _defaultHumanType,
+        description: description.trim(),
+        tags: _defaultHumanTags,
+      ),
+    );
+    await saveLocalAgentMd(aid, mdContent);
+    return mdContent;
+  }
+
   /// Save agent.md content locally for the given AID
   static Future<void> saveLocalAgentMd(String aid, String mdContent) async {
     try {
@@ -179,19 +265,67 @@ class AgentInfoService {
   }
 
   /// Sync local agent.md to AP after going online. Fire-and-forget.
+  /// 每次 online 都向 AP 确认 agent.md 是否存在，不存在则补传。
   static void syncOnOnline(String aid) {
     () async {
       try {
-        final mdContent = await getLocalAgentMd(aid);
+        var mdContent = await getLocalAgentMd(aid);
         if (mdContent == null) {
-          debugPrint('[AgentInfo] syncOnOnline: no local agent.md for $aid');
-          return;
+          // 本地没有则自动生成
+          debugPrint('[AgentInfo] syncOnOnline: auto-generating agent.md for $aid');
+          mdContent = await createDefaultHumanAgentMd(aid: aid);
         }
-        await syncAgentMd(aid, mdContent);
+
+        // 每次都调用 syncAgentMd，由 AP 的 sync_public_files 接口判断是否需要上传
+        final ok = await syncAgentMd(aid, mdContent);
+        if (ok) {
+          debugPrint('[AgentInfo] syncOnOnline: agent.md ensured on AP for $aid');
+        } else {
+          debugPrint('[AgentInfo] syncOnOnline: failed to sync agent.md for $aid');
+        }
       } catch (e) {
         debugPrint('[AgentInfo] syncOnOnline error: $e');
       }
     }();
+  }
+
+  /// Force upload agent.md to AP (skip sync check, used on first creation)
+  static Future<bool> forceUploadAgentMd(String aid, String mdContent) async {
+    try {
+      final signature = await AgentCPService.getSignature();
+      if (signature == null || signature.isEmpty) {
+        debugPrint('[AgentInfo] forceUploadAgentMd: no signature available');
+        return false;
+      }
+
+      final dotIndex = aid.indexOf('.');
+      if (dotIndex < 0) return false;
+      final domain = aid.substring(dotIndex + 1);
+
+      final contentBytes = utf8.encode(mdContent);
+      final uploadUrl = Uri.parse('https://ap.$domain/api/accesspoint/upload_file');
+      final uploadResponse = await http.post(
+        uploadUrl,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'agent_id': aid,
+          'signature': signature,
+          'file_name': 'agent.md',
+          'content': base64Encode(contentBytes),
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      if (uploadResponse.statusCode != 200) {
+        debugPrint('[AgentInfo] forceUploadAgentMd: failed HTTP ${uploadResponse.statusCode}');
+        return false;
+      }
+
+      debugPrint('[AgentInfo] forceUploadAgentMd: agent.md uploaded for $aid');
+      return true;
+    } catch (e) {
+      debugPrint('[AgentInfo] forceUploadAgentMd error: $e');
+      return false;
+    }
   }
 
   /// Sync agent.md content to the AP server

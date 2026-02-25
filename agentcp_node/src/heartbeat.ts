@@ -24,7 +24,7 @@ export class HeartbeatClient {
     // 重连相关常量
     private static readonly MAX_SEND_FAILURES = 3;
     private static readonly MAX_RECV_FAILURES = 3;
-    private static readonly MAX_MISSED_HEARTBEATS = 3;
+    private static readonly MAX_MISSED_HEARTBEATS = 6;
     private static readonly RECONNECT_BACKOFF_MAX = 30000;
     private static readonly SOCKET_TIMEOUT = 1000;
 

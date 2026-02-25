@@ -1,6 +1,6 @@
 {
-    "name": "evol",
-    "short_name": "evol",
+    "name": "ACP",
+    "short_name": "ACP",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

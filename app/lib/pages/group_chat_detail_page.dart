@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../i18n/app_texts.dart';
 import '../services/agentcp_service.dart';
 import '../services/agent_info_service.dart';
 import '../widgets/group_avatar_widget.dart';
@@ -20,12 +22,24 @@ class GroupChatDetailPage extends StatefulWidget {
 }
 
 class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
+  static const int _pageSize = 30;
+  static const double _topRefreshTolerance = 8;
+
   final _messageController = TextEditingController();
+  final _inputFocusNode = FocusNode();
   final _scrollController = ScrollController();
 
   List<GroupChatMessage> _messages = [];
+  final List<GroupChatMessage> _optimisticMessages = [];
+  int _currentFetchLimit = _pageSize;
+  int _lastStoreMessageCount = 0;
+  bool _hasMoreHistory = true;
+  bool _isLoadingMoreHistory = false;
+  bool _didInitialAutoScroll = false;
+  double _lastKeyboardInset = 0;
   bool _isLoading = true;
   bool _isSending = false;
+  Timer? _refreshTimer;
 
   // Save original callbacks so we can restore them on dispose
   Function(String, String)? _prevOnGroupMessageBatch;
@@ -34,8 +48,25 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
   @override
   void initState() {
     super.initState();
+    _inputFocusNode.addListener(() {
+      if (_inputFocusNode.hasFocus) {
+        _scrollToBottom();
+      }
+    });
     _setupCallbacks();
     _init();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final inset = MediaQuery.viewInsetsOf(context).bottom;
+    if (inset > _lastKeyboardInset && inset > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom();
+      });
+    }
+    _lastKeyboardInset = inset;
   }
 
   void _setupCallbacks() {
@@ -45,16 +76,14 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
     AgentCPService.onGroupMessageBatch = (groupId, batchJson) {
       _prevOnGroupMessageBatch?.call(groupId, batchJson);
       if (groupId == widget.group.groupId && mounted && !_isSending) {
-        _loadMessages();
-        AgentCPService.groupMarkRead(widget.group.groupId);
+        _scheduleRefresh();
       }
     };
 
     AgentCPService.onGroupNewMessage = (groupId, latestMsgId, sender, preview) {
       _prevOnGroupNewMessage?.call(groupId, latestMsgId, sender, preview);
       if (groupId == widget.group.groupId && mounted && !_isSending) {
-        _loadMessages();
-        AgentCPService.groupMarkRead(widget.group.groupId);
+        _scheduleRefresh();
       }
     };
   }
@@ -64,7 +93,9 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
     // Restore original callbacks for ChatPage
     AgentCPService.onGroupMessageBatch = _prevOnGroupMessageBatch;
     AgentCPService.onGroupNewMessage = _prevOnGroupNewMessage;
+    _refreshTimer?.cancel();
     _messageController.dispose();
+    _inputFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -72,11 +103,40 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
   Future<void> _init() async {
     await AgentCPService.joinGroupSession(widget.group.groupId);
     await AgentCPService.groupMarkRead(widget.group.groupId);
-    await _loadMessages();
+    await _loadMessages(scrollToBottom: false);
+    await _autoScrollToLatestOnEnter();
   }
 
-  Future<void> _loadMessages() async {
-    final result = await AgentCPService.groupGetMessages(widget.group.groupId, limit: 200);
+  Future<void> _autoScrollToLatestOnEnter() async {
+    if (_didInitialAutoScroll || !mounted) return;
+    _didInitialAutoScroll = true;
+
+    // Retry a few times to ensure list layout is complete before jumping.
+    for (int i = 0; i < 4; i++) {
+      _scrollToBottom(animated: false);
+      await Future.delayed(const Duration(milliseconds: 60));
+      if (!mounted) return;
+    }
+  }
+
+  void _scheduleRefresh({Duration delay = const Duration(milliseconds: 150)}) {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer(delay, () async {
+      if (!mounted) return;
+      await _loadMessages();
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (!mounted) return;
+      await _loadMessages();
+      AgentCPService.groupMarkRead(widget.group.groupId);
+    });
+  }
+
+  Future<void> _loadMessages({int? limit, bool scrollToBottom = true}) async {
+    final fetchLimit = limit ?? _currentFetchLimit;
+    final result = await AgentCPService.groupGetMessages(
+      widget.group.groupId,
+      limit: fetchLimit,
+    );
     if (result['success'] == true && result['messages'] != null) {
       final messages = (result['messages'] as List).map((m) {
         final map = Map<String, dynamic>.from(m);
@@ -90,27 +150,141 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
           isMine: (map['sender'] ?? '').toString() == widget.currentAid,
         );
       }).toList();
-      
+
+      // If we have optimistic messages and the store returned fewer messages
+      // than what we currently display, the store hasn't persisted yet.
+      // Skip this refresh to avoid flicker — keep the in-memory state.
+      if (_optimisticMessages.isNotEmpty &&
+          fetchLimit == _currentFetchLimit &&
+          messages.length < _messages.length) {
+        return;
+      }
+
+      final mergedMessages = _mergeMessagesWithOptimistic(messages);
+
       if (mounted) {
-        setState(() { 
-          _messages = messages; 
+        setState(() {
+          _messages = mergedMessages;
+          _currentFetchLimit = fetchLimit;
+          _lastStoreMessageCount = messages.length;
           _isLoading = false;
+          if (messages.length < fetchLimit) {
+            _hasMoreHistory = false;
+          }
         });
-        _scrollToBottom();
+        if (scrollToBottom) {
+          _scrollToBottom();
+        }
       }
     }
   }
 
-  void _scrollToBottom() {
+  Future<void> _loadMoreHistory() async {
+    if (_isLoading || _isLoadingMoreHistory || !_hasMoreHistory) return;
+    if (_isSending) return;
+    if (_scrollController.hasClients) {
+      final position = _scrollController.position;
+      final isAtTop = position.pixels <= position.minScrollExtent + _topRefreshTolerance;
+      if (!isAtTop) return;
+    }
+
+    _isLoadingMoreHistory = true;
+    final beforeStoreCount = _lastStoreMessageCount;
+    final beforePixels = _scrollController.hasClients ? _scrollController.position.pixels : 0.0;
+    final beforeMaxScrollExtent =
+        _scrollController.hasClients ? _scrollController.position.maxScrollExtent : 0.0;
+
+    await _loadMessages(
+      limit: _currentFetchLimit + _pageSize,
+      scrollToBottom: false,
+    );
+
+    if (!mounted) {
+      _isLoadingMoreHistory = false;
+      return;
+    }
+
+    if (_scrollController.hasClients) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!_scrollController.hasClients) return;
+        final position = _scrollController.position;
+        final extentDelta = position.maxScrollExtent - beforeMaxScrollExtent;
+        final target = (beforePixels + (extentDelta > 0 ? extentDelta : 0.0))
+            .clamp(position.minScrollExtent, position.maxScrollExtent)
+            .toDouble();
+        position.jumpTo(target);
+      });
+    }
+
+    final didLoadMore = _lastStoreMessageCount > beforeStoreCount;
+    if (!didLoadMore && mounted) {
+      setState(() {
+        _hasMoreHistory = false;
+      });
+    }
+    _isLoadingMoreHistory = false;
+  }
+
+  bool _isSameMessage(GroupChatMessage a, GroupChatMessage b) {
+    if (a.msgId.isNotEmpty && b.msgId.isNotEmpty && a.msgId == b.msgId) {
+      return true;
+    }
+    if (a.sender != b.sender || a.content != b.content) {
+      return false;
+    }
+    return (a.timestamp - b.timestamp).abs() <= 15000;
+  }
+
+  List<GroupChatMessage> _mergeMessagesWithOptimistic(List<GroupChatMessage> storeMessages) {
+    final merged = List<GroupChatMessage>.from(storeMessages);
+    final unmatchedStore = List<GroupChatMessage>.from(storeMessages);
+    final stillPending = <GroupChatMessage>[];
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    for (final pending in _optimisticMessages) {
+      final matchedIdx = unmatchedStore.indexWhere((stored) => _isSameMessage(pending, stored));
+      if (matchedIdx >= 0) {
+        unmatchedStore.removeAt(matchedIdx);
+        continue;
+      }
+
+      // Keep optimistic messages briefly to avoid flicker before store persistence.
+      if (now - pending.timestamp <= 30000) {
+        merged.add(pending);
+        stillPending.add(pending);
+      }
+    }
+
+    _optimisticMessages
+      ..clear()
+      ..addAll(stillPending);
+
+    merged.sort((a, b) {
+      final tsCmp = a.timestamp.compareTo(b.timestamp);
+      if (tsCmp != 0) return tsCmp;
+      return a.msgId.compareTo(b.msgId);
+    });
+    return merged;
+  }
+
+  void _scrollToBottom({bool animated = true}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-        );
+        if (animated) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+          );
+        } else {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        }
       }
     });
+  }
+
+  void _dismissKeyboard() {
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   Future<void> _sendMessage() async {
@@ -118,17 +292,21 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
     if (text.isEmpty) return;
     _messageController.clear();
 
+    final now = DateTime.now().millisecondsSinceEpoch;
     final msg = GroupChatMessage(
-      msgId: DateTime.now().millisecondsSinceEpoch.toString(),
+      msgId: 'local-$now',
       groupId: widget.group.groupId,
       sender: widget.currentAid,
       content: text,
       contentType: 'text',
-      timestamp: DateTime.now().millisecondsSinceEpoch,
+      timestamp: now,
       isMine: true,
     );
 
-    setState(() { _messages.add(msg); });
+    setState(() {
+      _optimisticMessages.add(msg);
+      _messages.add(msg);
+    });
     _scrollToBottom();
 
     _isSending = true;
@@ -139,17 +317,19 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
     _isSending = false;
 
     if (result['success'] != true) {
+      setState(() {
+        _optimisticMessages.removeWhere((m) => m.msgId == msg.msgId);
+        _messages.removeWhere((m) => m.msgId == msg.msgId);
+      });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Send failed: ${result['message']}')),
+          SnackBar(content: Text(AppTexts.sendFailed(context, '${result['message']}'))),
         );
       }
     }
 
-    // Reload to get the confirmed message from server
-    if (mounted) {
-      await _loadMessages();
-    }
+    // Delay refresh to avoid reading store before native layer persists new message.
+    if (mounted) _scheduleRefresh(delay: const Duration(milliseconds: 500));
   }
 
   void _showGroupInfoDialog() async {
@@ -183,7 +363,7 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
             children: [
               if (info['description'] != null && (info['description'] as String).isNotEmpty)
                 Padding(padding: const EdgeInsets.only(bottom: 12), child: Text(info['description'])),
-              Text('Members (${members.length})', style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(AppTexts.groupMembersCount(context, members.length), style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               SizedBox(
                 height: 200,
@@ -206,7 +386,7 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
             ],
           ),
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close'))],
+        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppTexts.close(context)))],
       ),
     );
   }
@@ -249,6 +429,7 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: GestureDetector(
           onTap: _showGroupInfoDialog,
@@ -266,7 +447,7 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadMessages,
-            tooltip: 'Refresh Messages',
+            tooltip: AppTexts.groupRefreshTooltip(context),
           ),
           IconButton(
             icon: const Icon(Icons.group),
@@ -281,15 +462,19 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
                 ),
               );
             },
-            tooltip: 'Group Members',
+            tooltip: AppTexts.groupMembersTooltip(context),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(child: _buildChatArea()),
-          _buildMessageInput(),
-        ],
+      body: GestureDetector(
+        onTap: _dismissKeyboard,
+        behavior: HitTestBehavior.translucent,
+        child: Column(
+          children: [
+            Expanded(child: _buildChatArea()),
+            _buildMessageInput(),
+          ],
+        ),
       ),
     );
   }
@@ -309,17 +494,27 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
               size: 72,
             ),
             const SizedBox(height: 12),
-            const Text('No messages yet. Send the first one!', style: TextStyle(color: Colors.grey)),
+            Text(AppTexts.groupNoMessages(context), style: const TextStyle(color: Colors.grey)),
           ],
         ),
       );
     }
     
-    return ListView.builder(
+    final listView = ListView.builder(
       controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       itemCount: _messages.length,
       itemBuilder: (context, index) => _buildMessageBubble(_messages[index]),
+    );
+
+    if (!_hasMoreHistory) {
+      return listView;
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadMoreHistory,
+      child: listView,
     );
   }
 
@@ -390,6 +585,7 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
 
   Widget _buildMessageInput() {
     return SafeArea(
+      top: false,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
@@ -402,12 +598,14 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
           children: [
             Expanded(
               child: TextField(
+                focusNode: _inputFocusNode,
                 controller: _messageController,
-                decoration: const InputDecoration(
-                  hintText: 'Type a message...',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(24))),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: InputDecoration(
+                  hintText: AppTexts.groupInputHint(context),
+                  border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(24))),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
+                onTapOutside: (_) => _dismissKeyboard(),
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _sendMessage(),
               ),

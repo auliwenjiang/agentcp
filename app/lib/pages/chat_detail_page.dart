@@ -21,11 +21,13 @@ class ChatDetailPage extends StatefulWidget {
 
 class _ChatDetailPageState extends State<ChatDetailPage> {
   final _messageController = TextEditingController();
+  final _inputFocusNode = FocusNode();
   final _scrollController = ScrollController();
   AgentInfo? _peerAgentInfo;
   bool _showSlashMenu = false;
   List<Map<String, dynamic>> _filteredCommands = [];
   int _selectedCommandIndex = 0;
+  double _lastKeyboardInset = 0;
 
   static const List<Map<String, dynamic>> _allCommands = [
     {'cmd': '/new', 'icon': Icons.add_circle_outline, 'label': 'New Session', 'desc': 'Create a new session with this peer'},
@@ -44,15 +46,33 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     widget.session.addListener(_onSessionUpdated);
     // Listen for '/' input to show command menu
     _messageController.addListener(_onInputChanged);
+    _inputFocusNode.addListener(() {
+      if (_inputFocusNode.hasFocus) {
+        _scrollToBottom();
+      }
+    });
   }
 
   @override
   void dispose() {
     widget.session.removeListener(_onSessionUpdated);
     _messageController.removeListener(_onInputChanged);
+    _inputFocusNode.dispose();
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final inset = MediaQuery.viewInsetsOf(context).bottom;
+    if (inset > _lastKeyboardInset && inset > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom();
+      });
+    }
+    _lastKeyboardInset = inset;
   }
 
   void _onInputChanged() {
@@ -379,6 +399,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         : (widget.session.peerAid.isNotEmpty ? widget.session.peerAid : 'Chat');
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: GestureDetector(
           onTap: _openAgentMdPage,
@@ -392,13 +413,29 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           ),
         ),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Column(
-        children: [
-          Expanded(child: _buildChatArea()),
-          _buildSlashCommandMenu(),
-          _buildMessageInput(),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline, size: 22),
+            tooltip: 'New Session',
+            onPressed: _handleNewSession,
+          ),
+          IconButton(
+            icon: const Icon(Icons.history, size: 22),
+            tooltip: 'Session History',
+            onPressed: _handleSwitchSession,
+          ),
         ],
+      ),
+      body: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        behavior: HitTestBehavior.translucent,
+        child: Column(
+          children: [
+            Expanded(child: _buildChatArea()),
+            _buildSlashCommandMenu(),
+            _buildMessageInput(),
+          ],
+        ),
       ),
     );
   }
@@ -572,6 +609,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   Widget _buildMessageInput() {
     return SafeArea(
+      top: false,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
@@ -585,6 +623,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           children: [
             Expanded(
               child: TextField(
+                focusNode: _inputFocusNode,
                 controller: _messageController,
                 decoration: const InputDecoration(
                   hintText: 'Type / for commands...',
@@ -594,6 +633,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
+                onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _sendMessage(),
               ),
@@ -626,11 +666,22 @@ class _AgentMdPageState extends State<AgentMdPage> {
   String? _bodyMarkdown;
   bool _loading = true;
   String? _error;
+  bool _creatingSession = false;
+  String? _currentAid;
 
   @override
   void initState() {
     super.initState();
     _fetchMd();
+    _loadCurrentAid();
+  }
+
+  Future<void> _loadCurrentAid() async {
+    final currentAid = await AgentCPService.getCurrentAID();
+    if (!mounted) return;
+    setState(() {
+      _currentAid = currentAid;
+    });
   }
 
   Future<void> _fetchMd() async {
@@ -709,12 +760,97 @@ class _AgentMdPageState extends State<AgentMdPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isSelf = _currentAid != null && _currentAid == widget.aid;
+    final chatTip = isSelf ? '这是你自己' : '和 TA 聊天';
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(widget.aid, style: const TextStyle(fontSize: 14)),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          if (_creatingSession)
+            const Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: Center(
+                child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            )
+          else
+            IconButton(
+              tooltip: chatTip,
+              onPressed: isSelf ? null : _startChat,
+              icon: const Icon(Icons.chat_bubble_outline),
+            ),
+        ],
       ),
       body: _buildBody(),
+    );
+  }
+
+  Future<void> _startChat() async {
+    if (_creatingSession) return;
+
+    final currentAid = _currentAid ?? await AgentCPService.getCurrentAID();
+    if (currentAid == null || currentAid.isEmpty) {
+      _showSnack('当前账号未登录，无法发起聊天');
+      return;
+    }
+    if (currentAid == widget.aid) {
+      _showSnack('不能和自己聊天');
+      return;
+    }
+
+    setState(() {
+      _creatingSession = true;
+    });
+
+    try {
+      final result = await AgentCPService.createSession([widget.aid]);
+      if (!mounted) return;
+
+      if (result['success'] != true) {
+        _showSnack('创建会话失败: ${result['message']}');
+        return;
+      }
+
+      final sessionId = result['sessionId'] as String? ?? '';
+      if (sessionId.isEmpty) {
+        _showSnack('创建会话失败：缺少会话 ID');
+        return;
+      }
+
+      setState(() {
+        _currentAid = currentAid;
+      });
+
+      final session = SessionItem(sessionId: sessionId, peerAid: widget.aid);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ChatDetailPage(
+            session: session,
+            currentAid: currentAid,
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _creatingSession = false;
+        });
+      }
+    }
+  }
+
+  void _showSnack(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
     );
   }
 

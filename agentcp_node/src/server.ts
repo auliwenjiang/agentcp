@@ -150,24 +150,26 @@ async function doEnsureOnline(aid: string): Promise<AidInstance> {
         }
     });
 
-    // 心跳重连成功后，自动触发 WebSocket 重连 + 群组重新注册
+    // 心跳重连成功后，自动触发 WebSocket 重连 + 重新注册上线
     hb.onReconnect(() => {
         if (instance.agentWS) {
             logger.log('[Server] 心跳重连成功，触发 WebSocket 重连...');
             instance.agentWS.reconnect().then(async () => {
-                // WebSocket 重连成功后，重新注册所有在线群组
-                // 断线期间 group.ap 会将在线状态过期，必须重新 register_online 才能收到推送
                 const onlineGroups = instance.agentCP.getOnlineGroups();
                 if (onlineGroups.length > 0) {
-                    logger.log(`[Server] WebSocket 重连成功，重新注册 ${onlineGroups.length} 个在线群组...`);
-                    for (const groupId of onlineGroups) {
+                    await instance.agentCP.groupRegisterOnline();
+                    logger.log(`[Server] WebSocket 重连成功，已重新注册上线，在线群组: ${onlineGroups.length}`);
+                    // 后台异步拉取断线期间可能漏掉的消息
+                    Promise.all(onlineGroups.map(async (groupId) => {
                         try {
-                            await instance.agentCP.joinGroupSession(groupId);
-                            logger.log(`[Server] 群组重新注册成功: ${groupId}`);
+                            const lastMsgId = instance.agentCP.getGroupLastMsgId(groupId);
+                            await instance.agentCP.pullAndStoreGroupMessages(groupId, lastMsgId, 50);
                         } catch (e: any) {
-                            logger.warn(`[Server] 群组重新注册失败: ${groupId}`, e.message || e);
+                            logger.warn(`[Server] reconnect sync failed: ${groupId}`, e.message || e);
                         }
-                    }
+                    })).then(() => {
+                        logger.log(`[Server] 重连后台消息同步完成`);
+                    });
                 }
             }).catch((err) => {
                 logger.error('[Server] WebSocket 重连失败:', err);
@@ -184,18 +186,21 @@ async function doEnsureOnline(aid: string): Promise<AidInstance> {
             logger.log('[Server] 重新鉴权成功，使用新 signature 重连 WebSocket...');
             await instance.agentWS!.reconnect(newConnConfig.messageServer, newConnConfig.messageSignature);
 
-            // 重连成功后重新注册所有在线群组
             const onlineGroups = instance.agentCP.getOnlineGroups();
             if (onlineGroups.length > 0) {
-                logger.log(`[Server] 重新鉴权重连成功，重新注册 ${onlineGroups.length} 个在线群组...`);
-                for (const groupId of onlineGroups) {
+                await instance.agentCP.groupRegisterOnline();
+                logger.log(`[Server] 重新鉴权重连成功，已重新注册上线，在线群组: ${onlineGroups.length}`);
+                // 后台异步拉取断线期间可能漏掉的消息
+                Promise.all(onlineGroups.map(async (groupId) => {
                     try {
-                        await instance.agentCP.joinGroupSession(groupId);
-                        logger.log(`[Server] 群组重新注册成功: ${groupId}`);
+                        const lastMsgId = instance.agentCP.getGroupLastMsgId(groupId);
+                        await instance.agentCP.pullAndStoreGroupMessages(groupId, lastMsgId, 50);
                     } catch (e: any) {
-                        logger.warn(`[Server] 群组重新注册失败: ${groupId}`, e.message || e);
+                        logger.warn(`[Server] reconnect sync failed: ${groupId}`, e.message || e);
                     }
-                }
+                })).then(() => {
+                    logger.log(`[Server] 重连后台消息同步完成`);
+                });
             }
         } catch (err) {
             logger.error('[Server] 重新鉴权重连失败:', err);
@@ -279,8 +284,32 @@ async function doEnsureOnline(aid: string): Promise<AidInstance> {
 }
 
 // 确保群组客户端已初始化
+// 群组客户端初始化锁，防止并发请求重复初始化
+const groupInitPromises = new Map<string, Promise<void>>();
+
 async function ensureGroupClient(instance: AidInstance): Promise<void> {
     if (instance.groupInitialized && instance.agentCP.groupClient) return;
+    if (!instance.agentWS) throw new Error('WebSocket 未连接');
+
+    const aid = instance.aid;
+
+    // 如果已有初始化在进行中，等待它完成
+    const existing = groupInitPromises.get(aid);
+    if (existing) {
+        await existing;
+        return;
+    }
+
+    const initPromise = doInitGroupClient(instance);
+    groupInitPromises.set(aid, initPromise);
+    try {
+        await initPromise;
+    } finally {
+        groupInitPromises.delete(aid);
+    }
+}
+
+async function doInitGroupClient(instance: AidInstance): Promise<void> {
     if (!instance.agentWS) throw new Error('WebSocket 未连接');
 
     const aid = instance.aid;
@@ -354,7 +383,7 @@ async function ensureGroupClient(instance: AidInstance): Promise<void> {
         },
         onJoinApproved(groupId, groupAddress) {
             logger.log(`[Group] onJoinApproved: group=${groupId} address=${groupAddress}`);
-            // 审核通过：获取群信息、添加本地存储、注册到 Home AP
+            // 审核通过：获取群信息、添加本地存储、注册在线，完成后再通知浏览器
             (async () => {
                 try {
                     if (!instance.agentCP.groupOps) {
@@ -373,12 +402,13 @@ async function ensureGroupClient(instance: AidInstance): Promise<void> {
                 } catch (e: any) {
                     logger.error(`[Group] onJoinApproved processing failed: group=${groupId}`, e.message);
                 }
+                // 本地存储就绪后再通知浏览器刷新群列表
+                broadcastToBrowser({
+                    type: 'join_approved',
+                    group_id: groupId,
+                    group_address: groupAddress,
+                });
             })();
-            broadcastToBrowser({
-                type: 'join_approved',
-                group_id: groupId,
-                group_address: groupAddress,
-            });
         },
         onJoinRejected(groupId, reason) {
             logger.log(`[Group] onJoinRejected: group=${groupId} reason=${reason}`);
@@ -435,14 +465,27 @@ async function ensureGroupClient(instance: AidInstance): Promise<void> {
         }
     }
 
-    // 为所有已加入群组注册上线（register_online + 拉取未读 + 启动心跳）
+    // 注册上线 + 将群组加入在线列表（不阻塞）
     const groups = instance.agentCP.getLocalGroupList();
-    for (const group of groups) {
-        try {
-            await instance.agentCP.joinGroupSession(group.group_id);
-        } catch (e: any) {
-            logger.warn(`[Group] joinGroupSession failed: ${group.group_id}`, e.message);
+    if (groups.length > 0) {
+        await instance.agentCP.groupRegisterOnline();
+        for (const group of groups) {
+            instance.agentCP.addOnlineGroup(group.group_id);
         }
+        instance.agentCP.ensureGroupHeartbeat();
+        logger.log(`[Group] 已注册上线，在线群组: ${groups.length}`);
+
+        // 后台异步拉取历史消息，不阻塞启动流程
+        Promise.all(groups.map(async (group) => {
+            try {
+                const lastMsgId = instance.agentCP.getGroupLastMsgId(group.group_id);
+                await instance.agentCP.pullAndStoreGroupMessages(group.group_id, lastMsgId, 50);
+            } catch (e: any) {
+                logger.warn(`[Group] background sync failed: ${group.group_id}`, e.message);
+            }
+        })).then(() => {
+            logger.log(`[Group] 后台消息同步完成，共 ${groups.length} 个群组`);
+        });
     }
 
     instance.groupInitialized = true;
@@ -878,6 +921,7 @@ const indexHtml = `<!DOCTYPE html>
                 var data = await res.json();
                 if (data.success) {
                     showStatus(aid + ' 已上线，正在进入聊天...', 'success');
+                    sessionStorage.setItem('chatEntry','1');
                     window.location.href = '/chat';
                 } else {
                     showStatus(data.error || '上线失败', 'error');
@@ -889,7 +933,7 @@ const indexHtml = `<!DOCTYPE html>
             }
         }
 
-        function enterChat(aid) { window.location.href = '/chat'; }
+        function enterChat(aid) { sessionStorage.setItem('chatEntry','1'); window.location.href = '/chat'; }
 
         async function goOffline(aid) {
             try {
@@ -1203,6 +1247,7 @@ const chatHtml = `<!DOCTYPE html>
             <div class="group-info-bar" id="groupInfoBar" style="display:none;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 <span id="groupInfoText">群组</span>
+                <span id="groupMemberStats" style="font-size:11px;color:var(--t2);margin-left:4px;"></span>
                 <span class="copy-link" id="groupInviteBtn" onclick="generateInviteLink()" title="生成邀请链接" style="display:none;">生成邀请链接</span>
                 <span class="copy-link" id="groupCopyLinkBtn" onclick="copyGroupLink()" title="复制群链接" style="display:none;">复制群链接</span>
                 <span class="copy-link" onclick="showGroupMembers()" title="查看成员">成员</span>
@@ -1393,14 +1438,39 @@ const chatHtml = `<!DOCTYPE html>
             if (type === 'human') return '/assets/human.png';
             return '/assets/agent.png';
         }
-        async function fetchAgentInfo(aid) {
-            if (agentInfoCache[aid]) return agentInfoCache[aid];
-            try {
-                var r = await fetch('/api/agent-info?aid=' + encodeURIComponent(aid));
-                var d = await r.json();
-                if (d.type || d.name) { agentInfoCache[aid] = d; }
-                return d;
-            } catch(e) { return { type:'', name:'', description:'', tags:[] }; }
+        // 批量 agent info 请求：攒批 50ms 后合并发送一次
+        var _agentInfoBatchQueue=[];
+        var _agentInfoBatchTimer=null;
+        function _flushAgentInfoBatch(){
+            _agentInfoBatchTimer=null;
+            var queue=_agentInfoBatchQueue;
+            _agentInfoBatchQueue=[];
+            var aids=queue.map(function(q){ return q.aid; });
+            fetch('/api/agent-info-batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({aids:aids})})
+                .then(function(r){ return r.json(); })
+                .then(function(d){
+                    if(d.success&&d.data){
+                        queue.forEach(function(q){
+                            var info=d.data[q.aid]||{type:'',name:'',description:'',tags:[]};
+                            if(info.type||info.name) agentInfoCache[q.aid]=info;
+                            q.resolve(info);
+                        });
+                    } else {
+                        var empty={type:'',name:'',description:'',tags:[]};
+                        queue.forEach(function(q){ q.resolve(empty); });
+                    }
+                })
+                .catch(function(){
+                    var empty={type:'',name:'',description:'',tags:[]};
+                    queue.forEach(function(q){ q.resolve(empty); });
+                });
+        }
+        function fetchAgentInfo(aid){
+            if(agentInfoCache[aid]) return Promise.resolve(agentInfoCache[aid]);
+            return new Promise(function(resolve){
+                _agentInfoBatchQueue.push({aid:aid,resolve:resolve});
+                if(!_agentInfoBatchTimer) _agentInfoBatchTimer=setTimeout(_flushAgentInfoBatch,50);
+            });
         }
         async function deleteSession(e, sessionId){
             e.stopPropagation();
@@ -1438,6 +1508,9 @@ const chatHtml = `<!DOCTYPE html>
         function hideNewMsgTip(){ if(D.newMsgTip) D.newMsgTip.style.display='none'; }
 
         async function init(){
+            // 刷新页面时强制回到身份管理页面
+            if(!sessionStorage.getItem('chatEntry')){ window.location.href='/'; return; }
+            sessionStorage.removeItem('chatEntry');
             initDom();
             // 配置 marked：支持换行、GFM
             if(typeof marked!=='undefined'&&marked.setOptions){
@@ -2003,6 +2076,7 @@ const chatHtml = `<!DOCTYPE html>
             D.title.textContent=name;
             D.groupInfoBar.style.display='flex';
             D.groupInfoText.textContent=name;
+            $('groupMemberStats').textContent='';
             D.input.disabled=false;
             D.input.placeholder='输入群消息...';
             D.input.focus();
@@ -2018,7 +2092,7 @@ const chatHtml = `<!DOCTYPE html>
                 gmsg.textContent='选择群组...';
                 await fetch('/api/group/select',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({groupId:groupId,aid:S.aid})});
             } catch(e){}
-            // 获取群信息判断是否为创建者
+            // 获取群信息判断是否为创建者，同时获取成员统计
             try {
                 gmsg.textContent='获取群信息...';
                 var r=await fetch('/api/group/info?groupId='+encodeURIComponent(groupId)+'&aid='+encodeURIComponent(S.aid));
@@ -2030,6 +2104,14 @@ const chatHtml = `<!DOCTYPE html>
                     $('groupDutyBtn').style.display='';
                 } else {
                     $('groupCopyLinkBtn').style.display='';
+                }
+                // 展示成员统计
+                if(d.member_stats){
+                    var ms=d.member_stats;
+                    var parts=[ms.total+'人'];
+                    if(ms.human) parts.push(ms.human+'人类');
+                    if(ms.agent) parts.push(ms.agent+'Agent');
+                    $('groupMemberStats').textContent='('+parts.join(' / ')+')';
                 }
             } catch(e){
                 // 获取失败时默认显示复制群链接
@@ -2243,16 +2325,33 @@ const chatHtml = `<!DOCTYPE html>
             } else {
                 D.msgs.scrollTop=prevScrollTop;
             }
-            // 异步加载未缓存的 agent info，加载完成后重新渲染以更新头像
+            // 异步加载未缓存的 agent info，加载完成后局部更新头像和名字
             var unique=needFetch.filter(function(v,i,a){ return a.indexOf(v)===i; });
-            unique.forEach(function(aid){
-                fetchAgentInfo(aid).then(function(){
-                    if(S.tab!=='group') return;
-                    _lastGroupMsgSig='';
-                    _lastGroupMsgs._forceRender=true;
-                    renderGroupMsgs(_lastGroupMsgs);
+            if(unique.length){
+                fetchAgentInfo(unique[0]); // 触发批量请求（攒批机制会合并）
+                unique.forEach(function(aid){
+                    fetchAgentInfo(aid).then(function(info){
+                        if(!info||S.tab!=='group') return;
+                        // 局部更新 DOM：找到该 sender 的所有消息，更新头像和名字
+                        var avatars=D.msgs.querySelectorAll('.msg-avatar[title="'+escH(aid)+'"]');
+                        var newSrc=getAvatarSrc(info.type);
+                        var displayName=(info.name)||aid;
+                        avatars.forEach(function(img){
+                            img.src=newSrc;
+                            img.title=displayName;
+                            // 更新同一消息里的名字
+                            var msgEl=img.closest('.message');
+                            if(msgEl){
+                                var meta=msgEl.querySelector('.msg-meta');
+                                if(meta&&!msgEl.classList.contains('sent')){
+                                    var timeStr=meta.textContent.split(' · ')[1]||'';
+                                    meta.textContent=displayName+' · '+timeStr;
+                                }
+                            }
+                        });
+                    });
                 });
-            });
+            }
         }
 
         // Group modals
@@ -2754,6 +2853,30 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
         return;
     }
 
+    // 批量获取 agent info，优先读本地缓存，未缓存的后台预热
+    if (pathname === '/api/agent-info-batch' && method === 'POST') {
+        try {
+            const body = await parseBody(req);
+            const aids: string[] = body.aids || [];
+            const result: Record<string, { type: string; name: string; description: string; tags: string[] }> = {};
+            const empty = { type: '', name: '', description: '', tags: [] as string[] };
+            for (const aid of aids) {
+                const cached = agentInfoCache.get(aid);
+                if (cached && Date.now() - cached.cachedAt < AGENT_INFO_CACHE_TTL) {
+                    result[aid] = { type: cached.type, name: cached.name, description: cached.description, tags: cached.tags || [] };
+                } else {
+                    result[aid] = cached ? { type: cached.type, name: cached.name, description: cached.description, tags: cached.tags || [] } : empty;
+                    // 后台异步拉取，下次请求就有了
+                    getAgentInfo(aid).catch(() => {});
+                }
+            }
+            sendJson(res, { success: true, data: result });
+        } catch (e: any) {
+            sendJson(res, { success: false, error: e.message });
+        }
+        return;
+    }
+
     // 获取远程 agent.md 原始内容
     if (pathname === '/api/agent-md-raw' && method === 'GET') {
         const aid = parsedUrl.query.aid as string;
@@ -3206,14 +3329,12 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
             if (!aid) { sendJson(res, { success: false, error: '缺少 aid', groups: [] }); return; }
             const instance = await ensureOnline(aid);
             await ensureGroupClient(instance);
-            // 首次访问时从服务端同步群组列表
-            if (!instance.groupListSynced) {
-                try {
-                    await instance.agentCP.syncGroupList();
-                    instance.groupListSynced = true;
-                } catch (syncErr: any) {
-                    logger.warn('[Group] syncGroupList error:', syncErr.message);
-                }
+            // 每次都从服务端同步群组列表，确保审核通过等变更及时反映
+            try {
+                await instance.agentCP.syncGroupList();
+                instance.groupListSynced = true;
+            } catch (syncErr: any) {
+                logger.warn('[Group] syncGroupList error:', syncErr.message);
             }
             const groups = instance.agentCP.getLocalGroupList();
             sendJson(res, { success: true, groups, activeGroupId: instance.activeGroupId });
@@ -3245,8 +3366,33 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
             if (!aid) { sendJson(res, { success: false, error: '缺少 aid' }); return; }
             const instance = await ensureOnline(aid);
             await ensureGroupClient(instance);
-            const info = await instance.agentCP.groupOps!.getGroupInfo(instance.groupTargetAid, groupId);
-            sendJson(res, { success: true, ...info });
+            const [info, membersResult] = await Promise.all([
+                instance.agentCP.groupOps!.getGroupInfo(instance.groupTargetAid, groupId),
+                instance.agentCP.groupOps!.getMembers(instance.groupTargetAid, groupId).catch(() => ({ members: [] })),
+            ]);
+            // 只用本地缓存统计成员类型，不发远程请求，不阻塞响应
+            let humanCount = 0, agentCount = 0;
+            const members = membersResult.members || [];
+            for (const m of members) {
+                const memberAid = m.agent_id || '';
+                if (!memberAid) continue;
+                const cached = agentInfoCache.get(memberAid);
+                if (cached) {
+                    if (cached.type === 'human') humanCount++;
+                    else if (cached.type === 'agent') agentCount++;
+                }
+            }
+            sendJson(res, {
+                success: true, ...info,
+                member_stats: { total: members.length, human: humanCount, agent: agentCount },
+            });
+            // 后台异步预热未缓存的 agent info，下次请求就有了
+            for (const m of members) {
+                const memberAid = m.agent_id || '';
+                if (memberAid && !agentInfoCache.has(memberAid)) {
+                    getAgentInfo(memberAid).catch(() => {});
+                }
+            }
         } catch (e: any) {
             sendJson(res, { success: false, error: e.message });
         }
@@ -3276,6 +3422,7 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
             });
             sendJson(res, { success: true, ...result });
         } catch (e: any) {
+            logger.error(`[API] /api/group/send FAILED: error=${e.message}`);
             sendJson(res, { success: false, error: e.message });
         }
         return;
@@ -3426,6 +3573,25 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
             if (!aid) { sendJson(res, { success: false, error: '缺少 aid', groups: [] }); return; }
             const instance = await ensureOnline(aid);
             await ensureGroupClient(instance);
+            // 同步服务端群列表到本地存储，确保新审核通过的群也能在左侧列表显示
+            try {
+                await instance.agentCP.syncGroupList();
+                instance.groupListSynced = true;
+            } catch (syncErr: any) {
+                logger.warn('[Group] my-groups syncGroupList error:', syncErr.message);
+            }
+            // 确保所有本地群都已注册在线
+            const localGroups = instance.agentCP.getLocalGroupList();
+            const onlineGroups = new Set(instance.agentCP.getOnlineGroups());
+            for (const g of localGroups) {
+                if (!onlineGroups.has(g.group_id)) {
+                    try {
+                        await instance.agentCP.joinGroupSession(g.group_id);
+                    } catch (e: any) {
+                        logger.warn(`[Group] my-groups joinGroupSession failed: ${g.group_id}`, e.message);
+                    }
+                }
+            }
             const ops = instance.agentCP.groupOps!;
             const target = instance.groupTargetAid;
             const result = await ops.listMyGroups(target);

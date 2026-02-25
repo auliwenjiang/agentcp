@@ -19,11 +19,14 @@ class AgentCPPage extends StatefulWidget {
 
 class _AgentCPPageState extends State<AgentCPPage> {
   static const String _defaultAP = 'agentcp.io';
+  static const List<String> _apOptions = ['agentcp.io', 'agentid.pub'];
 
   final _nameController = TextEditingController();
   final _apController = TextEditingController(text: _defaultAP);
   final _nicknameController = TextEditingController();
   final _descController = TextEditingController();
+  String _selectedAP = _defaultAP;
+  bool _isCustomAP = false;
 
   bool _isLoading = true;
   bool _isCreating = false;
@@ -144,9 +147,9 @@ class _AgentCPPageState extends State<AgentCPPage> {
       return;
     }
 
-    // 验证名称格式（只允许字母、数字、下划线）
-    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(name)) {
-      _showMessage('名称只能包含字母、数字和下划线', isError: true);
+    // 验证名称格式（只允许英文字母和数字）
+    if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(name)) {
+      _showMessage('名称只能包含英文字母和数字', isError: true);
       return;
     }
 
@@ -172,26 +175,22 @@ class _AgentCPPageState extends State<AgentCPPage> {
       if (result['success'] == true) {
         _showMessage('AID 创建成功: $aid');
 
-        // Generate agent.md and sync to AP
+        // Generate complete agent.md and save locally
         final nickname = _nicknameController.text.trim();
         final description = _descController.text.trim();
-        final mdContent = '---\n'
-            'aid: "$aid"\n'
-            'name: "${nickname.isNotEmpty ? nickname : name}"\n'
-            'type: "human"\n'
-            'version: "1.0.0"\n'
-            'description: "${description.isNotEmpty ? description : ''}"\n'
-            '---\n';
+        final mdContent = await AgentInfoService.createDefaultHumanAgentMd(
+          aid: aid,
+          name: nickname.isNotEmpty ? nickname : null,
+          description: description,
+        );
 
-        // Save agent.md locally
-        await AgentInfoService.saveLocalAgentMd(aid, mdContent);
-
-        // Load + online, then fire-and-forget sync
+        // Load + online, then force upload agent.md
         try {
           await AgentCPService.loadAID(aid, password: '123456');
           await AgentCPService.online();
           await AgentCPService.setHandlers();
-          AgentInfoService.syncOnOnline(aid); // fire-and-forget
+          // Force upload on first creation (bypass sync check)
+          AgentInfoService.forceUploadAgentMd(aid, mdContent);
           // Initialize group client
           _initGroupClient(aid);
         } catch (e) {
@@ -383,6 +382,12 @@ class _AgentCPPageState extends State<AgentCPPage> {
               onPressed: () => Navigator.pushNamed(context, '/chat'),
               tooltip: '进入聊天',
             ),
+          if (_aidList.length < 10)
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: _showCreateDialog,
+              tooltip: '创建新身份',
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _initSDKAndLoadAIDs,
@@ -391,13 +396,6 @@ class _AgentCPPageState extends State<AgentCPPage> {
         ],
       ),
       body: _buildBody(),
-      floatingActionButton: _aidList.length < 10
-          ? FloatingActionButton(
-              onPressed: _showCreateDialog,
-              tooltip: '创建新身份',
-              child: const Icon(Icons.add),
-            )
-          : null,
     );
   }
 
@@ -593,14 +591,15 @@ class _AgentCPPageState extends State<AgentCPPage> {
         TextField(
           controller: _nameController,
           decoration: const InputDecoration(
-            labelText: '名称',
-            hintText: '例如: alice',
+            labelText: 'AID 名称',
+            hintText: '只能输入英文和数字',
             border: OutlineInputBorder(),
             prefixIcon: Icon(Icons.person),
+            prefixText: 'AID: ',
           ),
           textInputAction: TextInputAction.next,
           enabled: !_isCreating,
-          onChanged: (_) => setState(() {}), // 实时更新预览
+          onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: 16),
 
@@ -633,17 +632,8 @@ class _AgentCPPageState extends State<AgentCPPage> {
         ),
         const SizedBox(height: 16),
 
-        // AP 输入（默认值）
-        TextField(
-          controller: _apController,
-          decoration: const InputDecoration(
-            labelText: 'AP 服务器',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.cloud),
-          ),
-          enabled: !_isCreating,
-          onChanged: (_) => setState(() {}), // 实时更新预览
-        ),
+        // AP 服务器选择
+        _buildAPSelector(),
         const SizedBox(height: 12),
 
         // 预览 AID
@@ -700,10 +690,66 @@ class _AgentCPPageState extends State<AgentCPPage> {
     );
   }
 
+  /// AP 服务器选择器
+  Widget _buildAPSelector() {
+    return Column(
+      children: [
+        DropdownButtonFormField<String>(
+          value: _isCustomAP ? 'custom' : _selectedAP,
+          decoration: const InputDecoration(
+            labelText: 'AP 服务器',
+            border: OutlineInputBorder(),
+            prefixIcon: Icon(Icons.cloud),
+          ),
+          items: [
+            ..._apOptions.map((ap) => DropdownMenuItem(
+                  value: ap,
+                  child: Text(ap),
+                )),
+            const DropdownMenuItem(
+              value: 'custom',
+              child: Text('手动输入'),
+            ),
+          ],
+          onChanged: _isCreating
+              ? null
+              : (value) {
+                  setState(() {
+                    if (value == 'custom') {
+                      _isCustomAP = true;
+                      _apController.text = '';
+                    } else {
+                      _isCustomAP = false;
+                      _selectedAP = value!;
+                      _apController.text = value;
+                    }
+                  });
+                },
+        ),
+        if (_isCustomAP) ...[
+          const SizedBox(height: 12),
+          TextField(
+            controller: _apController,
+            decoration: const InputDecoration(
+              labelText: '自定义 AP 服务器',
+              hintText: '例如: example.com',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.edit),
+            ),
+            enabled: !_isCreating,
+            onChanged: (_) => setState(() {}),
+          ),
+        ],
+      ],
+    );
+  }
+
   /// 显示创建对话框（有 AID 时点击创建按钮）
   void _showCreateDialog() {
     _nameController.clear();
+    _selectedAP = _defaultAP;
     _apController.text = _defaultAP;
+    _isCustomAP = false;
     _nicknameController.clear();
     _descController.clear();
 
@@ -722,94 +768,129 @@ class _AgentCPPageState extends State<AgentCPPage> {
               top: 24,
               bottom: MediaQuery.of(context).viewInsets.bottom + 24,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '创建新 AID',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '创建新 AID',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                ),
-                const SizedBox(height: 24),
-                TextField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: '名称',
-                    hintText: '例如: alice',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                  autofocus: true,
-                  onChanged: (_) => setModalState(() {}),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _nicknameController,
-                  decoration: const InputDecoration(
-                    labelText: '昵称 (可选)',
-                    hintText: '例如: Alice Wang',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.badge),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _descController,
-                  decoration: const InputDecoration(
-                    labelText: '描述 (可选)',
-                    hintText: '简单介绍自己',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.description),
-                  ),
-                  maxLines: 2,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _apController,
-                  decoration: const InputDecoration(
-                    labelText: 'AP 服务器',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.cloud),
-                  ),
-                  onChanged: (_) => setModalState(() {}),
-                ),
-                const SizedBox(height: 12),
-                if (_nameController.text.isNotEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 24),
+                  TextField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'AID 名称',
+                      hintText: '只能输入英文和数字',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.person),
+                      prefixText: 'AID: ',
                     ),
-                    child: Text(
-                      '${_nameController.text}.${_apController.text}',
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontWeight: FontWeight.bold,
+                    autofocus: true,
+                    onChanged: (_) => setModalState(() {}),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _nicknameController,
+                    decoration: const InputDecoration(
+                      labelText: '昵称 (可选)',
+                      hintText: '例如: Alice Wang',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.badge),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _descController,
+                    decoration: const InputDecoration(
+                      labelText: '描述 (可选)',
+                      hintText: '简单介绍自己',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.description),
+                    ),
+                    maxLines: 2,
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: _isCustomAP ? 'custom' : _selectedAP,
+                    decoration: const InputDecoration(
+                      labelText: 'AP 服务器',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.cloud),
+                    ),
+                    items: [
+                      ..._apOptions.map((ap) => DropdownMenuItem(
+                            value: ap,
+                            child: Text(ap),
+                          )),
+                      const DropdownMenuItem(
+                        value: 'custom',
+                        child: Text('手动输入'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setModalState(() {
+                        if (value == 'custom') {
+                          _isCustomAP = true;
+                          _apController.text = '';
+                        } else {
+                          _isCustomAP = false;
+                          _selectedAP = value!;
+                          _apController.text = value;
+                        }
+                      });
+                      setState(() {});
+                    },
+                  ),
+                  if (_isCustomAP) ...[
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _apController,
+                      decoration: const InputDecoration(
+                        labelText: '自定义 AP 服务器',
+                        hintText: '例如: example.com',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.edit),
+                      ),
+                      onChanged: (_) => setModalState(() {}),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  if (_nameController.text.isNotEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${_nameController.text}.${_apController.text}',
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _createAID();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Colors.deepPurple,
-                      foregroundColor: Colors.white,
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _createAID();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('创建'),
                     ),
-                    child: const Text('创建'),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

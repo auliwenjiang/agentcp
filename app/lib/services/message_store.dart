@@ -214,4 +214,49 @@ class MessageStore {
     if (trimmed.isEmpty) return '';
     return trimmed;
   }
+
+  // ── Group list cache ──
+
+  String _getGroupsPath(String aid) {
+    return path.join(_basePath!, 'AIDs', aid, 'sessions', '_groups.json');
+  }
+
+  Future<void> saveGroupList(String ownerAid, List<Map<String, dynamic>> groups) async {
+    if (_basePath == null) await init();
+    await _ensureDir(_getSessionsDir(ownerAid));
+    final file = File(_getGroupsPath(ownerAid));
+    await file.writeAsString(jsonEncode(groups));
+  }
+
+  Future<List<Map<String, dynamic>>> loadGroupList(String ownerAid) async {
+    if (_basePath == null) await init();
+    final file = File(_getGroupsPath(ownerAid));
+    if (!await file.exists()) return [];
+    try {
+      final content = await file.readAsString();
+      return List<Map<String, dynamic>>.from(jsonDecode(content));
+    } catch (e) {
+      print('[MessageStore] Error loading group list: $e');
+      return [];
+    }
+  }
+
+  Future<void> upsertGroup(String ownerAid, Map<String, dynamic> group) async {
+    final groups = await loadGroupList(ownerAid);
+    final groupId = group['groupId'] ?? '';
+    if (groupId.isEmpty) return;
+    final idx = groups.indexWhere((g) => g['groupId'] == groupId);
+    if (idx >= 0) {
+      groups[idx] = {...groups[idx], ...group};
+    } else {
+      groups.add(group);
+    }
+    await saveGroupList(ownerAid, groups);
+  }
+
+  Future<void> removeGroup(String ownerAid, String groupId) async {
+    final groups = await loadGroupList(ownerAid);
+    groups.removeWhere((g) => g['groupId'] == groupId);
+    await saveGroupList(ownerAid, groups);
+  }
 }

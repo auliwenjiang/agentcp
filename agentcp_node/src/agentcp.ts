@@ -743,6 +743,32 @@ class AgentCP implements IAgentCP {
     // ============================================================
 
     /**
+     * 将群组加入在线列表（不发送网络请求）。
+     */
+    public addOnlineGroup(groupId: string): void {
+        this._onlineGroups.add(groupId);
+    }
+
+    /**
+     * 确保群组心跳定时器已启动（公开方法）。
+     */
+    public ensureGroupHeartbeat(): void {
+        this._ensureHeartbeat();
+    }
+
+    /**
+     * 向 group.ap 发送一次 register_online，告知当前客户端在线。
+     * 不带群组 ID，只需在启动或重连时调用一次。
+     */
+    public async groupRegisterOnline(): Promise<void> {
+        if (!this.groupOps || !this._groupTargetAid) {
+            throw new Error('群组客户端未初始化，请先调用 initGroupClient');
+        }
+        await this.groupOps.registerOnline(this._groupTargetAid);
+        logger.log(`[Group] registerOnline: 已通知 group.ap 在线`);
+    }
+
+    /**
      * 加入群组会话（完整生命周期）：
      * 1. register_online → 告知 group.ap 在线
      * 2. 将群组加入在线列表
@@ -753,13 +779,15 @@ class AgentCP implements IAgentCP {
             throw new Error('群组客户端未初始化，请先调用 initGroupClient');
         }
 
-        // Step 1: register_online（仅通知 group.ap 在线，不再返回游标）
-        await this.groupOps.registerOnline(this._groupTargetAid);
+        // 如果还没有在线群组，说明是首次加入，需要先 registerOnline
+        if (this._onlineGroups.size === 0) {
+            await this.groupOps.registerOnline(this._groupTargetAid);
+        }
         this._onlineGroups.add(groupId);
 
         logger.log(`[Group] joinGroupSession: group=${groupId}`);
 
-        // Step 2: 冷启动同步 — 拉取历史消息对齐，再进入批推送接收
+        // 冷启动同步 — 拉取历史消息对齐，再进入批推送接收
         try {
             const lastMsgId = this.getGroupLastMsgId(groupId);
             await this.pullAndStoreGroupMessages(groupId, lastMsgId, 50);
@@ -767,7 +795,7 @@ class AgentCP implements IAgentCP {
             logger.warn(`[Group] cold-start sync failed: group=${groupId}`, e.message || e);
         }
 
-        // Step 3: 启动心跳定时器（首次加入群组时启动）
+        // 启动心跳定时器（首次加入群组时启动）
         this._ensureHeartbeat();
     }
 

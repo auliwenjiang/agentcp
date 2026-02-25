@@ -1,11 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../i18n/app_language.dart';
+import '../i18n/app_texts.dart';
+import '../services/app_lifecycle_service.dart';
 import '../services/agentcp_service.dart';
 import '../services/agent_info_service.dart';
+import '../services/message_store.dart';
 import '../widgets/group_avatar_widget.dart';
 import 'agentcp_page.dart';
 import 'chat_detail_page.dart';
 import 'group_chat_detail_page.dart';
+import 'create_group_page.dart';
 
 enum ChatType {
   p2p,
@@ -46,7 +51,7 @@ class _ChatPageState extends State<ChatPage> {
   List<GroupItem> _groupSessions = [];
   
   String? _currentAid;
-  bool _isConnected = false;
+  bool _isSyncing = false;
   
   AgentInfo? _currentAgentInfo;
   final Map<String, AgentInfo> _peerAgentInfoCache = {};
@@ -71,21 +76,23 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> _init() async {
     final aid = await AgentCPService.getCurrentAID();
-    final online = await AgentCPService.isOnline();
     setState(() {
       _currentAid = aid;
-      _isConnected = online;
     });
 
     if (aid != null) {
       // Set SDK handlers for both P2P and Group
       await AgentCPService.setGroupHandlers();
-      
+
+      // Load from local cache first (fast)
       await Future.wait([
         _loadP2PSessions(),
-        _loadGroupSessions(),
+        _loadGroupSessionsFromCache(),
       ]);
-      
+
+      // Then sync from server (login scenario)
+      _syncGroupSessionsFromServer();
+
       final agentInfo = await AgentInfoService().getAgentInfo(aid);
       setState(() {
         _currentAgentInfo = agentInfo;
@@ -110,32 +117,41 @@ class _ChatPageState extends State<ChatPage> {
     };
 
     AgentCPService.onStateChanged = (oldState, newState) {
-      setState(() {
-        _isConnected = newState == 3;
-      });
+      // Auto-reconnect: if state changed from Online(3) to Offline(0),
+      // attempt to reconnect after a short delay
+      if (oldState == 3 && newState == 0) {
+        debugPrint('[ChatPage] Connection lost, attempting auto-reconnect...');
+        Future.delayed(const Duration(seconds: 2), () async {
+          final stillOffline = !(await AgentCPService.isOnline());
+          if (stillOffline && _currentAid != null) {
+            debugPrint('[ChatPage] Still offline, calling online()...');
+            await AgentCPService.online();
+          }
+        });
+      }
     };
 
     // Group Listeners
     AgentCPService.onGroupMessageBatch = (groupId, batchJson) {
-      _loadGroupSessions();
+      _loadGroupSessionsFromCache();
     };
 
     AgentCPService.onGroupNewMessage = (groupId, latestMsgId, sender, preview) {
-      _loadGroupSessions();
+      _loadGroupSessionsFromCache();
     };
 
     AgentCPService.onGroupInvite = (groupId, groupAddress, invitedBy) {
-      _showSnack('Received group invite from $invitedBy');
-      _loadGroupSessions();
+      _showSnack(AppTexts.receivedGroupInvite(context, invitedBy));
+      _syncGroupSessionsFromServer();
     };
 
     AgentCPService.onGroupJoinApproved = (groupId, groupAddress) {
-      _showSnack('Join approved for group $groupId');
+      _showSnack(AppTexts.joinApprovedForGroup(context, groupId));
       // Finalize: join group session for real-time messages
       AgentCPService.joinGroupSession(groupId).then((_) {
-        _loadGroupSessions();
+        _syncGroupSessionsFromServer();
       }).catchError((_) {
-        _loadGroupSessions();
+        _syncGroupSessionsFromServer();
       });
     };
 
@@ -203,7 +219,30 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
   
-  Future<void> _loadGroupSessions() async {
+  /// Load group list from local cache only (fast, no network).
+  Future<void> _loadGroupSessionsFromCache() async {
+    if (_currentAid == null) return;
+    final cached = await MessageStore().loadGroupList(_currentAid!);
+    if (cached.isEmpty) return;
+    final groups = cached.map((g) => GroupItem(
+      groupId: g['groupId'] ?? '',
+      groupName: g['groupName'] ?? '',
+      lastMsgTime: g['lastMsgTime'] ?? 0,
+      unreadCount: g['unreadCount'] ?? 0,
+      lastMsgPreview: g['lastMsgPreview'] ?? '',
+      memberAids: List<String>.from(g['memberAids'] ?? []),
+    )).where((g) => g.groupId.isNotEmpty).toList();
+    if (mounted) {
+      setState(() { _groupSessions = groups; });
+    }
+  }
+
+  /// Sync group list from server, update local cache. Called on login and force refresh.
+  Future<void> _syncGroupSessionsFromServer() async {
+    if (_currentAid == null) return;
+    if (_isSyncing) return;
+    setState(() => _isSyncing = true);
+
     final localGroupIds = <String>{};
     final allGroups = <GroupItem>[];
 
@@ -246,7 +285,6 @@ class _ChatPageState extends State<ChatPage> {
               const ['name', 'group_name', 'groupName'],
             );
             if (localGroupIds.contains(groupId)) {
-              // Update group name if local value is still placeholder-like.
               final idx = allGroups.indexWhere((item) => item.groupId == groupId);
               if (idx >= 0 &&
                   _shouldResolveGroupName(allGroups[idx].groupName, groupId) &&
@@ -294,7 +332,6 @@ class _ChatPageState extends State<ChatPage> {
       } catch (e) {
         debugPrint('[ChatList] fetch group last msg failed for ${g.groupId}: $e');
       }
-      // Fetch members for group avatar (up to 9)
       try {
         final membersResult = await AgentCPService.groupGetMembers(g.groupId);
         if (membersResult['success'] == true && membersResult['data'] != null) {
@@ -316,7 +353,6 @@ class _ChatPageState extends State<ChatPage> {
       } catch (e) {
         debugPrint('[ChatList] fetch group members failed for ${g.groupId}: $e');
       }
-      // Fetch group name from server if still empty
       String groupName = g.groupName;
       if (_shouldResolveGroupName(groupName, g.groupId)) {
         try {
@@ -343,8 +379,22 @@ class _ChatPageState extends State<ChatPage> {
       ));
     }
 
+    // 4. Save to local cache
+    final cacheList = groupsWithPreview.map((g) => {
+      'groupId': g.groupId,
+      'groupName': g.groupName,
+      'lastMsgTime': g.lastMsgTime,
+      'unreadCount': g.unreadCount,
+      'lastMsgPreview': g.lastMsgPreview,
+      'memberAids': g.memberAids,
+    }).toList();
+    await MessageStore().saveGroupList(_currentAid!, cacheList);
+
     if (mounted) {
-      setState(() { _groupSessions = groupsWithPreview; });
+      setState(() {
+        _groupSessions = groupsWithPreview;
+        _isSyncing = false;
+      });
     }
   }
 
@@ -396,7 +446,7 @@ class _ChatPageState extends State<ChatPage> {
             children: [
               ListTile(
                 leading: const Icon(Icons.person),
-                title: const Text('New P2P Chat'),
+                title: Text(AppTexts.newP2PChat(context)),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showConnectDialog();
@@ -404,7 +454,7 @@ class _ChatPageState extends State<ChatPage> {
               ),
               ListTile(
                 leading: const Icon(Icons.group_add),
-                title: const Text('Create Group Chat'),
+                title: Text(AppTexts.createGroupChat(context)),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showCreateGroupDialog();
@@ -412,18 +462,10 @@ class _ChatPageState extends State<ChatPage> {
               ),
               ListTile(
                 leading: const Icon(Icons.login),
-                title: const Text('Join Group Chat'),
+                title: Text(AppTexts.joinGroupChat(context)),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showJoinGroupDialog();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.search),
-                title: const Text('Search Groups'),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _showSearchGroupDialog();
                 },
               ),
             ],
@@ -438,20 +480,20 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Connect to Peer'),
+        title: Text(AppTexts.connectToPeerTitle(context)),
         content: TextField(
           controller: peerController,
-          decoration: const InputDecoration(
-            labelText: 'Peer AID',
-            hintText: 'e.g. alice.aid.pub',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: AppTexts.peerAidLabel(context),
+            hintText: AppTexts.peerAidHint(context),
+            border: const OutlineInputBorder(),
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(AppTexts.cancel(context)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -460,7 +502,7 @@ class _ChatPageState extends State<ChatPage> {
               Navigator.pop(ctx);
               await _connectToPeer(peerAid);
             },
-            child: const Text('Connect'),
+            child: Text(AppTexts.connectButton(context)),
           ),
         ],
       ),
@@ -470,7 +512,7 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _connectToPeer(String peerAid) async {
     final createResult = await AgentCPService.createSession([peerAid]);
     if (createResult['success'] != true) {
-      _showSnack('Failed to create session: ${createResult['message']}');
+      _showSnack(AppTexts.createSessionFailed(context, '${createResult['message']}'));
       return;
     }
     final sessionId = createResult['sessionId'] as String;
@@ -482,103 +524,33 @@ class _ChatPageState extends State<ChatPage> {
     _navigateToChatDetail(session);
   }
   
-  void _showCreateGroupDialog() {
-    final nameCtrl = TextEditingController();
-    final aliasCtrl = TextEditingController();
-    final subjectCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
-    final tagsCtrl = TextEditingController();
-    String visibility = 'public';
-
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) {
-          return AlertDialog(
-            title: const Text('Create Group'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Group Name (required)', border: OutlineInputBorder()), autofocus: true),
-                  const SizedBox(height: 12),
-                  TextField(controller: aliasCtrl, decoration: const InputDecoration(labelText: 'Alias (optional)', border: OutlineInputBorder())),
-                  const SizedBox(height: 12),
-                  TextField(controller: subjectCtrl, decoration: const InputDecoration(labelText: 'Subject (optional)', border: OutlineInputBorder())),
-                  const SizedBox(height: 12),
-                  TextField(controller: descCtrl, decoration: const InputDecoration(labelText: 'Description (optional)', border: OutlineInputBorder())),
-                  const SizedBox(height: 12),
-                  TextField(controller: tagsCtrl, decoration: const InputDecoration(labelText: 'Tags (comma separated)', border: OutlineInputBorder())),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    value: visibility,
-                    decoration: const InputDecoration(labelText: 'Visibility', border: OutlineInputBorder()),
-                    items: const [
-                      DropdownMenuItem(value: 'public', child: Text('Public')),
-                      DropdownMenuItem(value: 'private', child: Text('Private')),
-                      DropdownMenuItem(value: 'internal', child: Text('Internal')),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) setDialogState(() => visibility = val);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-              ElevatedButton(
-                onPressed: () async {
-                  final name = nameCtrl.text.trim();
-                  if (name.isEmpty) {
-                    _showSnack('Group name is required');
-                    return;
-                  }
-                  Navigator.pop(ctx);
-                  
-                  // Parse tags
-                  final tagsText = tagsCtrl.text.trim();
-                  final tagsList = tagsText.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-                  final tagsJson = tagsList.isNotEmpty ? jsonEncode(tagsList) : '';
-
-                  final result = await AgentCPService.groupCreateGroup(
-                    name: name, 
-                    alias: aliasCtrl.text.trim(),
-                    subject: subjectCtrl.text.trim(),
-                    description: descCtrl.text.trim(),
-                    visibility: visibility,
-                    tags: tagsJson,
-                  );
-                  
-                  if (result['success'] == true) {
-                    final groupId = result['groupId'] ?? '';
-                    if (groupId.isNotEmpty) {
-                      await AgentCPService.joinGroupSession(groupId);
-                    }
-                    _showSnack('Group created');
-                    await _loadGroupSessions();
-                  } else {
-                    _showSnack('Create failed: ${result['message']}');
-                  }
-                },
-                child: const Text('Create'),
-              ),
-            ],
-          );
-        },
-      ),
+  void _showCreateGroupDialog() async {
+    final created = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => const CreateGroupPage()),
     );
+    if (created == true) {
+      _showSnack(AppTexts.groupCreated(context));
+      await _syncGroupSessionsFromServer();
+    }
   }
-  
+
   void _showJoinGroupDialog() {
     final urlCtrl = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Join Group'),
-        content: TextField(controller: urlCtrl, decoration: const InputDecoration(labelText: 'Group URL', border: OutlineInputBorder()), autofocus: true),
+        title: Text(AppTexts.joinGroupTitle(context)),
+        content: TextField(
+          controller: urlCtrl,
+          decoration: InputDecoration(
+            labelText: AppTexts.groupUrlLabel(context),
+            border: const OutlineInputBorder(),
+          ),
+          autofocus: true,
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppTexts.cancel(context))),
           ElevatedButton(
             onPressed: () async {
               final url = urlCtrl.text.trim();
@@ -589,8 +561,12 @@ class _ChatPageState extends State<ChatPage> {
                 final groupId = result['groupId'] ?? '';
                 final groupName = result['groupName'] ?? groupId;
                 final pending = result['pending'] == true;
-                _showSnack(pending ? 'Join request sent, waiting for approval' : 'Joined group successfully');
-                await _loadGroupSessions();
+                _showSnack(
+                  pending
+                      ? AppTexts.joinRequestSentWaiting(context)
+                      : AppTexts.joinedGroupSuccessfully(context),
+                );
+                await _syncGroupSessionsFromServer();
                 // If group not in list yet (server propagation delay), add it manually
                 if (!pending && groupId.isNotEmpty && !_groupSessions.any((g) => g.groupId == groupId)) {
                   setState(() {
@@ -610,95 +586,16 @@ class _ChatPageState extends State<ChatPage> {
                   }
                 }
               } else {
-                _showSnack('Join failed: ${result['message']}');
+                _showSnack(AppTexts.joinFailed(context, '${result['message']}'));
               }
             },
-            child: const Text('Join'),
+            child: Text(AppTexts.joinButton(context)),
           ),
         ],
       ),
     );
   }
   
-  void _showSearchGroupDialog() {
-    final keywordCtrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) {
-          List<dynamic> searchResults = [];
-          return AlertDialog(
-            title: const Text('Search Groups'),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(child: TextField(controller: keywordCtrl, decoration: const InputDecoration(labelText: 'Keyword', border: OutlineInputBorder()))),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () async {
-                          final result = await AgentCPService.groupSearchGroups(keyword: keywordCtrl.text.trim());
-                          if (result['success'] == true && result['data'] != null) {
-                            try {
-                              final data = result['data'] is String ? jsonDecode(result['data']) : result['data'];
-                              setDialogState(() { searchResults = data is List ? data : []; });
-                            } catch (_) {
-                              setDialogState(() { searchResults = []; });
-                            }
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                  if (searchResults.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: 200,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: searchResults.length,
-                        itemBuilder: (_, i) {
-                          final g = Map<String, dynamic>.from(searchResults[i]);
-                          return ListTile(
-                            title: Text(g['name'] ?? g['group_id'] ?? ''),
-                            subtitle: Text(g['description'] ?? ''),
-                            trailing: TextButton(
-                              child: const Text('Join'),
-                              onPressed: () async {
-                                final url = g['group_url'] ?? '';
-                                if (url.isNotEmpty) {
-                                  final joinResult = await AgentCPService.groupJoinByUrl(groupUrl: url);
-                                  final pending = joinResult['pending'] == true;
-                                  final groupId = joinResult['groupId'] ?? '';
-                                  if (!pending && groupId.isNotEmpty) {
-                                    try { await AgentCPService.joinGroupSession(groupId); } catch (_) {}
-                                  }
-                                  _showSnack(pending ? 'Join request sent' : 'Joined group successfully');
-                                  await _loadGroupSessions();
-                                }
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
@@ -716,19 +613,19 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Leave Group'),
-        content: const Text('Are you sure you want to leave this group?'),
+        title: Text(AppTexts.leaveGroupTitle(context)),
+        content: Text(AppTexts.leaveGroupConfirm(context)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppTexts.cancel(context))),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
               await AgentCPService.groupLeaveGroup(groupId);
-              await _loadGroupSessions();
-              _showSnack('Left group');
+              await _syncGroupSessionsFromServer();
+              _showSnack(AppTexts.leftGroup(context));
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Leave'),
+            child: Text(AppTexts.leaveButton(context)),
           ),
         ],
       ),
@@ -794,8 +691,8 @@ class _ChatPageState extends State<ChatPage> {
     return '';
   }
 
-  void _navigateToChatDetail(SessionItem session) {
-    Navigator.push(
+  void _navigateToChatDetail(SessionItem session) async {
+    final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
         builder: (_) => ChatDetailPage(
@@ -803,9 +700,41 @@ class _ChatPageState extends State<ChatPage> {
           currentAid: _currentAid ?? '',
         ),
       ),
-    ).then((_) {
-      setState(() {});
-    });
+    );
+
+    if (!mounted) return;
+
+    if (result != null) {
+      final action = result['action'] as String?;
+      final newSession = result['session'] as SessionItem?;
+
+      if (action == 'new_session' && newSession != null) {
+        // Add the new session to the list and navigate to it
+        setState(() {
+          _findOrCreateSession(newSession.sessionId, newSession.peerAid);
+        });
+        _navigateToChatDetail(
+          _p2pSessions.firstWhere((s) => s.sessionId == newSession.sessionId),
+        );
+        return;
+      }
+
+      if (action == 'switch_session' && newSession != null) {
+        // Add/update the session in the list and navigate to it
+        setState(() {
+          final existing = _p2pSessions.where((s) => s.sessionId == newSession.sessionId);
+          if (existing.isEmpty) {
+            _p2pSessions.add(newSession);
+          }
+        });
+        _navigateToChatDetail(
+          _p2pSessions.firstWhere((s) => s.sessionId == newSession.sessionId),
+        );
+        return;
+      }
+    }
+
+    setState(() {});
   }
   
   void _navigateToGroupChatDetail(GroupItem group) {
@@ -818,7 +747,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     ).then((_) {
-      _loadGroupSessions(); // Refresh group state when popping back
+      _loadGroupSessionsFromCache(); // Refresh group state when popping back
     });
   }
 
@@ -868,30 +797,103 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     final unifiedSessions = _getUnifiedList();
 
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await AppLifecycleService.moveTaskToBack();
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
-        title: const Text('Chats'),
+        title: Text(AppTexts.chatsTitle(context)),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.circle, size: 12,
-                color: _isConnected ? Colors.green : Colors.grey),
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: _showLanguageDialog,
+            tooltip: AppTexts.languageMenuLabel(context),
+          ),
+          IconButton(
+            icon: _isSyncing
+                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.refresh),
+            tooltip: AppTexts.forceRefreshTooltip(context),
+            onPressed: _isSyncing ? null : _syncGroupSessionsFromServer,
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _showNewChatMenu,
+            tooltip: AppTexts.startNewChat(context),
           ),
         ],
       ),
       drawer: _buildDrawer(),
       body: _buildSessionList(unifiedSessions),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showNewChatMenu,
-        child: const Icon(Icons.add),
       ),
     );
+  }
+
+  Future<void> _showLanguageDialog() async {
+    final languageController = AppLanguageScope.of(context);
+    var selected = languageController.language;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Text(AppTexts.languageDialogTitle(context)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<AppLanguage>(
+                value: AppLanguage.en,
+                groupValue: selected,
+                title: Text(AppTexts.languageOptionEnglish(context)),
+                onChanged: (value) {
+                  if (value == null) return;
+                  setDialogState(() => selected = value);
+                },
+              ),
+              RadioListTile<AppLanguage>(
+                value: AppLanguage.zh,
+                groupValue: selected,
+                title: Text(AppTexts.languageOptionChinese(context)),
+                onChanged: (value) {
+                  if (value == null) return;
+                  setDialogState(() => selected = value);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(AppTexts.cancel(context)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(AppTexts.save(context)),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed != true) return;
+    await languageController.setLanguage(selected);
+    if (!mounted) return;
+
+    final switchedMsg = selected == AppLanguage.zh
+        ? AppTexts.languageChangedToChinese(context)
+        : AppTexts.languageChangedToEnglish(context);
+    final path = languageController.getPersistedLocationLabel();
+    final persistedMsg = AppTexts.languagePersistedTip(context, path);
+    _showSnack('$switchedMsg\n$persistedMsg');
   }
 
   Widget _buildDrawer() {
@@ -931,16 +933,6 @@ class _ChatPageState extends State<ChatPage> {
                         Text(_currentAid!,
                             style: const TextStyle(fontSize: 12, color: Colors.white70)),
                       const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.circle, size: 8,
-                              color: _isConnected ? Colors.greenAccent : Colors.redAccent),
-                          const SizedBox(width: 4),
-                          Text(_isConnected ? 'Online' : 'Offline',
-                              style: TextStyle(fontSize: 12,
-                                  color: _isConnected ? Colors.greenAccent : Colors.redAccent)),
-                        ],
-                      ),
                     ],
                   ),
                 ),
@@ -949,7 +941,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
           ListTile(
             leading: const Icon(Icons.manage_accounts),
-            title: const Text('Identity Management'),
+            title: Text(AppTexts.identityManagementEntry(context)),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -962,7 +954,7 @@ class _ChatPageState extends State<ChatPage> {
           const Divider(),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text('AgentCP App', style: TextStyle(color: Colors.grey[400])),
+            child: Text(AppTexts.appNameSubtitle(context), style: TextStyle(color: Colors.grey[400])),
           )
         ],
       ),
@@ -977,10 +969,10 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey[300]),
             const SizedBox(height: 16),
-            Text('No chats yet.', style: TextStyle(color: Colors.grey[500])),
+            Text(AppTexts.noChatsYet(context), style: TextStyle(color: Colors.grey[500])),
             TextButton(
               onPressed: _showNewChatMenu,
-              child: const Text('Start a new chat'),
+              child: Text(AppTexts.startNewChat(context)),
             ),
           ],
         ),
@@ -1086,12 +1078,12 @@ class _ChatPageState extends State<ChatPage> {
               showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Delete Chat'),
-                  content: const Text('Are you sure you want to delete this chat session?'),
+                  title: Text(AppTexts.deleteChatTitle(context)),
+                  content: Text(AppTexts.deleteChatConfirm(context)),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Cancel'),
+                      child: Text(AppTexts.cancel(context)),
                     ),
                     TextButton(
                       onPressed: () {
@@ -1099,7 +1091,7 @@ class _ChatPageState extends State<ChatPage> {
                         _deleteSession(item.id);
                       },
                       style: TextButton.styleFrom(foregroundColor: Colors.red),
-                      child: const Text('Delete'),
+                      child: Text(AppTexts.deleteButton(context)),
                     ),
                   ],
                 ),

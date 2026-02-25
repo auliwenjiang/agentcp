@@ -83,7 +83,7 @@ class GroupItem {
 /// 提供 AgentCP SDK 的 Flutter 接口，封装与原生平台的通信
 class AgentCPService {
   static const MethodChannel _channel =
-      MethodChannel('com.example.evol/agentcp');
+      MethodChannel('com.agent.acp/agentcp');
 
   // Callback holders for native → Dart events
   static Function(ChatMessage)? onMessageReceived;
