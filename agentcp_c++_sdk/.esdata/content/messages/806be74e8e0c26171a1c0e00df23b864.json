@@ -1,7 +1,0 @@
-{
-  "text": "PS C:\\Users\\liwenjiang> claude mcp add-json \"webSearchMcp\" '{\"url\":\"http://localhost:9151/mcp\",\"transport\":\"http\"}'\n\nInvalid configuration: : Invalid input",
-  "files": [],
-  "links": [],
-  "search": false,
-  "think": false
-}

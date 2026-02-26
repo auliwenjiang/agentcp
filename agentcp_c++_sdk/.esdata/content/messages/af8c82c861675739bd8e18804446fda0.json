@@ -1,7 +1,0 @@
-{
-  "text": "API Error: Cannot convert argunent to a ByteString because the character at index 7 has a value of 28003 which isgreater than 255.",
-  "files": [],
-  "links": [],
-  "search": false,
-  "think": false
-}

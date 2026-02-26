@@ -32,6 +32,9 @@ agentcp_c++_sdk/android/gtest_src/
 *.swp
 *.swo
 
+# ES data (runtime)
+.esdata/
+
 # Project specific
 /aid/
 data/mu/

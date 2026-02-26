@@ -1,8 +1,0 @@
-[
-  {
-    "type": "content",
-    "content": "在 macOS 中，Claude 的用户目录通常位于：\n\n**标准位置：**\n```\n~/Library/Application Support/Claude/\n```\n\n**访问方法：**\n\n1. **通过 Finder：**\n   - 打开 Finder\n   - 按 `Shift + Command + G`\n   - 输入 `~/Library/Application Support/Claude/`\n   - 点击\"前往\"\n\n2. **通过终端：**\n   ```bash\n   open ~/Library/Application\\ Support/Claude/\n   ```\n\n3. **如果找不到：**\n   - 有些版本的 Claude 可能使用不同的路径，可以尝试：\n     ```bash\n     find ~ -name \"*claude*\" -type d 2>/dev/null\n     ```\n   - 或者查看应用程序包内容：\n     ```bash\n     ls -la /Applications/Claude.app/Contents/\n     ```\n\n**注意：**\n- `~` 代表当前用户的主目录（如 `/Users/你的用户名/`）\n- 如果 Claude 是浏览器版本，则没有本地用户目录，数据存储在浏览器中\n- 如果是桌面应用，上述路径应该存在\n\n你需要找什么特定的文件吗？我可以提供更具体的帮助。",
-    "status": "success",
-    "timestamp": 1771924158156
-  }
-]
