@@ -2498,13 +2498,22 @@ const chatHtml = `<!DOCTYPE html>
                 var r=await fetch('/api/group/invite-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({groupId:S.activeGroupId,aid:S.aid})});
                 var d=await r.json();
                 if(d.success&&d.code){
-                    var baseUrl=d.group_url||('https://'+S.groupTargetAid+'/'+S.activeGroupId);
-                    var inviteUrl=baseUrl+'?code='+d.code;
-                    try {
-                        await navigator.clipboard.writeText(inviteUrl);
-                        alert('邀请链接已复制到剪贴板\\n\\n'+inviteUrl);
-                    } catch(e){
-                        prompt('请手动复制邀请链接:',inviteUrl);
+                    var shareText=d.share_text||'';
+                    var inviteUrl=d.invite_url||'';
+                    if(shareText){
+                        try {
+                            await navigator.clipboard.writeText(shareText);
+                            alert('分享文案已复制到剪贴板\\n\\n'+shareText);
+                        } catch(e){
+                            prompt('请手动复制分享文案:',shareText);
+                        }
+                    } else if(inviteUrl){
+                        try {
+                            await navigator.clipboard.writeText(inviteUrl);
+                            alert('邀请链接已复制到剪贴板\\n\\n'+inviteUrl);
+                        } catch(e){
+                            prompt('请手动复制邀请链接:',inviteUrl);
+                        }
                     }
                 } else { alert(d.error||'生成邀请码失败'); }
             } catch(e){ alert('生成邀请码失败: '+e.message); }
@@ -3461,7 +3470,26 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
             const result = await instance.agentCP.groupOps!.createInviteCode(
                 instance.groupTargetAid, groupId, body.options);
             const groupUrl = `https://${instance.groupTargetAid}/${groupId}`;
-            sendJson(res, { success: true, ...result, group_url: groupUrl });
+            const inviteUrl = `${groupUrl}?code=${result.code}`;
+
+            // 获取群名称
+            let groupName = '群聊';
+            try {
+                const info = await instance.agentCP.groupOps!.getGroupInfo(instance.groupTargetAid, groupId);
+                groupName = info.name || '群聊';
+            } catch (_) {}
+
+            // 生成分享文案
+            const userProfileUrl = `https://${aid}`;
+            const shareText = `我加入了Agent互联网，访问${userProfileUrl}查看我的个人信息，快来加入${groupName}[${inviteUrl}]一起聊天吧`;
+
+            sendJson(res, {
+                success: true,
+                ...result,
+                group_url: groupUrl,
+                invite_url: inviteUrl,
+                share_text: shareText
+            });
         } catch (e: any) {
             sendJson(res, { success: false, error: e.message });
         }

@@ -74,7 +74,7 @@ allprojects {
         mavenCentral()
         // 添加 AgentCP SDK 本地 Maven 仓库
         maven {
-            url = uri("H:/project/agentcp-so/android/build/repo")
+            url = uri("H:/project/evol_main/evol_app/agentcp-so/android/build/repo")
         }
     }
 }

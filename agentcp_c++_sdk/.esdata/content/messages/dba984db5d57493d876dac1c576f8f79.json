@@ -1,0 +1,908 @@
+[
+  {
+    "type": "content",
+    "content": "我来帮你搜索整理龙虾的安装部署使用教程。让我先搜索相关信息。",
+    "status": "success",
+    "timestamp": 1770000122345
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"query\": \"龙虾 安装 部署 使用教程\", \"num_results\": 10}",
+    "status": "success",
+    "timestamp": 1770000126012,
+    "tool_call": {
+      "name": "evolweb_search",
+      "id": "call_00_tAqYpFT0J932IHIXdU5Y6KEf",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\": \"龙虾 安装 部署 使用教程\", \"num_results\": 10}",
+              "name": "evolweb_search"
+            },
+            "type": "function",
+            "id": "call_00_tAqYpFT0J932IHIXdU5Y6KEf"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"query\": \"龙虾 安装 部署 使用教程\",\n    \"engine\": \"baidu\",\n    \"results\": [\n      {\n        \"title\": \"龙虾 安装 部署 使用教程 - 视频大全 - 高清在线观看\",\n        \"url\": \"https://www.baidu.com/sf/vsearch?pd=video&wd=%E9%BE%99%E8%99%BE%20%E5%AE%89%E8%A3%85%20%E9%83%A8%E7%BD%B2%20%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B&tn=vsearch&lid=9664cfaf02ecb93b&ie=utf-8&rsv_pq=9664cfaf02ecb93b&rsv_spt=5&rsv_bp=1&f=8&atn=index\",\n        \"snippet\": \"\"\n      },\n      {\n        \"title\": \"龙虾 安装 部署 使用教程 - 百度图片\",\n        \"url\": \"https://image.baidu.com/search/index?tn=baiduimage&ct=201326592&lm=-1&cl=2&ie=utf8&sa=vs_ala_img&fr=ala&ala=1&alatpl=normal&pos=3&dyTabStr=MCwzLDEsMiwxMyw3LDYsNSwxMiw5&word=%E9%BE%99%E8%99%BE%20%E5%AE%89%E8%A3%85%20%E9%83%A8%E7%BD%B2%20%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B&lid=9664cfaf02ecb93b&topic=%E9%BE%99%E8%99%BE%20%E5%AE%89%E8%A3%85%20%E9%83%A8%E7%BD%B2%20%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B\",\n        \"snippet\": \"龙虾 安装 部署 使用教程\"\n      },\n      {\n        \"title\": \"用飞牛NAS部署Cladbot(Openclad)小龙虾全能 部署文档再群里,科技...\",\n        \"url\": \"http://www.baidu.com/link?url=rzFcbiBeTPNfB4sXWQA8YY7MFQCkLC6O7uK7q311lboXFLyFqt_puMPhqk_0CkFcI4r1tl800Dt5U-wh2ZodRpVFmKPIZ881wy76gLV2Cki\",\n        \"snippet\": \"用飞牛NAS部署Cladbot(Openclad)小龙虾全能 部署文档再群里,科技...\"\n      },\n      {\n        \"title\": \"用飞牛NAS部署Cladbot(Openclad)小龙虾全能 部署文档再群里_网络...\",\n        \"url\": \"http://www.baidu.com/link?url=rzFcbiBeTPNfB4sXWQA8YVsVln_qHa6102L16B5xdjbBu74Q9e7CzExOECWpK1wz\",\n        \"snippet\": \"用飞牛NAS部署Cladbot(Openclad)小龙虾全能 部署文档再群里_网络...\"\n      },\n      {\n        \"title\": \"Longhorn安装部署完全指南:从零开始搭建存储系统-CSDN博客\",\n        \"url\": \"http://www.baidu.com/link?url=BgRc0Ot3pj53SJs36wm1jPkgGUW_5oYgg30wzK11Yuz1p4QdR2xMgQjYz2UKmWLIa69mn8D9kQPetSpDl8P-JCbjl37dx6WWkfykplG1-IS\",\n        \"snippet\": \"Longhorn安装部署完全指南:从零开始搭建存储系统-CSDN博客\"\n      },\n      {\n        \"title\": \"K8S上快速部署LongHorn:分布式块存储实战指南\",\n        \"url\": \"http://www.baidu.com/link?url=F9j9iYzsEn9c_u6Zzco7kC7acVWbf43HcvZQUplQHMQnzL52Hemjrqkwpwo8w0h8VpQg7u9q2BGypxdsx4Zch_\",\n        \"snippet\": \"K8S上快速部署LongHorn:分布式块存储实战指南\"\n      },\n      {\n        \"title\": \"小龙虾防逃网安装指南-百度爱采购\",\n        \"url\": \"http://www.baidu.com/link?url=Rj6tSx3irhZ96n6F8EcADZck2-j4SiMs7sxG711sz1cJY8fc6LhPbTegfcnOYAN9TVy1Hb4NU1CDhND3itdaT3KQNf0U890VT2MWu8iNWhb7xrl9jXe1-QoUmAP8FNP10bf6E3Q__58Ev8EGsLJlWlzA3rWRXPQAZujRcHFgl9qdYZoPxNCizI8P19Rua9JZwbTi2yJUt8GROPOga07Gn58MecbCmTeh7ZkFMa_1cuZ9IrUxiSscOlTgN_VelZiN\",\n        \"snippet\": \"小龙虾防逃网安装指南-百度爱采购\"\n      },\n      {\n        \"title\": \"PostgreSQL 安装部署及配置使用教程_PostgreSQL_脚本之家\",\n        \"url\": \"http://www.baidu.com/link?url=HDaeoG5rxr3boSu0W8EkgMWAoC1hmDtuywxTK5vns5tTM9sGnhE1IL0HSZcp9XNXcRmq5IRFA0CCCUOCaKplyK\",\n        \"snippet\": \"PostgreSQL 安装部署及配置使用教程_PostgreSQL_脚本之家\"\n      },\n      {\n        \"title\": \"龙虾养殖 - 百度百科\",\n        \"url\": \"http://www.baidu.com/link?url=Rj6tSx3irhZ96n6F8EcADK7Qasv7Bkse8vZ98tB3w4tU_HB_srngDTxouQGM4W0Iy8la_a-0vay80v3c_qUX0Oi-4UoVJ-2NZMVIX7Ig3GOYFNTXSC0oRQ_iHoklWMRP\",\n        \"snippet\": \"药物预防药物预防主要是做好消毒处理，采用生石灰等消毒剂，平时管理中应重点加强小龙虾活动区域的消毒处理，适当投喂药饵。药物使用应遵循以下原则；（1）缺氧时不用药。（2）一在晴天上午9-10时用药。（3）连续用药时间不宜太长，不能超过3天。（4）稻田养... 养殖信息 疾病预防 预计收益 病害预防 百度百科  播报  暂停\"\n      }\n    ],\n    \"total\": 9,\n    \"url\": \"https://www.baidu.com/s?wd=%E9%BE%99%E8%99%BE%20%E5%AE%89%E8%A3%85%20%E9%83%A8%E7%BD%B2%20%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B&ie=utf-8\",\n    \"title\": \"龙虾 安装 部署 使用教程_百度搜索\",\n    \"tab_id\": \"1770000127838\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 4593\n  },\n  \"message\": \"搜索结果获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000127274,
+      "end_time": 1770000132436
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000132442
+  },
+  {
+    "type": "content",
+    "content": "搜索结果显示\"龙虾\"这个词可能有多重含义。让我搜索更具体的软件或工具名称，看看\"龙虾\"是否指某个特定的软件或系统。",
+    "status": "success",
+    "timestamp": 1770000134179
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"query\": \"\\\"龙虾\\\" 软件 安装 教程\", \"num_results\": 10}",
+    "status": "success",
+    "timestamp": 1770000136006,
+    "tool_call": {
+      "name": "evolweb_search",
+      "id": "call_00_01QgSNthjd5j0zlw4nwkYxCM",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\": \"\\\"龙虾\\\" 软件 安装 教程\", \"num_results\": 10}",
+              "name": "evolweb_search"
+            },
+            "type": "function",
+            "id": "call_00_01QgSNthjd5j0zlw4nwkYxCM"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"query\": \"\\\"龙虾\\\" 软件 安装 教程\",\n    \"engine\": \"baidu\",\n    \"results\": [\n      {\n        \"title\": \"龙虾便签电脑版下载v0.0.2-龙虾便签官方版下载安装2025_3DM软件\",\n        \"url\": \"http://www.baidu.com/link?url=IUjUNZnQPeGoeZrZix2R1N5XfDPcBvxVg67MES1vFKpQhvWmsCzRnwU7I4xmzGW1\",\n        \"snippet\": \"龙虾便签电脑版下载v0.0.2-龙虾便签官方版下载安装2025_3DM软件\"\n      },\n      {\n        \"title\": \"龙虾智能剪辑官方下载_龙虾智能剪辑最新版V2022.2.8免费下载_3DM...\",\n        \"url\": \"http://www.baidu.com/link?url=trUFvMLOolUmDTc8EZbGSBMXVMKV7LXU9VTFvg_CriRF8IkjZ2vBEMzbWO3rUoegDVYoDZZyYyLl1-pmzZggs_\",\n        \"snippet\": \"龙虾智能剪辑官方下载_龙虾智能剪辑最新版V2022.2.8免费下载_3DM...\"\n      },\n      {\n        \"title\": \"龙虾直播app免费下载_龙虾直播安卓最新版v1.0.1下载-多特软件站...\",\n        \"url\": \"http://www.baidu.com/link?url=trUFvMLOolUmDTc8EZbGSGOPLxpaqsM_7VdpLQQNeZ4Xiw13tKR3auTO8ZOn-ZDCs1nUJ1vmwwGuR4DjCOhyg_\",\n        \"snippet\": \"龙虾直播app免费下载_龙虾直播安卓最新版v1.0.1下载-多特软件站...\"\n      },\n      {\n        \"title\": \"手机龙虾恶作剧安卓版下载-龙虾恶作剧软件v1.1下载_飞翔下载\",\n        \"url\": \"http://www.baidu.com/link?url=trUFvMLOolUmDTc8EZbGS_ZZ-MEhgNFpMHXQVJGyMkQor-gpmUsIFOQ-VMC9iADI_Bn18FnYZS_nllck1y5-la\",\n        \"snippet\": \"手机龙虾恶作剧安卓版下载-龙虾恶作剧软件v1.1下载_飞翔下载\"\n      },\n      {\n        \"title\": \"白嫖Gemini 300美金+clawdbot（Openclaw）小龙虾安装教程\",\n        \"url\": \"http://www.baidu.com/link?url=E2eitsljLX0WwyzDPOqIjRW34O55G7SZGVC7Q9FrwUc9-g43NOmADfgYZnmBvRMLqN72RPUZW-qSVwMjWkV1ya\",\n        \"snippet\": \"视频时长 03:268小时前讲解如何通过自动化配置小龙虾并利用Google Cloud Platform的300刀额度。内容包括谷歌账号创建、信用卡验证、云平台申请... 哔哩哔哩\"\n      },\n      {\n        \"title\": \"龙虾影视现在是v2.3.5版本-龙虾影视最新版本下载v2.3.5去广..._乐游\",\n        \"url\": \"http://www.baidu.com/link?url=j00-QSN0tqzzi12slsyLIwg4ihrvo5JwiAafaGJxbKGzbOor0Rn_zLWrpoTR6yCW\",\n        \"snippet\": \"龙虾影视现在是v2.3.5版本-龙虾影视最新版本下载v2.3.5去广..._乐游\"\n      },\n      {\n        \"title\": \"龙虾智能剪辑电脑软件下载-龙虾视频剪辑软件电脑版v2025.1_gg下载站\",\n        \"url\": \"http://www.baidu.com/link?url=-BpjJ26BAEclhr2tF9b6wcylFmkfnEJVzaDUDTdB1tlT0lrCop2hIl7dUCPVLVEs\",\n        \"snippet\": \"龙虾智能剪辑电脑软件下载-龙虾视频剪辑软件电脑版v2025.1_gg下载站\"\n      },\n      {\n        \"title\": \"九安小龙虾助手app下载-九安龙虾挂机软件下载vPro 7.0.4-1_5577...\",\n        \"url\": \"http://www.baidu.com/link?url=TjqfoFsO1RcmFXVRwqXrncnPr2ut23y4m-beZgWocNO8W15CUfxTPcuf6iNVjThb\",\n        \"snippet\": \"九安小龙虾助手app下载-九安龙虾挂机软件下载vPro 7.0.4-1_5577...\"\n      }\n    ],\n    \"total\": 8,\n    \"url\": \"https://www.baidu.com/s?wd=%22%E9%BE%99%E8%99%BE%22%20%E8%BD%AF%E4%BB%B6%20%E5%AE%89%E8%A3%85%20%E6%95%99%E7%A8%8B&ie=utf-8\",\n    \"title\": \"\\\"龙虾\\\" 软件 安装 教程_百度搜索\",\n    \"tab_id\": \"1770000137816\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 3837\n  },\n  \"message\": \"搜索结果获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000137287,
+      "end_time": 1770000141658
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000141665
+  },
+  {
+    "type": "content",
+    "content": "我看到有一个关于\"clawdbot（Openclaw）小龙虾\"的教程。让我搜索更具体的\"clawdbot\"或\"Openclaw\"相关信息。",
+    "status": "success",
+    "timestamp": 1770000142794
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"query\": \"clawdbot Openclaw 小龙虾 安装 教程\", \"num_results\": 10}",
+    "status": "success",
+    "timestamp": 1770000144647,
+    "tool_call": {
+      "name": "evolweb_search",
+      "id": "call_00_QyRo9VJBQgehq62rCLXmTlF0",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\": \"clawdbot Openclaw 小龙虾 安装 教程\", \"num_results\": 10}",
+              "name": "evolweb_search"
+            },
+            "type": "function",
+            "id": "call_00_QyRo9VJBQgehq62rCLXmTlF0"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"query\": \"clawdbot Openclaw 小龙虾 安装 教程\",\n    \"engine\": \"baidu\",\n    \"results\": [\n      {\n        \"title\": \"clawdbot Openclaw 小龙虾 安装 教程的最新相关信息\",\n        \"url\": \"http://www.baidu.com/link?url=hdqvkNKWIxY5lnhFw2RM6V-IVeewaMahr7OR4iMWmmp2_jx83EOlW7nTlmHF0Vq53lMgjOeknPh-epi5YONlEgwCv9prk5RO7xHYk4dXTFdqatOYwRxD49fc8D4Ldrks5dHzkDuL967J6dcCDUPSrW7lPQtXNbmmX_gG9_hZP6maQ8mowTwODx9P1ltpqF1eyTZa3FKzVh5f2VTrI9Y7y_\",\n        \"snippet\": \"都非常的实用。最后的最后，终于，一切就绪！成功！ 看到安装好的界面，然后，就可以用这个命令，来启动Clawdbot。 clawdbot gateway --verbose 然后，你就能看到一串代码。 一般端口都默认是18789了，所以你可以直接复制。 http://127.0.0.1:18789/chat 然后就能看到亲切的，小龙虾界面了。\"\n      },\n      {\n        \"title\": \"智能体openclaw(旧名clawdbot/moltbot)使用教程-CSDN博客\",\n        \"url\": \"http://www.baidu.com/link?url=XQIL5dUiFJ51AxLhC6DIymANnhd_gznUNmSr8dvYcOqdKbvltZ-yw53cafLf8SnlxPnfePrWmPjY4Ho6rCozAldQUIVnku6JWJoCN5w3LBu\",\n        \"snippet\": \"智能体openclaw(旧名clawdbot/moltbot)使用教程-CSDN博客\"\n      },\n      {\n        \"title\": \"2026年使用Docker部署OpenClaw(原Clawdbot/Moltbot)完整步骤教程\",\n        \"url\": \"http://www.baidu.com/link?url=273NNNFNmeX1fYOw5Erbwv1Kw9bgOkGBFFgx3zAbfX5RO1qIZgARlhbbk62yLmzSqDDqTrKRzMw3WXM7S8Diuq\",\n        \"snippet\": \"2026年使用Docker部署OpenClaw(原Clawdbot/Moltbot)完整步骤教程\"\n      },\n      {\n        \"title\": \"10 万星爆款!OpenClaw(前 Clawdbot/Moltbot)极简部署指南 - 知乎\",\n        \"url\": \"http://www.baidu.com/link?url=9i3hCCYo6MF7scLxUskD5mdEuKL7_jiDydNyZck1iEBf4LPmx4NnFPgHARZiwC1uHKnO5EffwvO0fb83ay5M-K\",\n        \"snippet\": \"10 万星爆款!OpenClaw(前 Clawdbot/Moltbot)极简部署指南 - 知乎\"\n      },\n      {\n        \"title\": \"OpenClaw(原Clawdbot/Moltbot)本地部署快速指南-CSDN博客\",\n        \"url\": \"http://www.baidu.com/link?url=qX6_lLLtyc0biJ5d0svkSCyS-5Akpxz_q4EqEPnPDRTtFjvvziWWc-Di8BvHgqHS7s2_rIDxO_YQDOLRMEaKvD5w7KcmL8JuHzRNZA6dwDK\",\n        \"snippet\": \"OpenClaw(原Clawdbot/Moltbot)本地部署快速指南-CSDN博客\"\n      },\n      {\n        \"title\": \"只需3步,一键部署 OpenClaw(原 Clawdbot/Moltbot)成功图文教程\",\n        \"url\": \"http://www.baidu.com/link?url=TkggVZ8BDAJd8n0owFkE3HRpCFDjIwCb6ZTsYjw_MZDFu6QpmcI9_O6ODGRu8UIpMRoXhf-wfeEqeUfgPjjYLc8l2Zht7W-QzJoCiI5A_N3\",\n        \"snippet\": \"只需3步,一键部署 OpenClaw(原 Clawdbot/Moltbot)成功图文教程\"\n      },\n      {\n        \"title\": \"clawdbot Openclaw 小龙虾 安装 教程 - 视频大全 - 高清在线观看\",\n        \"url\": \"https://www.baidu.com/sf/vsearch?pd=video&wd=clawdbot%20Openclaw%20%E5%B0%8F%E9%BE%99%E8%99%BE%20%E5%AE%89%E8%A3%85%20%E6%95%99%E7%A8%8B&tn=vsearch&lid=97452eea02159591&ie=utf-8&rsv_pq=97452eea02159591&rsv_spt=5&rsv_bp=1&f=8&atn=index\",\n        \"snippet\": \" 18:09 【保姆级教程】火爆全网的智能体openclaw（原... 哔哩哔哩 2天前\"\n      }\n    ],\n    \"total\": 7,\n    \"url\": \"https://www.baidu.com/s?wd=clawdbot%20Openclaw%20%E5%B0%8F%E9%BE%99%E8%99%BE%20%E5%AE%89%E8%A3%85%20%E6%95%99%E7%A8%8B&ie=utf-8\",\n    \"title\": \"clawdbot Openclaw 小龙虾 安装 教程_百度搜索\",\n    \"tab_id\": \"1770000146586\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 3959\n  },\n  \"message\": \"搜索结果获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000146059,
+      "end_time": 1770000150548
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000150552
+  },
+  {
+    "type": "content",
+    "content": "很好！现在我知道\"龙虾\"指的是OpenClaw（原Clawdbot/Moltbot）这个AI智能体项目。让我打开几个相关的教程页面来获取详细的安装部署信息。",
+    "status": "success",
+    "timestamp": 1770000151860
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"url\": \"https://zhuanlan.zhihu.com/p/\"}",
+    "status": "success",
+    "timestamp": 1770000153710,
+    "tool_call": {
+      "name": "evolweb_fetch",
+      "id": "call_00_sHZYxn624ILwFDZsf5ziuHL7",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"url\": \"https://zhuanlan.zhihu.com/p/\"}",
+              "name": "evolweb_fetch"
+            },
+            "type": "function",
+            "id": "call_00_sHZYxn624ILwFDZsf5ziuHL7"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"url\": \"https://zhuanlan.zhihu.com/p/\",\n    \"final_url\": \"https://zhuanlan.zhihu.com/p/\",\n    \"title\": \"404 - 知乎\",\n    \"content\": \"关注\\n推荐\\n热榜\\n专栏\\n圈子\\nNew\\n付费咨询\\n知学堂\\n​\\n直答\\n切换模式\\n登录/注册\\n404\\n\\n你似乎来到了没有知识存在的荒原\\n\\n去往首页\\n登录知乎，您可以享受以下权益：\\n更懂你的优质内容\\n更专业的大咖答主\\n更深度的互动交流\\n更高效的创作环境\\n立即登录/注册\",\n    \"length\": 130,\n    \"truncated\": false,\n    \"tab_id\": \"1770000155054\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 843\n  },\n  \"message\": \"网页内容获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000154524,
+      "end_time": 1770000155907
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000155917
+  },
+  {
+    "type": "content",
+    "content": "让我打开CSDN博客的教程页面：",
+    "status": "success",
+    "timestamp": 1770000157680
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"url\": \"https://blog.csdn.net/article/details/\"}",
+    "status": "success",
+    "timestamp": 1770000158823,
+    "tool_call": {
+      "name": "evolweb_fetch",
+      "id": "call_00_jG8IBuvqTnafwN12WAR2zdou",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"url\": \"https://blog.csdn.net/article/details/\"}",
+              "name": "evolweb_fetch"
+            },
+            "type": "function",
+            "id": "call_00_jG8IBuvqTnafwN12WAR2zdou"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"url\": \"https://blog.csdn.net/article/details/\",\n    \"final_url\": \"https://blog.csdn.net/article/details/\",\n    \"title\": \"404\",\n    \"content\": \"博客\\n下载\\n社区\\nGitCode\\nGPU算力\\n更多 \\n 搜索 \\n\\nAI 搜索\\n\\n登录\\n会员·新人礼包 \\n消息\\n创作中心\\n创作\\n啊哦~你想找的内容离你而去了哦\\n内容不存在，可能为如下原因导致：\\n① 内容还在审核中\\n② 内容以前存在，但是由于不符合新\\n    的规定而被删除\\n③ 内容地址错误\\n④ 作者删除了内容。\\n可以到 建议专区 反馈更多问题。\\n返回首页\\n向专家提问\\n关于我们\\n招贤纳士\\n商务合作\\n寻求报道\\n400-660-0108\\nkefu@csdn.net\\n在线客服\\n工作时间 8:30-22:00\\n公安备案号11010502030143\\n京ICP备19004658号\\n京网文〔2020〕1039-165号\\n经营性网站备案信息\\n北京互联网违法和不良信息举报中心\\n家长监护\\n网络110报警服务\\n中国互联网举报中心\\nChrome商店下载\\n账号管理规范\\n版权与免责声明\\n版权申诉\\n出版物许可证\\n营业执照\\n©1999-2026北京创新乐知网络技术有限公司\",\n    \"length\": 425,\n    \"truncated\": false,\n    \"tab_id\": \"1770000160116\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 1434\n  },\n  \"message\": \"网页内容获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000159582,
+      "end_time": 1770000161555
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000161567
+  },
+  {
+    "type": "content",
+    "content": "让我搜索更具体的OpenClaw教程：",
+    "status": "success",
+    "timestamp": 1770000162762
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"query\": \"OpenClaw 安装 部署 教程 详细\", \"num_results\": 10}",
+    "status": "success",
+    "timestamp": 1770000163735,
+    "tool_call": {
+      "name": "evolweb_search",
+      "id": "call_00_IlcLPXI3lYo6zdhXtfttHx6t",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\": \"OpenClaw 安装 部署 教程 详细\", \"num_results\": 10}",
+              "name": "evolweb_search"
+            },
+            "type": "function",
+            "id": "call_00_IlcLPXI3lYo6zdhXtfttHx6t"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"query\": \"OpenClaw 安装 部署 教程 详细\",\n    \"engine\": \"baidu\",\n    \"results\": [\n      {\n        \"title\": \"OpenClaw 安装 部署 教程 详细的最新相关信息\",\n        \"url\": \"http://www.baidu.com/link?url=eYpU_OJTmv21lISeXUkl7OjpFQoEXlCYduEEtPg_L-A1CK3a0kCZEHWwZW075Ryv3xY0AD2AqpqiPgJr9rz54bVj-qfhguiUUTSgVkxfC1Es2ZQHVtwgPKwHTqETeA7ZB6EmRVSFZr40XgG-cubqDFFcDcLHwsYmNgT0ybGxYY0Rr6dH6TLTq3L66sgkvymlYAlxTs1Dy0r5fWSyE-o8r_\",\n        \"snippet\": \"下面是详细的部署教程，让你第一时间在百度智能云完成OpenClaw部署，部署过程主要包括：1、在轻量应用服务器控制台创建实例，通过一键安装脚本完成部署以及初始化；2、使用千帆完成文心系列、Qwen系列、Deepseek系列等主流模型配置，快速将百度大模型能力集成到机器人应用中。安装配置OpenClaw 步骤一：在轻量应用服务\"\n      },\n      {\n        \"title\": \"OpenClaw/Clawdbot:2026腾讯云部署教程,掌握搭建\",\n        \"url\": \"http://www.baidu.com/link?url=kp9xM3FCG8frdUxUxcOtO8pqfPv1tNryRBSHl96pLmwB0jB0etnM9uqFHKmmNLcTdCVOk6aJuxEqaRcJfMLxO7jPPuAec1gadEVILtOfMAy\",\n        \"snippet\": \"OpenClaw/Clawdbot:2026腾讯云部署教程,掌握搭建\"\n      },\n      {\n        \"title\": \"玩转Lighthouse|ClawdBot部署完全指南-腾讯云开发者社区-腾讯云\",\n        \"url\": \"http://www.baidu.com/link?url=H3rgNmTCU3U8Umih62UieChAsViMdKA3x5l41YmaNHEDLtRoORdjN7UvfCAJDLRNlnP96k1pTzppICBRHHjrvq\",\n        \"snippet\": \"玩转Lighthouse|ClawdBot部署完全指南-腾讯云开发者社区-腾讯云\"\n      },\n      {\n        \"title\": \"零基础入门:阿里云OpenClaw部署全流程详解(图文版)-阿里云开发者...\",\n        \"url\": \"http://www.baidu.com/link?url=kp9xM3FCG8frdUxUxcOtO5FJhaQtdfpl5tvvtQrWJru7MXhldCb0updJLSGoCn9xVTgicmnGDjfMTK0Ws6fP2_\",\n        \"snippet\": \"零基础入门:阿里云OpenClaw部署全流程详解(图文版)-阿里云开发者...\"\n      },\n      {\n        \"title\": \"OpenClaw(原Clawdbot/Moltbot)本地部署与阿里云上快速部署教程\",\n        \"url\": \"http://www.baidu.com/link?url=kp9xM3FCG8frdUxUxcOtO5FJhaQtdfpl5tvvtQrWJru7MXhldCb0updJLSGoCn9xqKECZLq0sjkUqghSC0O3gq\",\n        \"snippet\": \"OpenClaw(原Clawdbot/Moltbot)本地部署与阿里云上快速部署教程\"\n      },\n      {\n        \"title\": \"【最新教程】OpenClaw(原Clawdbot/Moltbot)本地部署快速指南-CSDN博客\",\n        \"url\": \"http://www.baidu.com/link?url=eYpU_OJTmv21lISeXUkl7XlU_jkocloeRxt-02BtihBCc3DSnZDGzqq-BcHN3WClrqvsLQySZ-_9K4CWHfVzw4RlpIc6_BNPRp-_jb2hfMG\",\n        \"snippet\": \"【最新教程】OpenClaw(原Clawdbot/Moltbot)本地部署快速指南-CSDN博客\"\n      },\n      {\n        \"title\": \"手把手教学——通过WSL部署OpenClaw(原clawdbot)-CSDN博客\",\n        \"url\": \"http://www.baidu.com/link?url=_XpjEn2dl4WMgS8atOeq-IX5tW1XGAgf_nlkgcnCSKlmzkX9wx5ydNDAAyz0zNF7ny30iUfYonoASqpAmYx_ae1fqD2KONdCm6w6rrPylGe\",\n        \"snippet\": \"手把手教学——通过WSL部署OpenClaw(原clawdbot)-CSDN博客\"\n      }\n    ],\n    \"total\": 7,\n    \"url\": \"https://www.baidu.com/s?wd=OpenClaw%20%E5%AE%89%E8%A3%85%20%E9%83%A8%E7%BD%B2%20%E6%95%99%E7%A8%8B%20%E8%AF%A6%E7%BB%86&ie=utf-8\",\n    \"title\": \"OpenClaw 安装 部署 教程 详细_百度搜索\",\n    \"tab_id\": \"1770000165524\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 4021\n  },\n  \"message\": \"搜索结果获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000164998,
+      "end_time": 1770000169551
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000169562
+  },
+  {
+    "type": "content",
+    "content": "让我打开腾讯云开发者社区的教程：",
+    "status": "success",
+    "timestamp": 1770000171333
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"url\": \"https://cloud.tencent.com/developer/article/\"}",
+    "status": "success",
+    "timestamp": 1770000172368,
+    "tool_call": {
+      "name": "evolweb_fetch",
+      "id": "call_00_nOxU3ornddzueq3WhGL0qUri",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"url\": \"https://cloud.tencent.com/developer/article/\"}",
+              "name": "evolweb_fetch"
+            },
+            "type": "function",
+            "id": "call_00_nOxU3ornddzueq3WhGL0qUri"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"url\": \"https://cloud.tencent.com/developer/article/\",\n    \"final_url\": \"https://cloud.tencent.com/developer/column\",\n    \"title\": \"腾讯云开发者社区-腾讯云\",\n    \"content\": \"腾讯云\\n开发者社区\\n文档\\n建议反馈\\n控制台\\n登录/注册\\n首页\\n学习\\n活动\\n专区\\n圈层\\n工具\\nMCP广场\\n文章/答案/技术大牛\\n搜索\\n发布\\n开发者社区\\n>\\n专栏首页\\n全部\\n云计算\\n人工智能\\n前端\\n后端\\n编程语言\\n数据库\\n大数据\\n音视频\\n更多\\n综合排序 | 最新优先\\n🔥玩转OpenClaw｜云上OpenClaw(Clawdbot)快速接入QQ指南\\nagent轻量应用服务器玩转Lighthouse\\n在正式开始为OpenClaw（Clawdbot）配置接入QQ机器人之前，请依次检查如下事项是否准备完成：\\n腾讯轻量云\\n2026-01-31\\n3.4K\\n25\\n玩转OpenClaw(Moltbot) | 使用Docker部署OpenClaw并绑定域名HTTPS开启公网访问\\n轻量应用服务器域名注册玩转Lighthouse容器服务\\n当你想玩玩OpenClaw但受限于服务器有正在运行的服务没法直接使用OpenClaw镜像重装时, Docker会是个不错的选择.\\nkr\\n2026-02-02\\n27\\n0\\n大模型应用：LangChain核心组件深度解析：llms与embeddings.3\\n第四期热点征文-大模型技术\\nLangChain 是一个用于构建大语言模型（LLM）应用程序的框架。它提供了一套工具和组件，使得开发者可以轻松地将LLM与其他数据源和工具连接起来，构建复杂的应用程序。\\n未闻花名\\n2026-01-31\\n57\\n0\\nLighthouse × OpenClaw：手把手教你搞定浏览器配置与启动\\n玩转Lighthouse轻量应用服务器服务器配置人工智能\\n很多用户安装完 OpenClaw 后，运行 openclaw browser status 发现状态一直是 running: false 而且browser: unknown。\\n云煮鱼\\n2026-02-01\\n162\\n0\\nMindFlow 移动端开发实录：从零到完整的 Flutter 应用\\n腾讯技术创作特训营S17#我与AI\\n随着 MindFlow Web 端的成功发布，我们开始进军移动端市场。作为一个 Markdown 编辑器，用户在不同设备间的无缝体验至关重要。本文记录了从零开始搭建 Flutter 移动端项目的完整过程，包括架构设计、UI 实现、状态管理以及跨平台适配等关键技术决策。\\n孟斯特\\n2026-02-01\\n27\\n0\\n大模型应用：大模型本地部署实战：从零构建可视化智能学习助手.2\\n第四期热点征文-大模型技术\\n本地部署最大的优势在于数据完全掌控。所有对话记录、学习内容都在本地处理，无需上传到云端，有效防止隐私泄露风险。对于教育场景尤其重要，学生的学习数据、提问内容都能得到充分保护。相比按使用量付费的云端API服务，本地部署只需一次性硬件投入。以Qwen1.5模型或ChatGLM3-6B为例，可以按需选择合适自己的，即使在普通笔记本电脑的CPU上也能流畅运行，大大降低了使用门槛。\\n未闻花名\\n2026-01-30\\n90\\n0\\nClawdbot新手入门详细指导书\\nAI 互动体验展opencl\\n安全声明：请注意，Clawdbot是一个自托管的智能体，可以被授予访问你的账户、消息甚至系统的权限。请自行承担风险，限制权限，切勿使用你无法承受泄露风险的凭证来运行它、以及切勿在生产环境内使用，如造成密钥等后果需要自行负责、该指导书非全小白教程，需要有动脑与解决问题能力，切勿当全小白教程，遇到问题就不喜欢找解决方法，就等着人家喂给你吃的这种，我觉得指导书可能帮不到你，腾讯云、阿里云等有现成的版本可以使用\\n稽不可失\\n2026-01-31\\n118\\n0\\nGo反射：性能瓶颈与零拷贝优化\\n优化go性能优化性能\\n做Go开发的，肯定少不了用反射——解析Tag、拿字段偏移、获取类型信息，ORM、序列化、配置绑定这些地方都要用到。\\nFgaoxing\\n2026-01-30\\n163\\n0\\n大模型应用：基于本地大模型的中文命名实体识别技术实践与应用\\n玩转腾讯混元大模型\\n命名实体识别（NER）作为自然语言处理的基础任务，在信息抽取、知识图谱构建、智能问答等应用中具有重要作用。随着大模型技术的快速发展，基于本地部署的大模型在NER任务中展现出显著优势。本文通过两个典型示例——通用领域中文NER和医疗领域专用NER，深入探讨本地大模型在实际应用中的技术实现和性能表现。\\n未闻花名\\n2026-01-29\\n134\\n0\\n玩转OpenClaw｜OpenClaw(Clawdbot)接入自定义大模型教程\\n玩转Lighthouse\\n还不知道OpenClaw是什么？一篇文章搞懂并教你快速搭建属于自己的OpenClaw >> OpenClaw一键秒级部署指南\\n小宇-xiaoyu\\n2026-01-29\\n4.8K\\n15\\n【玩转LightHouse】小白向Komari搭建及配置图文教程\\n轻量应用服务器服务器实时监控\\n本文作者：猫猫摸大鱼 原文地址：https://www.iloli.love/archives/1769602819038\\n猫猫摸大鱼\\n2026-01-29\\n120\\n0\\n玩转Lighthouse |Moltbot配置模型太麻烦？试试 Lighthouse 自带的 OrcaTerm，效率翻倍！\\n轻量应用服务器玩转Lighthouse\\nMoltbot 支持连接到任何遵循 OpenAI 接口规范 (OpenAI-compatible) 的本地代理服务。这意味着你可以利用各种本地运行的开源模型或自定义推理引擎。\\n云煮鱼\\n2026-01-29\\n570\\n5\\n🔥🔥🔥云上OpenClaw(Clawdbot)最全实践教程合辑\\n轻量应用服务器agent\\n欢迎加入OpenClaw交流群，和大家共同解锁、交流云上OpenClaw的使用经验，探索接入QQ、企微、飞书、钉钉、Discord、WhatsApp等IM应用之后的实用、有趣玩法。\\n嘉钰\\n2026-01-28\\n45.9K\\n68\\n如何在 Moltbot 配置腾讯云混元 API\\n腾讯混元大模型api模型DeepSeek\\nMoltbot（原 Clawdbot）是一款开源的 AI 个人助手，支持本地部署，兼容 MacOS、Windows 及 Linux 等多种系统，并支持接入常用聊天工具，让用户通过自然语言控制各种设备和服务。 它是一个功能强大的自动化工具，支持混元、Claude、GPT 等主流大语言模型，能够帮助用户处理邮件、日程安排、市场调研等多种自动化任务。\\n腾讯云AI\\n2026-01-30\\n989\\n1\\n浅谈世界模型（上篇）\\n人工智能\\n在通往通用人工智能（AGI）的道路上，“世界模型”已成为核心战场。本文就浅谈下世界模型。\\nlanguageX\\n2026-01-30\\n524\\n2\\n从 800 行到 1000 行：我的 Agent 实现了分层记忆，接入了 MCP 能力，还暴露了 WebUI\\n腾讯技术创作特训营S17#我与2025\\n回顾上次我们做了什么，上一篇文章中，我把代码从 300 行，增加到了 800 行，然后实现了一个 Plan Agent：\\n老码小张\\n2026-01-30\\n256\\n0\\n从架构师和产品经理角度来看 A2UI 的企业级应用\\n前端框架人工智能架构师\\n在数字化转型的浪潮中，企业面临着快速构建高质量应用的巨大压力。架构师需要确保系统的可扩展性和稳定性，而产品经理则需要快速响应市场需求并保证用户体验。ooderAgent 的发布为这一挑战提供了新的解决方案，通过 A2UI（Architect-to-UI）技术，实现了从架构设计到用户界面的直接转换。\\nOneCode\\n2026-01-30\\n240\\n0\\n黄啊码-耗时N天打磨的AI漫剧神器，创作变现一条龙，今天正式开源！\\n腾讯云AI编程达人秀\\n最近这么安静，相信很多人都觉得我在偷懒了吧,相反，“暴风雨来之前肯定会比较安静的”。今天，黄啊码又来了，我把耗时一个多月打磨的AI漫剧神器正式开源。\\n黄啊码\\n2026-01-30\\n319\\n0\\n告别手动打标！用腾讯混元大模型打造你的“AI 智能图库”\\n腾讯技术创作特训营S17#我与AI腾讯混元大模型图片标签腾讯混元大模型AIGC\\n在这个手机随手一拍就是 4K 高清图的时代，我们每个人的硬盘里可能都躺着成千上万张照片。作为开发者，如果你曾尝试开发过图片管理系统、壁纸站或者素材库，你一定遇到过一个痛点：\\nFront_Yue\\n2026-01-30\\n175\\n0\\nClawdbot一夜爆火，我用云服务器搭了个24小时在线的AI助理\\n腾讯技术创作特训营S17\\n近日，一款名为ClawdBot的产品在全球技术圈掀起热潮，从X、Reddit到中文技术社区，处处可见它的身影。究竟是什么让这个AI智能体如此引人注目？（已经改名为Moltbot）\\n卷福同学\\n2026-01-28\\n3.6K\\n4\\n点击加载更多\\n我的专栏\\n订阅的专栏\\n写文章\\n精选专题\\n更多\\n技术创作特训营·精选知识专栏\\n实用创作干货，实战最新作品\\n腾讯云社区精选MCP教程\\n精选教程，帮您便捷管云用云\\nDeepSeek技术最佳实践\\n真实案例分享，解锁多元应用场景\\n社区活动\\n腾讯云自媒体同步曝光计划\\n申请计划，获周边礼品\\n立即入驻\\n原创作者热度排行榜\\n更多\\n岳涛\\n热力值5667\\n1\\n未闻花名\\n热力值5255\\n2\\n一只牛博\\n热力值2789\\n3\\nqife122\\n热力值2583\\n4\\n网络前线\\n热力值2350\\n5\\n不惑\\n热力值2145\\n6\\nAI小怪兽\\n热力值2131\\n7\\n草竹道人\\n热力值2017\\n8\\nIvanCodes\\n热力值1559\\n9\\n江湖有缘\\n热力值1460\\n10\\n领券\\n社区\\n技术文章\\n技术问答\\n技术沙龙\\n技术视频\\n学习中心\\n技术百科\\n技术专区\\n活动\\n自媒体同步曝光计划\\n邀请作者入驻\\n自荐上首页\\n技术竞赛\\n圈层\\n腾讯云最具价值专家\\n腾讯云架构师技术同盟\\n腾讯云创作之星\\n腾讯云TDP\\n关于\\n社区规范\\n免责声明\\n联系我们\\n友情链接\\nMCP广场开源版权声明\\n\\t\\n腾讯云开发者\\n\\n扫码关注腾讯云开发者\\n\\n领取腾讯云代金券\\n\\n热门产品\\n域名注册云服务器区块链服务消息队列网络加速云数据库域名解析云存储视频直播\\n热门推荐\\n人脸识别腾讯会议企业云CDN加速视频通话图像分析MySQL 数据库SSL 证书语音识别\\n更多推荐\\n数据安全负载均衡短信文字识别云点播大数据小程序开发网站监控数据迁移\\n\\nCopyright © 2013 - 2026 Tencent Cloud. All Rights Reserved. 腾讯云 版权所有 \\n\\n深圳市腾讯计算机系统有限公司\\n ICP备案/许可证号：\\n粤B2-20090059 \\n粤公网安备44030502008569号\\n\\n腾讯云计算（北京）有限责任公司 京ICP证150476号 |  京ICP备11018762号\\n\\n首页\\n学习\\n活动\\n专区\\n圈层\\n工具\\nMCP广场\\n返回腾讯云官网\\n不再提示\",\n    \"length\": 4495,\n    \"truncated\": false,\n    \"tab_id\": \"1770000173723\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 2966\n  },\n  \"message\": \"网页内容获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000173192,
+      "end_time": 1770000176695
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000176708
+  },
+  {
+    "type": "content",
+    "content": "让我打开其中一个具体的教程文章：",
+    "status": "success",
+    "timestamp": 1770000179009
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"url\": \"https://cloud.tencent.com/developer/article/2470000\"}",
+    "status": "success",
+    "timestamp": 1770000179944,
+    "tool_call": {
+      "name": "evolweb_fetch",
+      "id": "call_00_y4Hjjui9xZFJD7bDxPbHaefd",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"url\": \"https://cloud.tencent.com/developer/article/2470000\"}",
+              "name": "evolweb_fetch"
+            },
+            "type": "function",
+            "id": "call_00_y4Hjjui9xZFJD7bDxPbHaefd"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"url\": \"https://cloud.tencent.com/developer/article/2470000\",\n    \"final_url\": \"https://cloud.tencent.com/developer/article/2470000\",\n    \"title\": \"开源免费, .NET 又一个 Word 处理神器-腾讯云开发者社区-腾讯云\",\n    \"content\": \"腾讯云\\n开发者社区\\n云开发5步搞定微信支付下单，安全高效！\\n文档\\n建议反馈\\n控制台\\n登录/注册\\n首页\\n学习\\n活动\\n专区\\n圈层\\n工具\\nMCP广场\\n文章/答案/技术大牛\\n搜索\\n发布\\n社区首页\\n>\\n专栏\\n>\\n开源免费, .NET 又一个 Word 处理神器\\n开源免费, .NET 又一个 Word 处理神器\\n发布于 2024-11-23 13:38:03\\n7900\\n举报\\n文章被收录于专栏：\\nDotNet NB && CloudNative\\n关联问题\\n换一批\\n这个Word处理神器支持哪些文档格式？\\n如何在.NET项目中集成这个开源免费的Word处理工具？\\n这个工具是否支持对Word文档进行编辑和格式化？\\nMiniWord\\n推荐一个 .NET 开源的免费 Word 处理神器 MiniWord。这是一个非常简单有效的 .NET Word 模板库，甚至可以使用一行代码处理 Word，非常方便。并且不需要安装微软 Word，无需 COM+ 和互操作支持 Linux 和 Mac，轻量级 Word 处理神器。\\n\\n快速使用\\n模板遵循“所见即所得”设计，模板标签样式完整保留。\\nvar value = new Dictionary<string, object>(){[\\\"title\\\"] = \\\"Hello MiniWord\\\"};\\nMiniSoftware.MiniWord.SaveAsByTemplate(outputPath, templatePath, value);\\n\\nMiniWord 模板格式字符串如 Vue、React {{tag}} ，用户只需确保 tag 和 value 参数 key 相同，系统会自动替换它们。\\nvar value = new Dictionary<string, object>()\\n{\\n    [\\\"Name\\\"] = \\\"Jack\\\",\\n    [\\\"Department\\\"] = \\\"IT Department\\\",\\n    [\\\"Purpose\\\"] = \\\"Shanghai site needs a new system to control HR system.\\\",\\n    [\\\"StartDate\\\"] = DateTime.Parse(\\\"2022-09-07 08:30:00\\\"),\\n    [\\\"EndDate\\\"] = DateTime.Parse(\\\"2022-09-15 15:30:00\\\"),\\n    [\\\"Approved\\\"] = true,\\n    [\\\"Total_Amount\\\"] = 123456,\\n};\\nMiniWord.SaveAsByTemplate(path, templatePath, value);\\n\\n模板\\n\\n结果\\n\\n.NET Core 使用\\n public IActionResult DownloadWordFromTemplatePath()\\n    {\\n string templatePath = \\\"TestTemplateComplex.docx\\\";\\n\\n        Dictionary<string, object> value = defaultValue;\\n\\n        MemoryStream memoryStream = new MemoryStream();\\n        MiniWord.SaveAsByTemplate(memoryStream, templatePath, value);\\n        memoryStream.Seek(0, SeekOrigin.Begin);\\n return new FileStreamResult(memoryStream, \\\"application/vnd.openxmlformats-officedocument.wordprocessingml.document\\\")\\n        {\\n            FileDownloadName = \\\"demo.docx\\\"\\n        };\\n    }\\n\\npublic IActionResult DownloadWordFromTemplateBytes()\\n    {\\n byte[] bytes = TemplateBytesCache[\\\"TestTemplateComplex.docx\\\"];\\n\\n        Dictionary<string, object> value = defaultValue;\\n\\n        MemoryStream memoryStream = new MemoryStream();\\n        MiniWord.SaveAsByTemplate(memoryStream, bytes, value);\\n        memoryStream.Seek(0, SeekOrigin.Begin);\\n return new FileStreamResult(memoryStream, \\\"application/vnd.openxmlformats-officedocument.wordprocessingml.document\\\")\\n        {\\n            FileDownloadName = \\\"demo.docx\\\"\\n        };\\n    }\\n\\nMiniWord 的更多功能，等待您去发现！\\n\\n项目地址\\n\\nhttps://github.com/mini-software/MiniWord\\n\\n本文参与 腾讯云自媒体同步曝光计划，分享自微信公众号。\\n原始发表：2024-11-22，如有侵权请联系 cloudcommunity@tencent.com 删除\\n开源\\nword\\n设计\\n系统\\n字符串\\n评论\\n登录后参与评论\\n推荐阅读\\n编辑精选文章\\n换一批\\n多租户的 4 种常用方案\\n10917\\n亿级月活的社交 APP，陌陌如何做到 3 分钟定位故障？\\n8331\\n60页PPT全解：DeepSeek系列论文技术要点整理\\n9813\\nJava与Go差别在哪，谁要被时代抛弃？\\n9498\\nMCP协议详解：一文读懂跨时代的模型上下文协议\\n22801\\n一文掌握 MCP 上下文协议：从理论到实践\\n9250\\n开源项目MiniWord .NET Word 操作由Word模板和数据简单、快速生成文件\\nc#.net\\nMiniWord .NET Word模板引擎，藉由Word模板和数据简单、快速生成文件。\\nNet分享\\n2023/07/26\\n6500\\nMagicodes.IE在.NET Core中通过请求头导出多种格式文件\\nhtmlcsexcelpdfstartup\\n在2.2里程碑中我们增加了一些新的功能,正如标题所写通过请求头进行导出我们不同格式的文件.下面我们来看一下如何使用.通过这种方式无论是对我们的数据多用途，还是说对我们的数据校验都做到了轻松易配。\\n心莱科技雪雁\\n2020/06/22\\n1.2K0\\n.NET使用MiniWord高效生成Word文件\\nword表格源码开源object\\nMiniWord是一个基于.NET开源、易于使用的.NET Word模板导出引擎，无需安装Office COM+，适用于Windows、Linux和Mac。\\n郑子铭\\n2024/12/30\\n3390\\nMagicodes.IE.AspNetCore之一行代码多格式导出\\njava腾讯云开发者社区html\\n在Startup.cs的Configure()方法中,在UseRouting()中间件之后,注册如下中间件\\n心莱科技雪雁\\n2021/04/30\\n4080\\n前端如何填充word模板\\njavascript\\n上篇文章介绍了如何使用nodejs填充word模板，今天介绍一下哎浏览器端如何填充word模板。\\n挥刀北上\\n2021/02/09\\n2.6K0\\n使用phpword插件实现word文档导出\\n官方文档\\nphpword的GitHub地址： https://github.com/PHPOffice/PHPWord\\n猿哥\\n2020/02/26\\n5.2K0\\nC# 使用openxml解析PPTX中的文本内容\\nc#存储openxml对象数据\\n      本文讨论的仅针对微软Office 2007以后的（OOXML定义）PowerPoint文档，Office 2007以前的用二进制格式定义的（ppt格式）文档不在本文讨论范围。\\nczwy\\n2023/10/22\\n1.4K0\\njava使用poi导出word并且带图片\\nxmlechartsexcelpoiword\\n最近在开发中有按照模板导出word的需求，并且把echarts图例附到word里，我开始使用freework取ftl模板的，不过由于转换麻烦，需定义好格式xml再转为ftl文件所以改为使用poi取word模板直接赋值的方式，并且通过拼接标签实现图片的附带和定义宽度高度。\\n余生大大\\n2022/10/25\\n2.8K0\\n聊聊Spring AI的Multimodality\\nLLM\\norg/springframework/ai/chat/messages/UserMessage.java\\ncode4it\\n2025/04/12\\n2120\\n聊聊Spring AI的Multimodality\\npublicstaticspringcodefinal\\norg/springframework/ai/chat/messages/UserMessage.java\\ncode4it\\n2025/04/13\\n1790\\n如何在 C# 中以编程的方式将 CSV 转为 Excel XLSX 文件\\nxlsx编程c#csvexcel\\nMicrosoft Excel的XLSX格式以及基于文本的CSV（逗号分隔值）格式，是数据交换中常见的文件格式。应用程序通过实现对这些格式的读写支持，可以显著提升性能。在本文中，小编将为大家介绍如何在Java中以编程的方式将【比特币-美元】市场数据CSV文件转化为XLSX 文件。\\n葡萄城控件\\n2024/03/05\\n6.8K0\\n关于Aspose word导出word C#\\nc#asp.net\\n其中TableStart:和TableEnd:为固定语法 TableCY 为表格名称（自定义和代码里面的匹配就行）\\n学以致用丶\\n2022/06/28\\n1.6K0\\n基于Python实现Word文档中图片的自动提取处理\\n腾讯技术创作特训营S14#新手村\\n但是，在许多场景下，我们需要从Word文档中提取这些图片，例如进行内容分析、创建图像数据库、或者在其他应用程序中重用这些图像。有时候不太方便。\\n熊猫钓鱼\\n2025/07/27\\n5420\\n使用Mongodb 做对象缓存\\nmongodb缓存\\nmongodb高效的访问速度，用来快速存取数据再合适不过了，缓存神马的，可以用这个的 另外，有的时候，如果仅仅存储几条数据，单独去建立一张表代价太大，这个时候，不妨试试这个 先发一个mongodb数据访问帮助类 public class MongdbHelper : IDisposable { public MongoServer Server { get; private set; } public MongoDB.Driver.MongoDatabase Dat\\nJadePeng\\n2018/03/12\\n2.1K0\\nHarmonyOS API 20 FilePicker 文件选择与多来源文件处理实战\\n腾讯技术创作特训营S16\\n如何基于 HarmonyOS API 20 提供的 FilePicker 能力，优雅实现跨目录、多格式的文件选择功能，并处理不同来源文件的权限与路径问题？这里我整理了一套完整的解决方案，希望可以帮助到大家。\\nchina马斯克\\n2025/12/04\\n2850\\n使用NPOI导出Excel文件\\njavahttpsserverless网络安全\\n在Controllers控制器目录中创建ExportController.cs控制器\\n全栈程序员站长\\n2022/07/02\\n2.2K0\\nPython实现Word文档中图片的自动提取与加载：从理论到实践\\n实践pythonimagepathword\\n在现代办公和文档处理中，Word文档已经成为最常用的文件格式之一。这些文档不仅包含文本内容，还经常嵌入各种图片、图表和其他媒体元素。在许多场景下，我们需要从Word文档中提取这些图片，例如进行内容分析、创建图像数据库、或者在其他应用程序中重用这些图像。同样，将图片按照特定顺序加载到Word文档中也是一个常见需求。本文将深入探讨如何使用Python实现Word文档中图片的自动提取与加载功能，从理论基础到实际应用，提供全面的技术指南。\\n熊猫钓鱼\\n2025/08/01\\n4030\\n在BlogCore中，上传附件到MinIO分布式文件服务器\\n分布式部署服务器集群数据\\n在上篇文章中，我们说到了Seaweedfs，通过原理，安装以及使用，从0到1的了解了这个老牌的分布式文件存储服务，那无独有偶，这篇咱们说说另一个高性能的分布式文件服务器——MinIO，http://docs.minio.org.cn/。\\n老张的哲学\\n2023/08/23\\n1.1K0\\nASP.NET Core 中简单使用 HttpClient 集成 Elasticsearch 实现日志记录与查询\\nhttpclient日志aspcoreelasticsearch\\n在开发中，将系统日志集中管理并支持实时搜索是提升运维效率的重要手段。本文将介绍如何在 ASP.NET Core 项目中通过 HttpClient 与 Elasticsearch 进行集成，实现日志的自动记录、索引和查询功能。\\n郑子铭\\n2025/07/12\\n2070\\nVue 前端通过 Get 和 Post 方法调用后台接口下载文件的实用集合\\n后台集合接口前端get\\n下面是整合后的技术方案与应用实例，主要围绕Vue调用下载接口并实现文件下载功能展开。\\n小焱写作\\n2025/09/04\\n8260\\n郑子铭\\n0\\nLV.4\\n后端开发工程师\\n关注\\n文章\\n1.5K\\n获赞\\n1.9K\\n专栏\\n1\\n作者相关精选\\n.NET使用MiniWord高效生成Word文件\\n目录\\nMiniWord\\n推荐一个 .NET 开源的免费 Word 处理神器 MiniWord。这是一个非常简单有效的 .NET Word 模板库，甚至可以使用一行代码处理 Word，非常方便。并且不需要安装微软 Word，无需 COM+ 和互操作支持 Linux 和 Mac，轻量级 Word 处理神器。\\n快速使用\\n模板遵循“所见即所得”设计，模板标签样式完整保留。 var value = new Dictionary<string, object>(){[\\\"title\\\"] = \\\"Hello MiniWord\\\"}; MiniSoftware.MiniWord.SaveAsByTemplate(outputPath, templatePath, value);\\n.NET Core 使用\\npublic IActionResult DownloadWordFromTemplatePath() { string templatePath = \\\"TestTemplateComplex.docx\\\"; Dictionary<string, object> value = defaultValue; MemoryStream memoryStream = new MemoryStream(); MiniWord.SaveAsByTemplate(memoryStream, templatePath, value); memoryStream.Seek(0, SeekOrigin.Begin); return new FileStreamResult(memoryStream, \\\"application/vnd.openxmlformats-officedocument.wordprocessingml.document\\\") { FileDownloadName = \\\"demo.docx\\\" }; } public IActionResult DownloadWordFromTemplateBytes() { byte[] bytes = TemplateBytesCache[\\\"TestTemplateComplex.docx\\\"]; Dictionary<string, object> value = defaultValue; MemoryStream memoryStream = new MemoryStream(); MiniWord.SaveAsByTemplate(memoryStream, bytes, value); memoryStream.Seek(0, SeekOrigin.Begin); return new FileStreamResult(memoryStream, \\\"application/vnd.openxmlformats-officedocument.wordprocessingml.document\\\") { FileDownloadName = \\\"demo.docx\\\" }; } MiniWord 的更多功能，等待您去发现！\\n交个朋友\\n加入腾讯云官网粉丝站\\n蹲全网底价单品 享第一手活动信息\\n广告\\n领券\\n社区\\n技术文章\\n技术问答\\n技术沙龙\\n技术视频\\n学习中心\\n技术百科\\n技术专区\\n活动\\n自媒体同步曝光计划\\n邀请作者入驻\\n自荐上首页\\n技术竞赛\\n圈层\\n腾讯云最具价值专家\\n腾讯云架构师技术同盟\\n腾讯云创作之星\\n腾讯云TDP\\n关于\\n社区规范\\n免责声明\\n联系我们\\n友情链接\\nMCP广场开源版权声明\\n\\t\\n腾讯云开发者\\n\\n扫码关注腾讯云开发者\\n\\n领取腾讯云代金券\\n\\n热门产品\\n域名注册云服务器区块链服务消息队列网络加速云数据库域名解析云存储视频直播\\n热门推荐\\n人脸识别腾讯会议企业云CDN加速视频通话图像分析MySQL 数据库SSL 证书语音识别\\n更多推荐\\n数据安全负载均衡短信文字识别云点播大数据小程序开发网站监控数据迁移\\n\\nCopyright © 2013 - 2026 Tencent Cloud. All Rights Reserved. 腾讯云 版权所有 \\n\\n深圳市腾讯计算机系统有限公司\\n ICP备案/许可证号：\\n粤B2-20090059 \\n粤公网安备44030502008569号\\n\\n腾讯云计算（北京）有限责任公司 京ICP证150476号 |  京ICP备11018762号\\n\\n目录\\n1\\n0\\n0\\n推荐\\n\\n首页\\n学习\\n活动\\n专区\\n圈层\\n工具\\nMCP广场\\n返回腾讯云官网\\n首页\\n学习\\n活动\\n专区\\n圈层\\n工具\\nMCP广场\\n返回腾讯云官网\\n不再提示\",\n    \"length\": 7791,\n    \"truncated\": false,\n    \"tab_id\": \"1770000181393\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 2531\n  },\n  \"message\": \"网页内容获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000180866,
+      "end_time": 1770000183931
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000183938
+  },
+  {
+    "type": "content",
+    "content": "这不是OpenClaw的教程。让我搜索GitHub上的OpenClaw",
+    "status": "success",
+    "timestamp": 1770000185576
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"query\": \"OpenClaw GitHub 项目 安装 教程\", \"num_results\": 10}",
+    "status": "success",
+    "timestamp": 1770000186766,
+    "tool_call": {
+      "name": "evolweb_search",
+      "id": "call_00_nmvlaG10PSctZ5Ao3XXLN7CE",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\": \"OpenClaw GitHub 项目 安装 教程\", \"num_results\": 10}",
+              "name": "evolweb_search"
+            },
+            "type": "function",
+            "id": "call_00_nmvlaG10PSctZ5Ao3XXLN7CE"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"query\": \"OpenClaw GitHub 项目 安装 教程\",\n    \"engine\": \"baidu\",\n    \"results\": [\n      {\n        \"title\": \"智能体openclaw(旧名clawdbot/moltbot)使用教程-CSDN博客\",\n        \"url\": \"http://www.baidu.com/link?url=a_epUFi8dFlVFeLMRsRbmdkBte8QigdkSZeZW6kWnYxSYth2c9BVktHw54XE9dnwqsrigGs1ZxWJuPhBYBkfGB2klpNy-Gfz_Rl0TeqwN4C\",\n        \"snippet\": \"智能体openclaw(旧名clawdbot/moltbot)使用教程-CSDN博客\"\n      },\n      {\n        \"title\": \"🦞 OpenClaw(Clawd/Moltbot)汉化版搭建指南-腾讯云开发者社区...\",\n        \"url\": \"http://www.baidu.com/link?url=LrWBGAhuh4JfbDG50QFpZHDiDEAFfNyVH-acV_x2fhWnl61O4T-6vWh2EPYvAy6-gChQfRNkcyWAHKo2PD5Vkq\",\n        \"snippet\": \"🦞 OpenClaw(Clawd/Moltbot)汉化版搭建指南-腾讯云开发者社区...\"\n      },\n      {\n        \"title\": \"在github codespaces部署开源个人智能体OpenClaw(Clawdbot/Moltbot...\",\n        \"url\": \"http://www.baidu.com/link?url=xVtjPpTUC7LfPWZgaCHnLeEd-MA78aQoZmqJJGH0ZSP97XY0N21W0Wz9A8eZWhVnulK0KiOIzCv3Mjud6fsgo3kB90sXP52r_lCUYenV4dG\",\n        \"snippet\": \"在github codespaces部署开源个人智能体OpenClaw(Clawdbot/Moltbot...\"\n      },\n      {\n        \"title\": \"全球狂揽100+K Star!绿联NAS部署火爆全网的『OpenClaw』喂饭级教程\",\n        \"url\": \"http://www.baidu.com/link?url=fZpayRNwrtVQVoqiquwzXViQ-8r59eY3HY0NJ5BbdrB9nkQVIzTBC2McS1r6wWcq5IurxmhVIClJwTOuIGKWrK\",\n        \"snippet\": \"全球狂揽100+K Star!绿联NAS部署火爆全网的『OpenClaw』喂饭级教程\"\n      },\n      {\n        \"title\": \"玩转Lighthouse|Moltbot(原Clawdbot)接入QQ 保姆级教程\",\n        \"url\": \"http://www.baidu.com/link?url=LrWBGAhuh4JfbDG50QFpZHDiDEAFfNyVH-acV_x2fhWnl61O4T-6vWh2EPYvAy6-HNyZZJ9lC62l6kH8jiyLz_\",\n        \"snippet\": \"玩转Lighthouse|Moltbot(原Clawdbot)接入QQ 保姆级教程\"\n      },\n      {\n        \"title\": \"5 分钟部署OpenClaw(原Clawdbot/Moltbot)AI 个人助理:阿里云轻量...\",\n        \"url\": \"http://www.baidu.com/link?url=9FI6pGnNZTmxVPlQSyTHCGwHEFMIr3RS8dRtzb9VBrOmVOSeDe82i4ZmBAOOXF1Bv6wGxupF-UjOUSpkYcb9immDIgA2G-WbGdGEbdkS8W3\",\n        \"snippet\": \"5 分钟部署OpenClaw(原Clawdbot/Moltbot)AI 个人助理:阿里云轻量...\"\n      },\n      {\n        \"title\": \"2天10万Star!GitHub史上最快开源项目OpenClaw,手把手教你免费实现...\",\n        \"url\": \"http://www.baidu.com/link?url=xVtjPpTUC7LfPWZgaCHnLeEd-MA78aQoZmqJJGH0ZSQmveCamU0FKjMzPtCpmwdroh789JjGjR0wfSYl4cXiA_\",\n        \"snippet\": \"2天10万Star!GitHub史上最快开源项目OpenClaw,手把手教你免费实现...\"\n      },\n      {\n        \"title\": \"OpenClaw GitHub 项目 安装 教程 - 视频大全 - 高清在线观看\",\n        \"url\": \"https://www.baidu.com/sf/vsearch?pd=video&wd=OpenClaw%20GitHub%20%E9%A1%B9%E7%9B%AE%20%E5%AE%89%E8%A3%85%20%E6%95%99%E7%A8%8B&tn=vsearch&lid=eef2b1ce0297162b&ie=utf-8&rsv_pq=eef2b1ce0297162b&rsv_spt=5&rsv_bp=1&f=8&atn=index\",\n        \"snippet\": \" 04:58 「Github一周热点24」桌面版ChatGPT,低代码平... 哔哩哔哩 2024-5-26\"\n      }\n    ],\n    \"total\": 8,\n    \"url\": \"https://www.baidu.com/s?wd=OpenClaw%20GitHub%20%E9%A1%B9%E7%9B%AE%20%E5%AE%89%E8%A3%85%20%E6%95%99%E7%A8%8B&ie=utf-8\",\n    \"title\": \"OpenClaw GitHub 项目 安装 教程_百度搜索\",\n    \"tab_id\": \"1770000188590\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 4104\n  },\n  \"message\": \"搜索结果获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000188059,
+      "end_time": 1770000192697
+    }
+  },
+  {
+    "type": "content",
+    "content": "这不是OpenClaw的教程。让我搜索GitHub上的OpenClaw项目：",
+    "status": "success",
+    "timestamp": 1770000192705
+  },
+  {
+    "type": "content",
+    "content": "让我打开CSDN的教程：",
+    "status": "success",
+    "timestamp": 1770000193933
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"url\": \"https://blog.csdn.net/weixin_123456/article/details/123456789\"}",
+    "status": "success",
+    "timestamp": 1770000194930,
+    "tool_call": {
+      "name": "evolweb_fetch",
+      "id": "call_00_iQLfHy04LZdIq4pVIwwVqKJF",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"url\": \"https://blog.csdn.net/weixin_123456/article/details/123456789\"}",
+              "name": "evolweb_fetch"
+            },
+            "type": "function",
+            "id": "call_00_iQLfHy04LZdIq4pVIwwVqKJF"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"url\": \"https://blog.csdn.net/weixin_123456/article/details/123456789\",\n    \"final_url\": \"https://blog.csdn.net/weixin_123456/article/details/123456789\",\n    \"title\": \"404\",\n    \"content\": \"博客\\n下载\\n社区\\nGitCode\\nGPU算力\\n更多 \\n 搜索 \\n\\nAI 搜索\\n\\n登录\\n会员·新人礼包 \\n消息\\n创作中心\\n创作\\n啊哦~你想找的内容离你而去了哦\\n内容不存在，可能为如下原因导致：\\n① 内容还在审核中\\n② 内容以前存在，但是由于不符合新\\n    的规定而被删除\\n③ 内容地址错误\\n④ 作者删除了内容。\\n可以到 建议专区 反馈更多问题。\\n返回首页\\n向专家提问\\n76.0MB\\n\\n精通Linux系统管理\\n\\n2025-09-11\\n\\n本书深入讲解Linux核心管理技能，涵盖命令行操作、用户权限、软件包管理、进程控制与磁盘配置，结合Shell脚本自动化及Ansible基础设施管理，助力系统管理员与开发者高效运维。内容延伸至云计算部署、Kubernetes容器...\\n\\n50.58MB\\n\\nLinux系统管理进阶指南\\n\\n2025-09-10\\n\\n全书内容详实，覆盖面广，不仅涉及系统管理的多个方面，还注重实际操作的指导性，让读者能够在理论学习的同时，提升实践操作能力。书中所讨论的主题均为Linux系统管理中的核心知识点，无论是逻辑卷管理的深入应用，...\\n\\n3.21MB\\n\\nRed Hat Linux 系统管理精要\\n\\n2025-12-16\\n\\n通过实用命令与真实场景示例，帮助系统管理员快速掌握日常维护、性能监控与故障恢复技巧。书中还介绍了LVM、RAID、CUPS打印服务及CVS版本控制等高级功能，兼具理论与实战价值。无论是初学者还是资深运维人员，都能...\\n\\n153.83MB\\n\\nmacOS系统管理实战指南\\n\\n2025-12-19\\n\\n本书深入讲解macOS Sierra...内容兼顾理论与实践，适合IT支持人员、系统管理员及希望深度理解macOS架构的技术爱好者。书中还介绍了Spotlight、Siri、文件标签和版本管理等高效工作特性，全面提升系统操作效率与安全性。\\n\\n204KB\\n\\n现代管理理论丛林PPT课件\\n\\n2022-05-05\\n\\n这一现象由哈罗德·孔茨在其1961年的论文《管理理论丛林》中首次提出，他将当时的管理理论分为六个学派：管理过程学派、经验或案例学派、行为学派、社会系统学派、决策学派和数学学派。 1. 管理过程学派：由亨利·...\\n\\n3.55MB\\n\\n灰色系统理论及其应用 刘思峰 （南航教案）PDF\\n\\n2021-01-21\\n\\n《灰色系统理论及其应用》全面、系统地论述了灰色系统的基本理论、基本方法和应用技术，是作者长期从事灰色系统理论探索、实际应用和教学工作的结晶，同时还吸收了国内外同行近年来取得的理论和应用研究新成果，向...\\n\\n36.23MB\\n\\nMac OS X系统管理精要\\n\\n2025-11-12\\n\\n本书深入解析Mac OS X系统的网络规划、用户管理、服务配置...适合需要构建和维护Mac网络环境的系统管理员阅读，帮助实现高效、安全的IT管理。内容兼顾基础与进阶，理论结合实操，是掌握Mac OS X企业级应用的理想指南。\\n\\n54KB\\n\\n教育管理理论1\\n\\n2022-08-04\\n\\n本章节将对教育管理理论进行详细的介绍和分析，从古典管理理论、人际关系理论、行为科学理论、开放系统管理理论等多角度进行探讨，并分析这些管理理论对教育管理的影响。 一、古典管理理论 古典管理理论始于20世纪...\\n\\n317KB\\n\\nSWUST计算机操作系统理论复习\\n\\n2025-06-11\\n\\n操作系统理论复习内容广泛，涵盖了进程管理、内存管理、文件系统、设备管理、用户接口和安全等多个方面。进程管理主要研究进程的创建、撤销、同步和通信机制，例如，互斥锁、信号量、生产者-消费者问题等都是进程...\\n\\n1.30MB\\n\\njsp通讯录信息管理系统 | 毕业设计\\n\\n2022-04-06\\n\\n（1）进一步巩固、加深学生所学专业课程《Web应用系统开发》的基本理论知识，理论联系实际，进一步培养学生综合分析问题，解决问题的能力。 （2）全面考核学生所掌握的基本理论知识及其实际业务能力，从而达到提高...\\n\\n410KB\\n\\njava超市管理系统实训报告\\n\\n2018-04-25\\n\\n在这个项目中，学生们将运用在《Java程序设计》课程中学到的理论知识，结合超市管理的具体需求，构建一个实际可用的数据库系统。 1. 课程设计的目的： 这项实训的主要目标是让学生们能够亲手体验数据库系统的完整...\\n\\n44KB\\n\\n系统安全管理的基本理论.docx\\n\\n2021-12-22\\n\\n系统安全管理是保障信息技术领域中，确保系统运行安全、降低风险的重要理论框架。它涉及系统从设计、开发到运行维护的全过程，旨在通过一系列系统安全工程方法，预防和控制潜在的危害，以达到最优的安全状态。 系统...\\n\\n3.98MB\\n\\nSolaris 8系统管理员考试速成指南\\n\\n2025-08-12\\n\\n本书旨在帮助考生准备Solaris 8系统管理员认证考试，涵盖安装与维护Solaris 8、用户账户设置、文件系统管理、备份恢复、进程管理和远程连接等内容。书中不仅提供了详细的理论知识，还包括实际操作指导和考试技巧，如...\\n\\n542B\\n\\n灰色系统理论及应用[源码]\\n\\n2025-11-13\\n\\n随着灰色系统理论的不断发展和完善，其在工程技术、社会经济、管理科学等领域的应用前景十分广阔，尤其在当前大数据、云计算等信息技术迅猛发展的背景下，灰色系统理论仍具有重要的研究价值和实际应用潜力。...\\n\\n210KB\\n\\n经典管理理论集.RAR.rar\\n\\n2022-02-27\\n\\n经典的管理理论主要分为科学管理理论、人际关系理论和系统管理理论三大流派。科学管理理论由弗雷德里克·泰勒提出，强调通过科学研究提高工作效率；人际关系理论由霍桑实验发展而来，重视员工的社会心理需求；系统...\\n\\n193KB\\n\\nC3I系统理论研究概况\\n\\n2015-07-02\\n\\n随着时间的推移，C3I系统理论逐步扩展到其他领域，比如民用紧急响应系统、大型企业管理系统等。 2. C3I系统理论的主要研究内容：这部分主要包括对C3I系统结构的分析、对系统各个组成部分的作用和相互关系的研究、对...\\n\\n25.26MB\\n\\n控制理论在生产系统中的应用\\n\\n2025-09-27\\n\\n本书深入探讨了控制理论在动态生产系统中的实际应用，结合时间与频率方法，帮助生产工程师理解和优化系统的动态行为。通过连续与离散时间建模、传递函数、频率响应及闭环控制设计等内容，系统地介绍了如何利用MATLAB...\\n\\n8.73MB\\n\\n学生管理系统（Mysql数据库版）\\n\\n2018-04-07\\n\\n《基于Mysql的学生管理系统详解》 学生管理系统是信息化教学中不可或缺的一部分，它旨在方便学校管理学生信息、成绩、出勤等各项数据。本系统采用Mysql数据库作为数据存储引擎，结合C语言进行程序开发，实现了高效...\\n\\nJava人事管理系统开源代码.zip_course\\n\\n2020-06-11\\n\\n本系统是一个简单的人事管理系统，实现了员工基本信息的简单管理，应用了图形化用户界面，使得系统操作简单化，而且看上去更加美观。首先在框架上添加一个列表和两个面板，在列表上显示添加的员工信息，在面板pan1上...\\n\\n关于我们\\n招贤纳士\\n商务合作\\n寻求报道\\n400-660-0108\\nkefu@csdn.net\\n在线客服\\n工作时间 8:30-22:00\\n公安备案号11010502030143\\n京ICP备19004658号\\n京网文〔2020〕1039-165号\\n经营性网站备案信息\\n北京互联网违法和不良信息举报中心\\n家长监护\\n网络110报警服务\\n中国互联网举报中心\\nChrome商店下载\\n账号管理规范\\n版权与免责声明\\n版权申诉\\n出版物许可证\\n营业执照\\n©1999-2026北京创新乐知网络技术有限公司\",\n    \"length\": 3192,\n    \"truncated\": false,\n    \"tab_id\": \"1770000196504\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 1526\n  },\n  \"message\": \"网页内容获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000195972,
+      "end_time": 1770000198032
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000198040
+  },
+  {
+    "type": "content",
+    "content": "让我直接搜索OpenClaw的官方文档或GitHub页面：",
+    "status": "success",
+    "timestamp": 1770000200263
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"query\": \"OpenClaw GitHub 官方文档\", \"num_results\": 10}",
+    "status": "success",
+    "timestamp": 1770000201495,
+    "tool_call": {
+      "name": "evolweb_search",
+      "id": "call_00_T7dFUP6qgu4tt7QqAWBzHoxC",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\": \"OpenClaw GitHub 官方文档\", \"num_results\": 10}",
+              "name": "evolweb_search"
+            },
+            "type": "function",
+            "id": "call_00_T7dFUP6qgu4tt7QqAWBzHoxC"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"query\": \"OpenClaw GitHub 官方文档\",\n    \"engine\": \"baidu\",\n    \"results\": [\n      {\n        \"title\": \"GitHub - openclaw/openclaw: Your own personal AI assistant...\",\n        \"url\": \"http://www.baidu.com/link?url=XyXif-t-O_tScsUkJNnwGVQw9Ya2cCX5gWpDggbW8z0hav5xqo6MogtBfPwaF9CJ\",\n        \"snippet\": \"GitHub - openclaw/openclaw: Your own personal AI assistant...\"\n      },\n      {\n        \"title\": \"在github codespaces部署开源个人智能体OpenClaw(Clawdbot/Moltbot...\",\n        \"url\": \"http://www.baidu.com/link?url=46ScAJiaqnxKTdXZj4irTt50ho9JdqRReCAEBX24a2sBFiVcCUACdiCTRBFJhOIanE5HXRvdRiub8RRrabQlwbDvBDF0huMwGroiaOxtiIW\",\n        \"snippet\": \"在github codespaces部署开源个人智能体OpenClaw(Clawdbot/Moltbot...\"\n      },\n      {\n        \"title\": \"一文读懂: Clawdbot分析与教程(Moltbot、openClaw)-CSDN博客\",\n        \"url\": \"http://www.baidu.com/link?url=46ScAJiaqnxKTdXZj4irTsCVt5xhve31wx34W3axEJ7Ptvw0nokyZbRXlX-cxYu-U6fs2ieWW-QzVojGPIHF1XnpoIpkbQnHazFhbA6nhNy\",\n        \"snippet\": \"一文读懂: Clawdbot分析与教程(Moltbot、openClaw)-CSDN博客\"\n      },\n      {\n        \"title\": \"【最新教程】OpenClaw(原Clawdbot/Moltbot)本地部署快速指南_AIGC...\",\n        \"url\": \"http://www.baidu.com/link?url=G1C4G8MqSYxMKgAdnrwze5Nqi7K0xYqQ31mso4F8cASCh4LD3xThVG8ksOvuNV0ux1zkypGHxO-EREgfiGlH-a\",\n        \"snippet\": \"【最新教程】OpenClaw(原Clawdbot/Moltbot)本地部署快速指南_AIGC...\"\n      },\n      {\n        \"title\": \"2026年使用Docker部署OpenClaw(原Clawdbot/Moltbot)完整步骤教程...\",\n        \"url\": \"http://www.baidu.com/link?url=hf2sxS-z16jrZ2F8M1G5RFHmQDJSztFGVJ-HKHNUptAGyJsFevkJ0U7TXXKWQ2inudCmpAsREK4sjCMoy2ihmq\",\n        \"snippet\": \"2026年使用Docker部署OpenClaw(原Clawdbot/Moltbot)完整步骤教程...\"\n      },\n      {\n        \"title\": \"【汉化中文版】OpenClaw(Clawdbot/Moltbot)第三方开源汉化中文...\",\n        \"url\": \"http://www.baidu.com/link?url=hf2sxS-z16jrZ2F8M1G5RCgiCYXi-sicK4fvMiDpahIZ5i5iG5FKW2KfJEalVV_oH9W4wgjE60YJPK-lPCa3WhATLElnXH95i02JQRUAr0q\",\n        \"snippet\": \"【汉化中文版】OpenClaw(Clawdbot/Moltbot)第三方开源汉化中文...\"\n      },\n      {\n        \"title\": \"🦞 OpenClaw(Clawd/Moltbot)汉化版搭建指南-腾讯云开发者社区...\",\n        \"url\": \"http://www.baidu.com/link?url=j4Bhv98oRN-y0qVgSpdFzU95UQhl7jC_P7P0CVSmFoB-mcTYvWR9a0IpkZPpmEEirvkuvdW6m3SeO6CF-ai_d_\",\n        \"snippet\": \"🦞 OpenClaw(Clawd/Moltbot)汉化版搭建指南-腾讯云开发者社区...\"\n      },\n      {\n        \"title\": \"Clawdbot - 开源AI个人助手,本地部署实现自然语言控制设备 | AI...\",\n        \"url\": \"http://www.baidu.com/link?url=kWU4_vpqWRpasKVBSS5VMPOhjGP92i4XfBUEvu6UJ1TnDJp56zj_xbiPMb4ESJaf\",\n        \"snippet\": \"Clawdbot - 开源AI个人助手,本地部署实现自然语言控制设备 | AI...\"\n      },\n      {\n        \"title\": \"5 分钟部署OpenClaw(原Clawdbot/Moltbot)AI 个人助理:阿里云轻量...\",\n        \"url\": \"http://www.baidu.com/link?url=G1C4G8MqSYxMKgAdnrwze8I2fMa4XT4lswWNiuR0gKxS_NOqzyiruQ-XYDhWqgJx_9r92xb4_rTffanfpBES-nFuG-to8HZw1zMWcxj8fjW\",\n        \"snippet\": \"5 分钟部署OpenClaw(原Clawdbot/Moltbot)AI 个人助理:阿里云轻量...\"\n      },\n      {\n        \"title\": \"OpenClaw 是什么?新手快速部署 OpenClaw(原 Moltbot/Clawdbot)全...\",\n        \"url\": \"http://www.baidu.com/link?url=G1C4G8MqSYxMKgAdnrwze8I2fMa4XT4lswWNiuR0gKxS_NOqzyiruQ-XYDhWqgJxisoE30R3WZt7ff6MdtiXdKMXaNPcO6RZ0FPQhROjrnq\",\n        \"snippet\": \"OpenClaw 是什么?新手快速部署 OpenClaw(原 Moltbot/Clawdbot)全...\"\n      }\n    ],\n    \"total\": 10,\n    \"url\": \"https://www.baidu.com/s?wd=OpenClaw%20GitHub%20%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3&ie=utf-8\",\n    \"title\": \"OpenClaw GitHub 官方文档_百度搜索\",\n    \"tab_id\": \"1770000203212\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 1570\n  },\n  \"message\": \"搜索结果获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000202684,
+      "end_time": 1770000204787
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000204796
+  },
+  {
+    "type": "content",
+    "content": "很好！现在让我打开GitHub的OpenClaw项目页面：",
+    "status": "success",
+    "timestamp": 1770000206622
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"url\": \"https://github.com/openclaw/openclaw\"}",
+    "status": "success",
+    "timestamp": 1770000207804,
+    "tool_call": {
+      "name": "evolweb_fetch",
+      "id": "call_00_Q4DjthBOIwVwiMtrhFVRJpld",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"url\": \"https://github.com/openclaw/openclaw\"}",
+              "name": "evolweb_fetch"
+            },
+            "type": "function",
+            "id": "call_00_Q4DjthBOIwVwiMtrhFVRJpld"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": false,\n  \"error\": \"等待加载超时\",\n  \"message\": \"网页加载失败: 等待加载超时\",\n  \"data\": {\n    \"tab_id\": \"1770000209174\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"url\": \"https://github.com/openclaw/openclaw\"\n  }\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000208645,
+      "end_time": 1770000239228
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000239240
+  },
+  {
+    "type": "content",
+    "content": "让我尝试打开CSDN的教程文章：",
+    "status": "success",
+    "timestamp": 1770000241963
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"url\": \"https://blog.csdn.net/weixin_123456/article/details/\"}",
+    "status": "success",
+    "timestamp": 1770000243004,
+    "tool_call": {
+      "name": "evolweb_fetch",
+      "id": "call_00_n468vuNLJc77MA1GK6ghgu6v",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"url\": \"https://blog.csdn.net/weixin_123456/article/details/\"}",
+              "name": "evolweb_fetch"
+            },
+            "type": "function",
+            "id": "call_00_n468vuNLJc77MA1GK6ghgu6v"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"url\": \"https://blog.csdn.net/weixin_123456/article/details/\",\n    \"final_url\": \"https://blog.csdn.net/weixin_123456/article/details/\",\n    \"title\": \"404\",\n    \"content\": \"博客\\n下载\\n社区\\nGitCode\\nGPU算力\\n更多 \\n 搜索 \\n\\nAI 搜索\\n\\n登录\\n会员·新人礼包 \\n消息\\n创作中心\\n创作\\n啊哦~你想找的内容离你而去了哦\\n内容不存在，可能为如下原因导致：\\n① 内容还在审核中\\n② 内容以前存在，但是由于不符合新\\n    的规定而被删除\\n③ 内容地址错误\\n④ 作者删除了内容。\\n可以到 建议专区 反馈更多问题。\\n返回首页\\n向专家提问\\n39KB\\n\\n纯CSS3卡通场景汽车动画效果实现项目_通过CSS3关键帧动画过渡效果变形属性以及盒阴影渐变等纯前端技术无任何JavaScript代码构建一个包含蓝天白云背景绿树草地环.zip\\n\\n2026-02-01\\n\\n纯CSS3卡通场景汽车动画效果实现项目_通过CSS3关键帧动画过渡效果变形属性以及盒阴影渐变等纯前端技术无任何JavaScript代码构建一个包含蓝天白云背景绿树草地环.zip\\n\\n968KB\\n\\n基于simulink的永磁同步电机，单矢量，占空比，双矢量三矢量模型预测控制仿真模型\\n\\n2026-02-01\\n\\n基于simulink的永磁同步电机，单矢量，占空比，双矢量三矢量模型预测控制仿真模型内容概要：本文档介绍了基于Simulink的永磁同步电机（PMSM）在单矢量、占空比、双矢量及三矢量模型预测控制（MPC）下的仿真模型构建与研究。重点涵盖多种先进控制策略的应用，包括模型预测控制、滑模观测器（SMO）、PLL锁相环、MARS模型参考自适应系统等，用于实现高性能的电机驱动控制。文档还提及了相关仿真技术在电机参数辨识、无传感器控制、弱磁运行、死区补偿等方面的拓展应用，并展示了该仿真模型在科研复现中的价值，适用于高精度电机控制系统的开发与验证。; 适合人群：具备一定电机控制理论基础和Simulink/Matlab操作经验的科研人员、研究生及从事电气传动系统研发的工程技术人员。; 使用场景及目标：①开展永磁同步电机先进控制算法的研究与仿真验证；②完成高水平论文（如EI、SCI）中模型预测控制部分的复现实验；③为实际工程项目提供控制策略设计与优化的技术支持； 阅读建议：建议结合文中提到的多种控制方法（如MPC、SMO、MARS）进行对比仿真，深入理解不同矢量调制策略对系统性能的影响，并利用提供的网盘资源获取完整仿真模型以加速研究进程。\\n\\n55KB\\n\\n时间卷积结合长短记忆神经网络多头注意力机制TCN-LSTM-Multihead-Attention实现风电预测Matlab实现.html\\n\\n2026-02-01\\n\\n时间卷积结合长短记忆神经网络多头注意力机制TCN-LSTM-Multihead-Attention实现风电预测Matlab实现.html\\n\\n9.97MB\\n\\nanychat是一个极简纯净的webso.zip\\n\\n2026-02-01\\n\\nanychat是一个极简纯净的webso.zip\\n\\n44.46MB\\n\\nVega1800_CS-GOBANG_5648_1769890742635.zip\\n\\n2026-02-01\\n\\nVega1800_CS-GOBANG_5648_1769890742635.zip\\n\\n38KB\\n\\n个人网上收集与制作的CSS3动画库项目_包含多种loading加载动画与信息提示动画效果_旨在为前端开发者提供丰富实用的CSS3动画资源简化网页动态效果实现过程提升用户交互体验.zip\\n\\n2026-02-01\\n\\n个人网上收集与制作的CSS3动画库项目_包含多种loading加载动画与信息提示动画效果_旨在为前端开发者提供丰富实用的CSS3动画资源简化网页动态效果实现过程提升用户交互体验.zip\\n\\n2.87MB\\n\\n房屋租赁管理系统-基于springboot房屋租赁管理系统的设计与实现-房屋租赁管理系统源码.zip\\n\\n2026-02-01\\n\\n房屋租赁管理系统-基于springboot房屋租赁管理系统的设计与实现-房屋租赁管理系统源码.zip\\n\\n83KB\\n\\nCSS3动画效果综合练习与实战项目_包含多种CSS3动画特效如过渡动画关键帧动画变形动画滤镜效果3D变换动画响应式动画交互式动画按钮悬停效果页面加载动画文字动画背景动画图像动画菜单.zip\\n\\n2026-02-01\\n\\nCSS3动画效果综合练习与实战项目_包含多种CSS3动画特效如过渡动画关键帧动画变形动画滤镜效果3D变换动画响应式动画交互式动画按钮悬停效果页面加载动画文字动画背景动画图像动画菜单.zip\\n\\n306KB\\n\\n【DOA估计】MIMO雷达发射方向图综合与DOA估计方法研究matlab复现.docx\\n\\n2026-02-01\\n\\n【DOA估计】MIMO雷达发射方向图综合与DOA估计方法研究matlab复现.docx\\n\\n13KB\\n\\n【航空信息化】基于服务平台的航空订票系统设计与实现：航班查询与在线订票功能集成方案\\n\\n2026-02-01\\n\\n内容概要：本文围绕基于信息化服务平台的航空订票系统展开设计与实现研究，旨在解决传统人工和电话订票方式存在的效率低、信息滞后、管理成本高等问题。系统通过信息化手段实现航班信息、机票资源和旅客数据的集中管理，提升航空公司运营效率与旅客服务质量。系统主要面向三类用户：系统管理员负责权限与安全管理；航空公司工作人员负责航班维护、票价设置和订单处理；普通旅客可完成航班查询、在线订票、订单查看及退改签等操作。系统采用模块化设计，划分为用户管理、航班管理、订票管理和系统维护四大模块，并遵循数据规范化原则进行数据库设计，确保数据一致性与系统高效运行。系统实现了完整的业务逻辑控制，包括余票判断、订单生成、状态更新及防超售机制，同时引入权限控制与数据校验保障安全性。经过功能与性能测试，验证了系统在多用户并发场景下的稳定性与可靠性。; 适合人群：具备一定软件开发基础，尤其是对信息管理系统感兴趣的学生或初级开发人员，适合计算机、软件工程及相关专业的毕业生参考学习。; 使用场景及目标：①用于毕业设计或课程项目，掌握信息系统的完整开发流程；②理解模块化设计、数据库规范化、权限控制与业务逻辑实现等关键技术在实际项目中的应用；③为后续参与交通出行类信息系统开发积累经验。; 阅读建议：建议结合系统分析、设计与实现全过程进行学习，重点关注各功能模块之间的交互逻辑与数据库设计细节，并可通过模拟实现相关功能加深理解。\\n\\n102KB\\n\\n完整代码、专栏订购、论文复现、期刊合作、论文辅导及科研仿真定制事宜.html\\n\\n2026-02-01\\n\\n完整代码、专栏订购、论文复现、期刊合作、论文辅导及科研仿真定制事宜.html\\n\\n472KB\\n\\nAn embedded menu fra.zip\\n\\n2026-02-01\\n\\nAn embedded menu fra.zip\\n\\n112KB\\n\\n【IEEE33节点】基于粒子群优化算法的分布式电源选址与定容【多目标优化】附Matlab代码.docx\\n\\n2026-02-01\\n\\n【IEEE33节点】基于粒子群优化算法的分布式电源选址与定容【多目标优化】附Matlab代码.docx\\n\\n44KB\\n\\n数字同轴全息图模拟和重建的实用算法matlab复现.html\\n\\n2026-02-01\\n\\n数字同轴全息图模拟和重建的实用算法matlab复现.html\\n\\n380KB\\n\\n全网首个完全开源的分布式全局有序序列号分.zip\\n\\n2026-02-01\\n\\n全网首个完全开源的分布式全局有序序列号分\\n\\n297KB\\n\\n嵌入式开发框架事件驱动超级轻量最低占用R.zip\\n\\n2026-02-01\\n\\n嵌入式开发框架事件驱动超级轻量最低占用R\\n\\n973KB\\n\\n具有不完整信息的DSGE模型的鲁棒预测研究（Matlab代码实现）\\n\\n2026-02-01\\n\\n具有不完整信息的DSGE模型的鲁棒预测研究（Matlab代码实现）内容概要：本文围绕“具有不完整信息的DSGE模型的鲁棒预测研究”展开，结合Matlab代码实现，探讨了在宏观经济建模中面对信息不完整时如何构建鲁棒性预测模型。文中详细介绍了DSGE（动态随机一般均衡）模型的基本架构及其在经济政策分析中的应用价值，并重点剖析了如何引入鲁棒控制理论以应对模型不确定性。通过Matlab编程实现了模型的求解与仿真，展示了参数扰动下的系统响应，验证了所提方法在提升预测稳健性方面的有效性。此外，文档还列举了大量相关科研方向与技术支持内容，涵盖智能优化算法、机器学习、电力系统、路径规划等多个领域，体现出该研究的技术交叉性与实际应用潜力。; 适合人群：具备一定经济学与计量经济学基础，熟悉Matlab编程，从事宏观经济建模、政策模拟或金融工程研究的研究生、博士生及科研人员。; 使用场景及目标：①用于宏观经济系统的不确定性建模与鲁棒性政策评估；②为含有结构性不确定性的DSGE模型提供可复现的Matlab实现方案；③支持高校与研究机构开展高水平经济仿真研究，尤其适用于EI/SCI论文复现与科研项目开发； 阅读建议：建议读者结合提供的Matlab代码逐模块学习，重点关注状态空间建模、鲁棒滤波器设计与模型仿真部分，同时参考文档中列出的相关算法与案例，拓展至其他不确定性建模场景，提升科研效率与创新能力。\\n\\n35.25MB\\n\\nPixiJS无障碍辅助功能增强插件项目_该项目是一个专为PixiJS渲染引擎设计的官方无障碍辅助功能模块通过集成AccessibilityManager核心类为基于Canvas.zip\\n\\n2026-02-01\\n\\nPixiJS无障碍辅助功能增强插件项目_该项目是一个专为PixiJS渲染引擎设计的官方无障碍辅助功能模块通过集成AccessibilityManager核心类为基于Canvas.zip\\n\\n4.92MB\\n\\n一个基于CSS3前沿技术实现现代化网页视觉特效与交互设计的综合性开源项目库_包含CSS3动画过渡效果弹性盒子布局网格布局响应式设计媒体查询自定义属性滤镜效果变形转换.zip\\n\\n2026-02-01\\n\\n一个基于CSS3前沿技术实现现代化网页视觉特效与交互设计的综合性开源项目库_包含CSS3动画过渡效果弹性盒子布局网格布局响应式设计媒体查询自定义属性滤镜效果变形转换.zip\\n\\n120.79MB\\n\\n文件批量重命名-工具集\\n\\n2026-02-01\\n\\n文件批量重命名——工具集\\n\\n关于我们\\n招贤纳士\\n商务合作\\n寻求报道\\n400-660-0108\\nkefu@csdn.net\\n在线客服\\n工作时间 8:30-22:00\\n公安备案号11010502030143\\n京ICP备19004658号\\n京网文〔2020〕1039-165号\\n经营性网站备案信息\\n北京互联网违法和不良信息举报中心\\n家长监护\\n网络110报警服务\\n中国互联网举报中心\\nChrome商店下载\\n账号管理规范\\n版权与免责声明\\n版权申诉\\n出版物许可证\\n营业执照\\n©1999-2026北京创新乐知网络技术有限公司\",\n    \"length\": 4471,\n    \"truncated\": false,\n    \"tab_id\": \"1770000244459\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 923\n  },\n  \"message\": \"网页内容获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000243926,
+      "end_time": 1770000245387
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000245400
+  },
+  {
+    "type": "content",
+    "content": "让我搜索一个具体的OpenClaw教程链接：",
+    "status": "success",
+    "timestamp": 1770000247679
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"query\": \"\\\"OpenClaw\\\" \\\"安装教程\\\" \\\"部署\\\"\", \"num_results\": 10}",
+    "status": "success",
+    "timestamp": 1770000248772,
+    "tool_call": {
+      "name": "evolweb_search",
+      "id": "call_00_xP9Th6VyDilU9l9ORHjp0ap0",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\": \"\\\"OpenClaw\\\" \\\"安装教程\\\" \\\"部署\\\"\", \"num_results\": 10}",
+              "name": "evolweb_search"
+            },
+            "type": "function",
+            "id": "call_00_xP9Th6VyDilU9l9ORHjp0ap0"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"query\": \"\\\"OpenClaw\\\" \\\"安装教程\\\" \\\"部署\\\"\",\n    \"engine\": \"baidu\",\n    \"results\": [\n      {\n        \"title\": \"OpenClaw红遍硅谷 百度智能云支持一键部署OpenClaw\",\n        \"url\": \"http://www.baidu.com/link?url=1BEqNUukcZhgaeL_EndDd0n1ZQEcRzg7i1CWV6ZEJQno3MjE1kN74uYo6Wq-rruUZMUeQLP2ZcIllDgF-oQmMPSycsCDOT9zwqkN6F-MCUK\",\n        \"snippet\": \"前天23:41快科技1月31日消息，近日OpenClaw（原来名字叫Clawdbot）成为硅谷圈最火的名词。在各大社交媒体上，人们纷纷分享着安装教程、应用体验。一位科技创业者将其称为“迄今为止最伟大的AI应用”，也有很多人说它就像一个能24小时待命的贾维斯。在OpenClaw爆火之后，百度智能云官方宣布正式上线OpenClaw一键部署功能，用户可以通过轻\"\n      },\n      {\n        \"title\": \"OpenClaw(原Clawdbot/Moltbot)本地部署快速指南_clawdbot本地部署...\",\n        \"url\": \"http://www.baidu.com/link?url=sJFBXH7OmijSZAg3LJxEPX0I_vBClXEa4QMGnNYJ801jyrNBo-xO_RrHlMpojaHWVTYAfMIATdnzEcoCGhGI3xs5qrZyxlHhVTsdhIwitVu\",\n        \"snippet\": \"OpenClaw(原Clawdbot/Moltbot)本地部署快速指南_clawdbot本地部署...\"\n      },\n      {\n        \"title\": \"OpenClaw完整安装与使用教程(从 0 到 1 全指南)-人工智能-PHP中文网\",\n        \"url\": \"http://www.baidu.com/link?url=8ox3CiV27lPLVMnulk4pZ7xV6RQ450KXLCGRvD0wYhQqLW6YRWKq_jorLWlsKJoB\",\n        \"snippet\": \"OpenClaw完整安装与使用教程(从 0 到 1 全指南)-人工智能-PHP中文网\"\n      },\n      {\n        \"title\": \"...+ discord 机器人部署指南学习教程_openclaw安装-CSDN博客\",\n        \"url\": \"http://www.baidu.com/link?url=WB_qKCzV6f2h5Yg_hB1nA9Xc2QNywG5TbruMg9OgjFNLH8xvd_NJ3hUShUCdCYz-PWZaG-qzqbg59IvXVAEH4C_ffy0wZ2BK14tLHeDHWY7\",\n        \"snippet\": \"...+ discord 机器人部署指南学习教程_openclaw安装-CSDN博客\"\n      },\n      {\n        \"title\": \"保姆级教程:OpenClaw(原Clawdbot)Linux系统部署飞书:搭建专属AI...\",\n        \"url\": \"http://www.baidu.com/link?url=G0tUK-bucxI22EoCgslPlHub0q9oAFFW7MvTiqKJXMSXXTO2yKUDQ_w_dQ7rD2mg3JnGRGPfhvj_M2D_kFiEDK\",\n        \"snippet\": \"保姆级教程:OpenClaw(原Clawdbot)Linux系统部署飞书:搭建专属AI...\"\n      },\n      {\n        \"title\": \"零基础入门:阿里云OpenClaw部署全流程详解(图文版) - 知乎\",\n        \"url\": \"http://www.baidu.com/link?url=_WFEBDmGdMz2vf1lfYsfqHeD2Zm3G3CeugbKmwvvnxUBlP0MH7Mn5QfHK_h7rgbVvylVmuXyyL7QToLkE1RPVq\",\n        \"snippet\": \"零基础入门:阿里云OpenClaw部署全流程详解(图文版) - 知乎\"\n      },\n      {\n        \"title\": \"🦞 OpenClaw(Clawd/Moltbot)汉化版搭建指南-腾讯云开发者社区...\",\n        \"url\": \"http://www.baidu.com/link?url=kqtu0uVygsE1rEoz0eKB5DbxiNKEQ0v6iMLxvAtLIusi2SGr0-gnOBAWAn5M8YLGEYU3I45JHno853K0auiA6a\",\n        \"snippet\": \"🦞 OpenClaw(Clawd/Moltbot)汉化版搭建指南-腾讯云开发者社区...\"\n      },\n      {\n        \"title\": \"OpenClaw红遍硅谷 百度智能云支持一键部署OpenClaw--快科技--科技改变...\",\n        \"url\": \"http://www.baidu.com/link?url=g5amh_LPMKgKKmPJIaANMIVafkulnNJ1XG7fOEMKjsUmkeEayWGepaoWuFToR9LOUq3z0GnporsJQNFkM4xhia\",\n        \"snippet\": \"OpenClaw红遍硅谷 百度智能云支持一键部署OpenClaw--快科技--科技改变...\"\n      }\n    ],\n    \"total\": 8,\n    \"url\": \"https://www.baidu.com/s?wd=%22OpenClaw%22%20%22%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B%22%20%22%E9%83%A8%E7%BD%B2%22&ie=utf-8\",\n    \"title\": \"\\\"OpenClaw\\\" \\\"安装教程\\\" \\\"部署\\\"_百度搜索\",\n    \"tab_id\": \"1770000250635\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 3988\n  },\n  \"message\": \"搜索结果获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000250101,
+      "end_time": 1770000254625
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000254637
+  },
+  {
+    "type": "content",
+    "content": "让我打开PHP中文网的教程：",
+    "status": "success",
+    "timestamp": 1770000256052
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"url\": \"https://www.php.cn/ai/123456.html\"}",
+    "status": "success",
+    "timestamp": 1770000257045,
+    "tool_call": {
+      "name": "evolweb_fetch",
+      "id": "call_00_Y9vBApcozlQHWIG6H3MS8cAQ",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"url\": \"https://www.php.cn/ai/123456.html\"}",
+              "name": "evolweb_fetch"
+            },
+            "type": "function",
+            "id": "call_00_Y9vBApcozlQHWIG6H3MS8cAQ"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"url\": \"https://www.php.cn/ai/123456.html\",\n    \"final_url\": \"https://www.php.cn/faq/123456.html\",\n    \"title\": \"升级数据库时遇到的Text file busy错误解决办法-mysql教程-PHP中文网\",\n    \"content\": \"讲师中心\\n微信公众号\\n注册 / 登录\\n首页\\n文章\\n专题\\nAI工具\\n学习\\n编程手册\\n下载\\n最近更新\\n当前位置：\\n首页\\n>\\n数据库\\n>\\nmysql教程\\n>\\n\\n正文\\n\\n0\\n\\n0\\n\\n升级数据库时遇到的Text file busy错误解决办法\\n\\nphp中文网\\n\\n发布时间：2016-06-07 15:36:13\\n\\n|\\n\\n1633人浏览过\\n\\n|\\n\\n来源于php中文网\\n\\n原创\\n\\n打patch时，由于进程占用导致升级过程中意外暂停，监听关了数据库也关了，原以为弹出来的这个消息可以忽略，可是忽略不了，用fuser命令查出PID再KILL掉即可顺利安装下去，但是有些进程可能是报表应用什么的，注意先通知相关人员停掉应用再KILL掉进程即可。 [\\n\\n打patch时，由于进程占用导致升级过程中意外暂停，监听关了数据库也关了，原以为弹出来的这个消息可以忽略，可是忽略不了，用fuser命令查出PID再KILL掉即可顺利安装下去，但是有些进程可能是报表应用什么的，注意先通知相关人员停掉应用再KILL掉进程即可。\\n\\n复制\\nAI写代码\\n\\n1\\n\\n2\\n\\n3\\n\\n4\\n\\n5\\n\\n6\\n\\n7\\n\\n8\\n\\n\\t\\n\\n[root@Znotz ~]# fuser /app/oracle/10g/bin/sqlplus\\n\\n/app/oracle/10g/bin/sqlplus:  3941e\\n\\n[root@Znotz ~]# ps -ef |grep 3941\\n\\noracle    3941  3913  0 11:11 pts/0    00:00:00 sqlplus   as sysdba\\n\\nroot      6678  6646  0 20:37 pts/10   00:00:00 grep 3941\\n\\n[root@Znotz ~]# kill -9 3941\\n\\n[root@Znotz ~]# ps -ef |grep 3941\\n\\nroot      6680  6646  0 20:37 pts/10   00:00:00 grep 3941\\n\\n----------------------------------------------------------------------------------------------\\n\\nblog:http://blog.csdn.net/waycomecome\\n\\nmail:waycomecome@gmail.com\\n\\n相关文章\\n\\nmysql中事务与锁结合实现高并发写入\\n\\nmysql数据库的行锁与表锁机制解析\\n\\nmysql在MacOS环境中使用Homebrew安装注意事项\\n\\nmysql常见错误有哪些_错误类型快速了解\\n\\nmysql主从复制中如何设置只读权限与数据访问控制\\n\\n本站声明：本文内容由网友自发贡献，版权归原作者所有，本站不承担相应法律责任。如您发现有涉嫌抄袭侵权的内容，请联系admin@php.cn\\n\\n上一篇：备份恢复数据库\\n下一篇：mongo数据库的操作\\n\\n热门AI工具\\n\\n更多\\nDeepSeek\\n\\n幻方量化公司旗下的开源大模型平台\\n\\nAI 编程开发\\nAI 聊天问答\\n豆包大模型\\n\\n字节跳动自主研发的一系列大型语言模型\\n\\nAI 编程开发\\nAI大模型\\n通义千问\\n\\n阿里巴巴推出的全能AI助手\\n\\nAI 编程开发\\nAgent智能体\\n腾讯元宝\\n\\n腾讯混元平台推出的AI助手\\n\\n文档处理\\nAI 聊天问答\\n文心一言\\n\\n文心一言是百度开发的AI聊天机器人，通过对话可以生成各种形式的内容。\\n\\nAI 编程开发\\nAI 文本写作\\n讯飞写作\\n\\n基于讯飞星火大模型的AI写作工具，可以快速生成新闻稿件、品宣文案、工作总结、心得体会等各种文文稿\\n\\nAI 文本写作\\n中文写作\\n即梦AI\\n\\n一站式AI创作平台，免费AI图片和视频生成。\\n\\n图片拼接\\nChatGPT\\n\\n最最强大的AI聊天机器人程序，ChatGPT不单是聊天机器人，还能进行撰写邮件、视频脚本、文案、翻译、代码等任务。\\n\\nAI 编程开发\\nAI 文本写作\\n智谱清言 - 免费全能的AI助手\\n\\n智谱清言 - 免费全能的AI助手\\n\\nAI 编程开发\\nAgent智能体\\n\\n相关专题\\n\\n更多\\n主流快递单号查询入口 实时物流进度一站式追踪专题\\n\\n本专题聚合极兔快递、京东快递、中通快递、圆通快递、韵达快递等主流物流平台的单号查询与运单追踪内容，重点解决单号查询、手机号查物流、官网入口直达、包裹进度实时追踪等高频问题，帮助用户快速获取最新物流状态，提升查件效率与使用体验。\\n\\n0\\n\\n2026.02.02\\n\\nGolang WebAssembly（WASM）开发入门\\n\\n本专题系统讲解 Golang 在 WebAssembly（WASM）开发中的实践方法，涵盖 WASM 基础原理、Go 编译到 WASM 的流程、与 JavaScript 的交互方式、性能与体积优化，以及典型应用场景（如前端计算、跨平台模块）。帮助开发者掌握 Go 在新一代 Web 技术栈中的应用能力。\\n\\n1\\n\\n2026.02.02\\n\\nPHP Swoole 高性能服务开发\\n\\n本专题聚焦 PHP Swoole 扩展在高性能服务端开发中的应用，系统讲解协程模型、异步IO、TCP/HTTP/WebSocket服务器、进程与任务管理、常驻内存架构设计。通过实战案例，帮助开发者掌握 使用 PHP 构建高并发、低延迟服务端应用的工程化能力。\\n\\n0\\n\\n2026.02.02\\n\\nJava JNI 与本地代码交互实战\\n\\n本专题系统讲解 Java 通过 JNI 调用 C/C++ 本地代码的核心机制，涵盖 JNI 基本原理、数据类型映射、内存管理、异常处理、性能优化策略以及典型应用场景（如高性能计算、底层库封装）。通过实战示例，帮助开发者掌握 Java 与本地代码混合开发的完整流程。\\n\\n0\\n\\n2026.02.02\\n\\ngo语言 注释编码\\n\\n本专题整合了go语言注释、注释规范等等内容，阅读专题下面的文章了解更多详细内容。\\n\\n61\\n\\n2026.01.31\\n\\ngo语言 math包\\n\\n本专题整合了go语言math包相关内容，阅读专题下面的文章了解更多详细内容。\\n\\n52\\n\\n2026.01.31\\n\\ngo语言输入函数\\n\\n本专题整合了go语言输入相关教程内容，阅读专题下面的文章了解更多详细内容。\\n\\n25\\n\\n2026.01.31\\n\\ngolang 循环遍历\\n\\n本专题整合了golang循环遍历相关教程，阅读专题下面的文章了解更多详细内容。\\n\\n10\\n\\n2026.01.31\\n\\nGolang人工智能合集\\n\\n本专题整合了Golang人工智能相关内容，阅读专题下面的文章了解更多详细内容。\\n\\n7\\n\\n2026.01.31\\n\\n热门下载\\n\\n更多\\n网站特效\\n/\\n网站源码\\n/\\n网站素材\\n/\\n前端模板\\n[图片特效]swiper手机端触屏滑动图片切换\\n[表单按钮]jQuery会员中心安全修改表单代码\\n[图片特效]js鼠标滚动图片等比例缩放代码\\n[表单按钮]CSS3弹出Metro登录表单\\n[图片特效]jquery叠加切换幻灯片\\n[表单按钮]jQuery表单输入文字计数显示代码\\n[图片特效]jQuery鼠标滑过图文切换\\n[表单按钮]jQuery仿京东注册表单验证代码\\n[图片特效]layUI图片拖拽上传裁剪代码\\n[表单按钮]jQuery reveal弹出表单\\n\\n相关下载\\n\\n更多\\nphp商城系统\\n淘源码商城PHP淘宝查信誉\\nPHP房产程序[BBWPS]\\nPHP简约自动发卡平台个人版\\nERMEB域名PHP离线网络授权系统\\nDifeye-敏捷的轻量级PHP框架\\n大泉州汽车网PHP整站程序\\n\\n精品课程\\n\\n更多\\n相关推荐\\n/\\n热门推荐\\n/\\n最新课程\\nJavaScript\\n\\n共185课时 | 22.3万人学习\\n\\nCSS教程\\n\\n共754课时 | 26.4万人学习\\n\\n支付宝沙箱支付（个人也能用的支付）\\n\\n共12课时 | 0.6万人学习\\n\\n最新文章\\n\\n更多\\nmysql在大数据量查询中的索引优化方法\\nmysql主从复制使用binlog吗_mysql日志机制说明\\nmysql中事务与锁结合实现高并发写入\\nmysql中SET语句赋值与变量设置的基础操作\\nmysql权限管理面试常问哪些问题_mysql高频考点解析\\n什么是mysql SQL执行流程_mysql整体执行过程解析\\nmysql中联合索引的创建与使用方法\\nmysql数据库的安全更新与补丁管理\\nmysql在社交网站中的好友关系数据库设计\\nmysql数据库的行锁与表锁机制解析\\n关于我们\\n免责申明\\n举报中心\\n意见反馈\\n讲师合作\\n广告合作\\n最新更新\\nphp中文网：公益在线php培训，帮助PHP学习者快速成长！\\n关注服务号\\n技术交流群\\nPHP中文网订阅号\\n每天精选资源文章推送\\n\\nCopyright 2014-2026 \\nhttps://www.php.cn/\\nAll Rights Reserved | php.cn |\\n湘ICP备2023035733号\",\n    \"length\": 3691,\n    \"truncated\": false,\n    \"tab_id\": \"1770000258431\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 3973\n  },\n  \"message\": \"网页内容获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000257859,
+      "end_time": 1770000262418
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000262448
+  },
+  {
+    "type": "content",
+    "content": "让我搜索更具体的OpenClaw安装教程：",
+    "status": "success",
+    "timestamp": 1770000264884
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"query\": \"OpenClaw 本地部署 教程 Windows\", \"num_results\": 10}",
+    "status": "success",
+    "timestamp": 1770000266175,
+    "tool_call": {
+      "name": "evolweb_search",
+      "id": "call_00_Wl7LFgcqfIiW2rWYqFhkfODk",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\": \"OpenClaw 本地部署 教程 Windows\", \"num_results\": 10}",
+              "name": "evolweb_search"
+            },
+            "type": "function",
+            "id": "call_00_Wl7LFgcqfIiW2rWYqFhkfODk"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"query\": \"OpenClaw 本地部署 教程 Windows\",\n    \"engine\": \"baidu\",\n    \"results\": [\n      {\n        \"title\": \"零门槛部署本地AI助手:2026年Windows系统OpenClaw(原Clawdbot/...\",\n        \"url\": \"http://www.baidu.com/link?url=FH0L_GcQpdS0i_EKzXlWdiGiqMFw6cN1JHPD0lnZSCxoKpBVL_JNL3J-N1swiOBqB3dahoEQSI7ny0esmhpJ1_\",\n        \"snippet\": \"零门槛部署本地AI助手:2026年Windows系统OpenClaw(原Clawdbot/...\"\n      },\n      {\n        \"title\": \"OpenClaw 本地部署 教程 Windows的最新相关信息\",\n        \"url\": \"http://www.baidu.com/link?url=AnXnPb33TZryKf6-9U1ysBF4i_gDE_XpnhS4cvh7k5AGWEJF3tACiF-63gNuFlJuNyPpZ_aBgyA0VaCuj5REph9_fRE02rffo_Hf5_cDpaXfUr8ai3fV8aRd3cPBq0FkP7wotn_y_g_8_c1thFpCzL10Bxjl5MJkxebCq65x5IJpgAxRGcnALzAR3ZwmZYJn\",\n        \"snippet\": \"一键部署,0 基础上手:告别繁琐配置,零门槛轻松上手!无需 Node.js、Docker 知识,在AI STORE、云电脑找到“OpenClaw”,你的私人 AI 助手立刻上线。 算力无限量,“always online”:云端稳定高可用,再也不怕本地电脑休眠或关机。天翼云提供坚实算力底座,“OpenClaw”7×24 小时待命,持续响应,不掉线。 按需\"\n      },\n      {\n        \"title\": \"Windows安装OpenClaw(Clawdbot)教程-CSDN博客\",\n        \"url\": \"http://www.baidu.com/link?url=imaHc8LwznaS0y4HD9rtItEN9Km5mnj-cuOZojxaStJct6-zRJhtWXojeb5cJr5gs50bymiECbXMnQJBbPgdmcxJ0LvIc7g9fuhj85mXERu\",\n        \"snippet\": \"Windows安装OpenClaw(Clawdbot)教程-CSDN博客\"\n      },\n      {\n        \"title\": \"OpenClaw(原Clawdbot/Moltbot)本地部署快速指南-CSDN博客\",\n        \"url\": \"http://www.baidu.com/link?url=Yb4t2N98F02bt1uQX_4O9FPD67poWBnBDxwEYc5fY1_19bsgE0jW1mJMoj0OMWB5g3NetTbxbN2Fz3dOvDPgjpctL2NErI2LdSalSsj5RLW\",\n        \"snippet\": \"OpenClaw(原Clawdbot/Moltbot)本地部署快速指南-CSDN博客\"\n      },\n      {\n        \"title\": \"OpenClaw(原Clawdbot/Moltbot)本地部署与阿里云上快速部署教程\",\n        \"url\": \"http://www.baidu.com/link?url=FH0L_GcQpdS0i_EKzXlWdiGiqMFw6cN1JHPD0lnZSCxoKpBVL_JNL3J-N1swiOBqncsLTUuE2mbTNfoYWeJ7oa\",\n        \"snippet\": \"OpenClaw(原Clawdbot/Moltbot)本地部署与阿里云上快速部署教程\"\n      },\n      {\n        \"title\": \"OpenClaw 在 Windows 10/11 保姆级部署教程(说人话版) - 知乎\",\n        \"url\": \"http://www.baidu.com/link?url=DjmI2BK-Iz5MhtkIEdaNABO0nDbgvYbaJlIN5-NO_gEAzJu6AYlA-FgWVLrYQxrJjZVj7x09sQABuw9E4xgax_\",\n        \"snippet\": \"OpenClaw 在 Windows 10/11 保姆级部署教程(说人话版) - 知乎\"\n      },\n      {\n        \"title\": \"OpenClaw 本地部署 教程 Windows - 视频大全 - 高清在线观看\",\n        \"url\": \"https://www.baidu.com/sf/vsearch?pd=video&wd=OpenClaw%20%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2%20%E6%95%99%E7%A8%8B%20Windows&tn=vsearch&lid=a27ecb1f020bfe96&ie=utf-8&rsv_pq=a27ecb1f020bfe96&rsv_spt=5&rsv_bp=1&f=8&atn=index\",\n        \"snippet\": \" 05:22 开源OpenAI代码解释器Open Interpreter本地部署 哔哩哔哩 2023-9-8\"\n      }\n    ],\n    \"total\": 7,\n    \"url\": \"https://www.baidu.com/s?wd=OpenClaw%20%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2%20%E6%95%99%E7%A8%8B%20Windows&ie=utf-8\",\n    \"title\": \"OpenClaw 本地部署 教程 Windows_百度搜索\",\n    \"tab_id\": \"1770000267979\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 4857\n  },\n  \"message\": \"搜索结果获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000267440,
+      "end_time": 1770000272843
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000272862
+  },
+  {
+    "type": "content",
+    "content": "很好！现在让我打开CSDN的Windows安装教程：",
+    "status": "success",
+    "timestamp": 1770000275188
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"url\": \"https://blog.csdn.net/weixin_123456/article/details/135790123\"}",
+    "status": "success",
+    "timestamp": 1770000276502,
+    "tool_call": {
+      "name": "evolweb_fetch",
+      "id": "call_00_2CDTKTEvqKUFxeMIYzwKpcJD",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"url\": \"https://blog.csdn.net/weixin_123456/article/details/135790123\"}",
+              "name": "evolweb_fetch"
+            },
+            "type": "function",
+            "id": "call_00_2CDTKTEvqKUFxeMIYzwKpcJD"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"url\": \"https://blog.csdn.net/weixin_123456/article/details/135790123\",\n    \"final_url\": \"https://blog.csdn.net/weixin_123456/article/details/135790123\",\n    \"title\": \"404\",\n    \"content\": \"博客\\n下载\\n社区\\nGitCode\\nGPU算力\\n更多 \\n 搜索 \\n\\nAI 搜索\\n\\n登录\\n会员·新人礼包 \\n消息\\n创作中心\\n创作\\n啊哦~你想找的内容离你而去了哦\\n内容不存在，可能为如下原因导致：\\n① 内容还在审核中\\n② 内容以前存在，但是由于不符合新\\n    的规定而被删除\\n③ 内容地址错误\\n④ 作者删除了内容。\\n可以到 建议专区 反馈更多问题。\\n返回首页\\n向专家提问\\n39KB\\n\\n纯CSS3卡通场景汽车动画效果实现项目_通过CSS3关键帧动画过渡效果变形属性以及盒阴影渐变等纯前端技术无任何JavaScript代码构建一个包含蓝天白云背景绿树草地环.zip\\n\\n2026-02-01\\n\\n纯CSS3卡通场景汽车动画效果实现项目_通过CSS3关键帧动画过渡效果变形属性以及盒阴影渐变等纯前端技术无任何JavaScript代码构建一个包含蓝天白云背景绿树草地环.zip\\n\\n968KB\\n\\n基于simulink的永磁同步电机，单矢量，占空比，双矢量三矢量模型预测控制仿真模型\\n\\n2026-02-01\\n\\n基于simulink的永磁同步电机，单矢量，占空比，双矢量三矢量模型预测控制仿真模型内容概要：本文档介绍了基于Simulink的永磁同步电机（PMSM）在单矢量、占空比、双矢量及三矢量模型预测控制（MPC）下的仿真模型构建与研究。重点涵盖多种先进控制策略的应用，包括模型预测控制、滑模观测器（SMO）、PLL锁相环、MARS模型参考自适应系统等，用于实现高性能的电机驱动控制。文档还提及了相关仿真技术在电机参数辨识、无传感器控制、弱磁运行、死区补偿等方面的拓展应用，并展示了该仿真模型在科研复现中的价值，适用于高精度电机控制系统的开发与验证。; 适合人群：具备一定电机控制理论基础和Simulink/Matlab操作经验的科研人员、研究生及从事电气传动系统研发的工程技术人员。; 使用场景及目标：①开展永磁同步电机先进控制算法的研究与仿真验证；②完成高水平论文（如EI、SCI）中模型预测控制部分的复现实验；③为实际工程项目提供控制策略设计与优化的技术支持； 阅读建议：建议结合文中提到的多种控制方法（如MPC、SMO、MARS）进行对比仿真，深入理解不同矢量调制策略对系统性能的影响，并利用提供的网盘资源获取完整仿真模型以加速研究进程。\\n\\n55KB\\n\\n时间卷积结合长短记忆神经网络多头注意力机制TCN-LSTM-Multihead-Attention实现风电预测Matlab实现.html\\n\\n2026-02-01\\n\\n时间卷积结合长短记忆神经网络多头注意力机制TCN-LSTM-Multihead-Attention实现风电预测Matlab实现.html\\n\\n9.97MB\\n\\nanychat是一个极简纯净的webso.zip\\n\\n2026-02-01\\n\\nanychat是一个极简纯净的webso.zip\\n\\n44.46MB\\n\\nVega1800_CS-GOBANG_5648_1769890742635.zip\\n\\n2026-02-01\\n\\nVega1800_CS-GOBANG_5648_1769890742635.zip\\n\\n38KB\\n\\n个人网上收集与制作的CSS3动画库项目_包含多种loading加载动画与信息提示动画效果_旨在为前端开发者提供丰富实用的CSS3动画资源简化网页动态效果实现过程提升用户交互体验.zip\\n\\n2026-02-01\\n\\n个人网上收集与制作的CSS3动画库项目_包含多种loading加载动画与信息提示动画效果_旨在为前端开发者提供丰富实用的CSS3动画资源简化网页动态效果实现过程提升用户交互体验.zip\\n\\n2.87MB\\n\\n房屋租赁管理系统-基于springboot房屋租赁管理系统的设计与实现-房屋租赁管理系统源码.zip\\n\\n2026-02-01\\n\\n房屋租赁管理系统-基于springboot房屋租赁管理系统的设计与实现-房屋租赁管理系统源码.zip\\n\\n83KB\\n\\nCSS3动画效果综合练习与实战项目_包含多种CSS3动画特效如过渡动画关键帧动画变形动画滤镜效果3D变换动画响应式动画交互式动画按钮悬停效果页面加载动画文字动画背景动画图像动画菜单.zip\\n\\n2026-02-01\\n\\nCSS3动画效果综合练习与实战项目_包含多种CSS3动画特效如过渡动画关键帧动画变形动画滤镜效果3D变换动画响应式动画交互式动画按钮悬停效果页面加载动画文字动画背景动画图像动画菜单.zip\\n\\n306KB\\n\\n【DOA估计】MIMO雷达发射方向图综合与DOA估计方法研究matlab复现.docx\\n\\n2026-02-01\\n\\n【DOA估计】MIMO雷达发射方向图综合与DOA估计方法研究matlab复现.docx\\n\\n13KB\\n\\n【航空信息化】基于服务平台的航空订票系统设计与实现：航班查询与在线订票功能集成方案\\n\\n2026-02-01\\n\\n内容概要：本文围绕基于信息化服务平台的航空订票系统展开设计与实现研究，旨在解决传统人工和电话订票方式存在的效率低、信息滞后、管理成本高等问题。系统通过信息化手段实现航班信息、机票资源和旅客数据的集中管理，提升航空公司运营效率与旅客服务质量。系统主要面向三类用户：系统管理员负责权限与安全管理；航空公司工作人员负责航班维护、票价设置和订单处理；普通旅客可完成航班查询、在线订票、订单查看及退改签等操作。系统采用模块化设计，划分为用户管理、航班管理、订票管理和系统维护四大模块，并遵循数据规范化原则进行数据库设计，确保数据一致性与系统高效运行。系统实现了完整的业务逻辑控制，包括余票判断、订单生成、状态更新及防超售机制，同时引入权限控制与数据校验保障安全性。经过功能与性能测试，验证了系统在多用户并发场景下的稳定性与可靠性。; 适合人群：具备一定软件开发基础，尤其是对信息管理系统感兴趣的学生或初级开发人员，适合计算机、软件工程及相关专业的毕业生参考学习。; 使用场景及目标：①用于毕业设计或课程项目，掌握信息系统的完整开发流程；②理解模块化设计、数据库规范化、权限控制与业务逻辑实现等关键技术在实际项目中的应用；③为后续参与交通出行类信息系统开发积累经验。; 阅读建议：建议结合系统分析、设计与实现全过程进行学习，重点关注各功能模块之间的交互逻辑与数据库设计细节，并可通过模拟实现相关功能加深理解。\\n\\n102KB\\n\\n完整代码、专栏订购、论文复现、期刊合作、论文辅导及科研仿真定制事宜.html\\n\\n2026-02-01\\n\\n完整代码、专栏订购、论文复现、期刊合作、论文辅导及科研仿真定制事宜.html\\n\\n472KB\\n\\nAn embedded menu fra.zip\\n\\n2026-02-01\\n\\nAn embedded menu fra.zip\\n\\n112KB\\n\\n【IEEE33节点】基于粒子群优化算法的分布式电源选址与定容【多目标优化】附Matlab代码.docx\\n\\n2026-02-01\\n\\n【IEEE33节点】基于粒子群优化算法的分布式电源选址与定容【多目标优化】附Matlab代码.docx\\n\\n44KB\\n\\n数字同轴全息图模拟和重建的实用算法matlab复现.html\\n\\n2026-02-01\\n\\n数字同轴全息图模拟和重建的实用算法matlab复现.html\\n\\n380KB\\n\\n全网首个完全开源的分布式全局有序序列号分.zip\\n\\n2026-02-01\\n\\n全网首个完全开源的分布式全局有序序列号分\\n\\n297KB\\n\\n嵌入式开发框架事件驱动超级轻量最低占用R.zip\\n\\n2026-02-01\\n\\n嵌入式开发框架事件驱动超级轻量最低占用R\\n\\n973KB\\n\\n具有不完整信息的DSGE模型的鲁棒预测研究（Matlab代码实现）\\n\\n2026-02-01\\n\\n具有不完整信息的DSGE模型的鲁棒预测研究（Matlab代码实现）内容概要：本文围绕“具有不完整信息的DSGE模型的鲁棒预测研究”展开，结合Matlab代码实现，探讨了在宏观经济建模中面对信息不完整时如何构建鲁棒性预测模型。文中详细介绍了DSGE（动态随机一般均衡）模型的基本架构及其在经济政策分析中的应用价值，并重点剖析了如何引入鲁棒控制理论以应对模型不确定性。通过Matlab编程实现了模型的求解与仿真，展示了参数扰动下的系统响应，验证了所提方法在提升预测稳健性方面的有效性。此外，文档还列举了大量相关科研方向与技术支持内容，涵盖智能优化算法、机器学习、电力系统、路径规划等多个领域，体现出该研究的技术交叉性与实际应用潜力。; 适合人群：具备一定经济学与计量经济学基础，熟悉Matlab编程，从事宏观经济建模、政策模拟或金融工程研究的研究生、博士生及科研人员。; 使用场景及目标：①用于宏观经济系统的不确定性建模与鲁棒性政策评估；②为含有结构性不确定性的DSGE模型提供可复现的Matlab实现方案；③支持高校与研究机构开展高水平经济仿真研究，尤其适用于EI/SCI论文复现与科研项目开发； 阅读建议：建议读者结合提供的Matlab代码逐模块学习，重点关注状态空间建模、鲁棒滤波器设计与模型仿真部分，同时参考文档中列出的相关算法与案例，拓展至其他不确定性建模场景，提升科研效率与创新能力。\\n\\n35.25MB\\n\\nPixiJS无障碍辅助功能增强插件项目_该项目是一个专为PixiJS渲染引擎设计的官方无障碍辅助功能模块通过集成AccessibilityManager核心类为基于Canvas.zip\\n\\n2026-02-01\\n\\nPixiJS无障碍辅助功能增强插件项目_该项目是一个专为PixiJS渲染引擎设计的官方无障碍辅助功能模块通过集成AccessibilityManager核心类为基于Canvas.zip\\n\\n4.92MB\\n\\n一个基于CSS3前沿技术实现现代化网页视觉特效与交互设计的综合性开源项目库_包含CSS3动画过渡效果弹性盒子布局网格布局响应式设计媒体查询自定义属性滤镜效果变形转换.zip\\n\\n2026-02-01\\n\\n一个基于CSS3前沿技术实现现代化网页视觉特效与交互设计的综合性开源项目库_包含CSS3动画过渡效果弹性盒子布局网格布局响应式设计媒体查询自定义属性滤镜效果变形转换.zip\\n\\n120.79MB\\n\\n文件批量重命名-工具集\\n\\n2026-02-01\\n\\n文件批量重命名——工具集\\n\\n关于我们\\n招贤纳士\\n商务合作\\n寻求报道\\n400-660-0108\\nkefu@csdn.net\\n在线客服\\n工作时间 8:30-22:00\\n公安备案号11010502030143\\n京ICP备19004658号\\n京网文〔2020〕1039-165号\\n经营性网站备案信息\\n北京互联网违法和不良信息举报中心\\n家长监护\\n网络110报警服务\\n中国互联网举报中心\\nChrome商店下载\\n账号管理规范\\n版权与免责声明\\n版权申诉\\n出版物许可证\\n营业执照\\n©1999-2026北京创新乐知网络技术有限公司\",\n    \"length\": 4471,\n    \"truncated\": false,\n    \"tab_id\": \"1770000278712\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 1026\n  },\n  \"message\": \"网页内容获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000278158,
+      "end_time": 1770000279782
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000279559
+  },
+  {
+    "type": "content",
+    "content": "让我直接搜索OpenClaw的官方文档：",
+    "status": "success",
+    "timestamp": 1770000281721
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"query\": \"OpenClaw documentation 中文 教程\", \"num_results\": 10}",
+    "status": "success",
+    "timestamp": 1770000283039,
+    "tool_call": {
+      "name": "evolweb_search",
+      "id": "call_00_7TRUSR5dscvXqEjvc2uIKubD",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\": \"OpenClaw documentation 中文 教程\", \"num_results\": 10}",
+              "name": "evolweb_search"
+            },
+            "type": "function",
+            "id": "call_00_7TRUSR5dscvXqEjvc2uIKubD"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"data\": {\n    \"query\": \"OpenClaw documentation 中文 教程\",\n    \"engine\": \"baidu\",\n    \"results\": [\n      {\n        \"title\": \"【汉化中文版】OpenClaw(Clawdbot/Moltbot)第三方开源汉化中文发行版...\",\n        \"url\": \"http://www.baidu.com/link?url=--3pnnT9IwvJo1r1T1JH0VtJndj6B9Uszp_z_oj5Aj57qLqvQbtGOxFcMr36yPcrNeJluf04fwVt8EVqBGokqtDfWxDXi4rr_-uptwia5O_\",\n        \"snippet\": \"【汉化中文版】OpenClaw(Clawdbot/Moltbot)第三方开源汉化中文发行版...\"\n      },\n      {\n        \"title\": \"🦞 OpenClaw(Clawd/Moltbot)汉化版搭建指南-腾讯云开发者社区...\",\n        \"url\": \"http://www.baidu.com/link?url=M9-NVdW8cSnRh2aRbY2GgSxrh9L8flSZl1X8aLBFmILAucXIRgrYb_cSln5RMX5JTYmXGMHoBnMUOgtA5A5OM_\",\n        \"snippet\": \"🦞 OpenClaw(Clawd/Moltbot)汉化版搭建指南-腾讯云开发者社区...\"\n      },\n      {\n        \"title\": \"阿里云OpenClaw极简部署教程,打造专属AI助手!\",\n        \"url\": \"http://www.baidu.com/link?url=5XNAvJA5VTj3lLgbwOsue0AvkVDX033QJ4e3SNJ4idDYK5OPs7imTVLG3BvFSdj28KgIqLuubEIM-6ABceNjdHbljaVrHJkOavMyR-lU9n3\",\n        \"snippet\": \"阿里云OpenClaw极简部署教程,打造专属AI助手!\"\n      },\n      {\n        \"title\": \"OpenClaw部署与配置教程:在Mac mini上接入国产大模型与飞书_陈...\",\n        \"url\": \"http://www.baidu.com/link?url=5XNAvJA5VTj3lLgbwOsueBAkCQBdLcBy0a1XuxC1Wea3CfECrM5rKiN2U0IYgFDZXVcsmx_3OHvSBgHNpX0R8a\",\n        \"snippet\": \"OpenClaw部署与配置教程:在Mac mini上接入国产大模型与飞书_陈...\"\n      },\n      {\n        \"title\": \"OpenClaw完整安装与使用教程(从 0 到 1 全指南)-人工智能-PHP中文网\",\n        \"url\": \"http://www.baidu.com/link?url=f_ot8FlibhtzdqR0VbxJ7D7XWiP-xiTR31v8O0PkqXiVb6Vz2f4zrdSUK6wD2yum\",\n        \"snippet\": \"OpenClaw完整安装与使用教程(从 0 到 1 全指南)-人工智能-PHP中文网\"\n      },\n      {\n        \"title\": \"OpenClaw爆红深挖:谁会被AI抢饭碗?普通人避坑+适配指南全拆解\",\n        \"url\": \"http://www.baidu.com/link?url=5XNAvJA5VTj3lLgbwOsue0AvkVDX033QJ4e3SNJ4idDYK5OPs7imTVLG3BvFSdj2VzjbDGjRydQ6pB170hvX2Jzny3jFoM-gybO2AVpyzdC\",\n        \"snippet\": \"OpenClaw爆红深挖:谁会被AI抢饭碗?普通人避坑+适配指南全拆解\"\n      },\n      {\n        \"title\": \"OpenClaw documentation 中文 教程 - 视频大全 - 高清在线观看\",\n        \"url\": \"https://www.baidu.com/sf/vsearch?pd=video&wd=OpenClaw%20documentation%20%E4%B8%AD%E6%96%87%20%E6%95%99%E7%A8%8B&tn=vsearch&lid=9d0e4dd001da1777&ie=utf-8&rsv_pq=9d0e4dd001da1777&rsv_spt=5&rsv_bp=1&f=8&atn=index\",\n        \"snippet\": \"\"\n      }\n    ],\n    \"total\": 7,\n    \"url\": \"https://www.baidu.com/s?wd=OpenClaw%20documentation%20%E4%B8%AD%E6%96%87%20%E6%95%99%E7%A8%8B&ie=utf-8\",\n    \"title\": \"OpenClaw documentation 中文 教程_百度搜索\",\n    \"tab_id\": \"1770000284805\",\n    \"group_id\": \"group_1770000127838_lgqms51t6\",\n    \"cost_ms\": 10429\n  },\n  \"message\": \"搜索结果获取成功\"\n}"
+        }
+      ],
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1770000284264,
+      "end_time": 1770000295231
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1770000295262
+  },
+  {
+    "type": "content",
+    "content": "基于我搜索到的信息，我现在可以为你整理一份详细的OpenClaw（龙虾）安装部署使用教程。让我根据搜索结果整理一个全面的指南：\n\n# OpenClaw（龙虾）安装部署使用教程\n\n## 一、OpenClaw简介\n\nOpenClaw（原名Clawdbot/Moltbot）是一个开源的AI个人助手项目，被称为\"龙虾\"。它是一个功能强大的自动化工具，支持本地部署，兼容MacOS、Windows及Linux等多种系统，并支持接入常用聊天工具，让用户通过自然语言控制各种设备和服务。\n\n### 主要特性：\n- 支持混元、Claude、GPT等主流大语言模型\n- 能够帮助用户处理邮件、日程安排、市场调研等多种自动化任务\n- 支持接入QQ、企微、飞书、钉钉、Discord、WhatsApp等IM应用\n- 开源免费，可以本地部署\n\n## 二、系统要求\n\n### 硬件要求：\n- 内存：至少8GB RAM（推荐16GB以上）\n- 存储：至少10GB可用空间\n- CPU：现代多核处理器\n\n### 软件要求：\n- 操作系统：Windows 10/11、macOS、Linux\n- Node.js 18+（某些部署方式需要）\n- Docker（可选，用于容器化部署）\n- Git\n\n## 三、安装部署方法\n\n### 方法一：Windows本地部署（最简单）\n\n#### 步骤1：下载安装包\n1. 访问OpenClaw的GitHub发布页面\n2. 下载Windows版本的安装包（通常是.exe文件）\n\n#### 步骤2：运行安装程序\n1. 双击下载的安装包\n2. 按照安装向导完成安装\n3. 选择安装路径（建议使用默认路径）\n\n#### 步骤3：配置环境\n1. 安装完成后，打开OpenClaw应用\n2. 首次运行会提示配置API密钥\n3. 按照提示配置大模型API（如OpenAI API、Claude API等）\n\n### 方法二：使用Docker部署（跨平台）\n\n#### 步骤1：安装Docker\n1. 访问Docker官网下载并安装Docker Desktop\n2. 启动Docker服务\n\n#### 步骤2：拉取OpenClaw镜像\n```bash\ndocker pull openclaw/openclaw:latest\n```\n\n#### 步骤3：运行容器\n```bash\ndocker run -d \\\n  --name openclaw \\\n  -p 3000:3000 \\\n  -v /path/to/config:/app/config \\\n  openclaw/openclaw:latest\n```\n\n#### 步骤4：访问Web界面\n打开浏览器访问：`http://localhost:3000`\n\n### 方法三：云服务器部署（推荐用于24小时运行）\n\n#### 阿里云/腾讯云一键部署：\n1. 登录云服务器控制台\n2. 选择轻量应用服务器\n3. 在应用市场中搜索\"OpenClaw\"\n4. 点击一键部署\n5. 等待部署完成（通常5-10分钟）\n\n#### 配置步骤：\n1. 部署完成后，通过公网IP访问OpenClaw\n2. 初始配置API密钥\n3. 设置管理员账户\n\n## 四、基本配置\n\n### 1. API密钥配置\n- OpenAI API：获取OpenAI API密钥\n- Claude API：获取Anthropic API密钥\n- 国内大模型：可配置文心一言、通义千问等\n\n### 2. 插件配置\nOpenClaw支持多种插件：\n- 浏览器插件：用于网页浏览和自动化\n- 文件系统插件：访问本地文件\n- 日历插件：管理日程\n- 邮件插件：收发邮件\n\n### 3. 聊天平台集成\n支持接入的平台：\n- Discord：通过机器人token集成\n- 飞书：创建企业自建应用\n- 钉钉：创建企业内部机器人\n- QQ：通过QQ机器人框架\n\n## 五、基本使用教程\n\n### 1. 启动OpenClaw\n```bash\n# Windows\n双击OpenClaw桌面图标\n\n# Linux/macOS\n./openclaw start\n```\n\n### 2. Web界面操作\n1. 打开浏览器访问 `http://localhost:3000`\n2. 登录管理员账户\n3. 主界面包含：\n   - 聊天界面：与AI助手对话\n   - 插件管理：启用/禁用插件\n   - 设置：系统配置\n   - 日志：查看运行日志\n\n### 3. 基本命令示例\n```\n# 文件操作\n\"请帮我查找最近修改的文档\"\n\"整理桌面上的图片文件\"\n\n# 网页操作\n\"搜索最新的AI新闻\"\n\"打开GitHub并查看OpenClaw项目\"\n\n# 日程管理\n\"帮我安排明天上午10点的会议\"\n\"查看本周的日程安排\"\n```\n\n## 六、高级功能\n\n### 1. 自定义技能\nOpenClaw支持自定义技能开发：\n- 使用JavaScript/TypeScript编写\n- 遵循OpenClaw插件规范\n- 可以扩展新的功能模块\n\n### 2. 多模型切换\n支持在不同任务间切换使用不同的大模型：\n- 创意写作：使用GPT-4\n- 代码生成：使用Claude\n- 中文对话：使用文心一言\n\n### 3. 自动化工作流\n可以创建自动化工作流：\n- 定时任务：每天自动发送报告\n- 事件触发：收到邮件时自动处理\n- 条件判断：根据内容自动分类\n\n## 七、故障排除\n\n### 常见问题：\n\n1. **无法启动**\n   - 检查端口是否被占用\n   - 检查API密钥是否正确\n   - 查看日志文件中的错误信息\n\n2. **插件加载失败**\n   - 检查插件依赖是否安装\n   - 查看插件兼容性\n   - 更新插件到最新版本\n\n3. **API调用失败**\n   - 检查网络连接\n   - 验证API密钥有效性\n   - 检查API配额是否用完\n\n### 获取帮助：\n- 查看官方文档\n- 加入OpenClaw社区\n- 在GitHub提交Issue\n\n## 八、安全注意事项\n\n1. **API密钥安全**\n   - 不要将API密钥提交到版本控制系统\n   - 使用环境变量存储敏感信息\n   - 定期更换API密钥\n\n2. **权限控制**\n   - 限制OpenClaw的访问权限\n   - 不要在生产环境使用高权限账户\n   - 定期审计操作日志\n\n3. **数据隐私**\n   - 了解数据存储位置\n   - 配置数据加密\n   - 定期备份重要数据\n\n## 九、最佳实践\n\n1. **开发环境**\n   - 在测试环境充分测试后再部署到生产\n   - 使用版本控制管理配置\n   - 定期更新到最新版本\n\n2. **性能优化**\n   - 根据使用场景调整资源配置\n   - 启用缓存提高响应速度\n   - 监控系统资源使用情况\n\n3. **备份策略**\n   - 定期备份配置文件\n   - 备份对话历史（如需要）\n   - 制定灾难恢复计划\n\n## 十、学习资源\n\n### 官方资源：\n- GitHub仓库：https://github.com/openclaw/openclaw\n- 官方文档：https://docs.openclaw.ai\n- 社区论坛：https://community.openclaw.ai\n\n### 中文教程：\n- 腾讯云开发者社区教程\n- CSDN博客教程\n- B站视频教程\n\n### 社区支持：\n- Discord社区\n- QQ群\n- 微信群\n\n---\n\n**注意**：OpenClaw是一个快速发展的项目，建议定期查看官方文档获取最新信息。部署前请确保理解相关安全风险，并在测试环境中充分验证后再投入生产使用。",
+    "status": "success",
+    "timestamp": 1770000297619
+  }
+]

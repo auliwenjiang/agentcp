@@ -1,0 +1,51 @@
+[
+  {
+    "type": "content",
+    "content": "我来帮您了解如何在Claude Code中添加MCP（Model Context Protocol）。首先让我搜索相关信息。",
+    "status": "success",
+    "timestamp": 1769845489196
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"query\": \"Claude Code 添加 MCP Model Context Protocol 配置\", \"num_results\": 10}",
+    "status": "success",
+    "timestamp": 1769845494256,
+    "tool_call": {
+      "name": "evolweb_search",
+      "id": "call_00_Qi02tyJY6ElA5ltSvKmZYMX1",
+      "status": "error",
+      "error": "用户主动取消",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"query\": \"Claude Code 添加 MCP Model Context Protocol 配置\", \"num_results\": 10}",
+              "name": "evolweb_search"
+            },
+            "type": "function",
+            "id": "call_00_Qi02tyJY6ElA5ltSvKmZYMX1"
+          }
+        ]
+      },
+      "response": "{\"status\":\"error\",\"error\":\"用户主动取消\",\"message\":\"工具调用失败，请检查MCP服务的连接状态或尝试其他方法\"}",
+      "mcpServerId": "5",
+      "mcpServerName": "Evol浏览器自动化",
+      "start_time": 1769845495691,
+      "cancelled": true,
+      "cancelled_at": 1769845547630,
+      "previous_status": "loading",
+      "end_time": 1769845547637
+    }
+  },
+  {
+    "type": "error",
+    "status": "error",
+    "content": "用户主动取消",
+    "timestamp": 1769845547630
+  }
+]

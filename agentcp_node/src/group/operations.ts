@@ -47,20 +47,58 @@ export class GroupOperations {
 
     /**
      * 从群聊链接解析出 targetAid 和 groupId。
-     * 例如 "https://group.agentcp.io/aa6f95b5-2e2f-4485-b1f4-d35c4940406e"
-     *   => { targetAid: "group.agentcp.io", groupId: "aa6f95b5-2e2f-4485-b1f4-d35c4940406e" }
+     * 支持三种输入格式：
+     * 1. 直接群链接: https://group.agentcp.io/9g9orhzs3tyw
+     * 2. 完整分享文案（自动提取方括号内的链接）: 我加入了Agent互联网...[https://group.agentcp.io/9g9orhzs3tyw]...
+     * 3. 纯群ID: 9g9orhzs3tyw
+     *
+     * 解析优先级：
+     * - 优先匹配方括号内的 URL [...]
+     * - 其次匹配文本中的任何 https:// 开头的 URL
+     * - 最后如果是纯字母数字，当作群ID处理（使用默认 targetAid: group.agentcp.io）
      */
     static parseGroupUrl(groupUrl: string): { targetAid: string; groupId: string } {
+        const input = groupUrl.trim();
+
+        // 1. 优先匹配方括号内的 URL
+        const bracketMatch = input.match(/\[https?:\/\/[^\]]+\]/);
+        if (bracketMatch) {
+            const urlInBracket = bracketMatch[0].slice(1, -1); // 去掉方括号
+            return this._parseUrl(urlInBracket);
+        }
+
+        // 2. 匹配文本中的任何 https:// 开头的 URL
+        const urlMatch = input.match(/https?:\/\/[^\s\]]+/);
+        if (urlMatch) {
+            return this._parseUrl(urlMatch[0]);
+        }
+
+        // 3. 纯字母数字，当作群ID处理
+        if (/^[a-zA-Z0-9_-]+$/.test(input)) {
+            return {
+                targetAid: 'group.agentcp.io',
+                groupId: input
+            };
+        }
+
+        // 都不匹配，尝试直接解析
+        return this._parseUrl(input);
+    }
+
+    /**
+     * 内部方法：解析标准 URL 格式
+     */
+    private static _parseUrl(urlString: string): { targetAid: string; groupId: string } {
         let url: URL;
         try {
-            url = new URL(groupUrl);
+            url = new URL(urlString);
         } catch {
-            throw new Error(`无效的群聊链接: ${groupUrl}`);
+            throw new Error(`无效的群链接: ${urlString}`);
         }
         const targetAid = url.hostname;
         const groupId = url.pathname.replace(/^\//, '');
         if (!targetAid || !groupId) {
-            throw new Error(`群聊链接缺少 targetAid 或 groupId: ${groupUrl}`);
+            throw new Error(`群链接缺少 targetAid 或 groupId: ${urlString}`);
         }
         return { targetAid, groupId };
     }

@@ -61,16 +61,21 @@ bool HeartbeatClient::Online() {
         return true;
     }
 
+    ACP_LOGI("HeartbeatClient::Online() creating UDP socket...");
     udp_socket_ = std::make_unique<net::UdpSocket>();
+    ACP_LOGI("HeartbeatClient::Online() binding UDP socket to 0.0.0.0:0...");
     if (!udp_socket_->Bind("0.0.0.0", 0)) {
         ACP_LOGE("HeartbeatClient::Online() UDP bind FAILED");
         return false;
     }
+    ACP_LOGI("HeartbeatClient::Online() UDP socket bound successfully, IsValid=%d", udp_socket_->IsValid());
 
     is_running_ = true;
     is_sending_ = true;
 
+    ACP_LOGI("HeartbeatClient::Online() starting send thread...");
     send_thread_ = std::thread(&HeartbeatClient::SendHeartbeatLoop, this);
+    ACP_LOGI("HeartbeatClient::Online() starting receive thread...");
     receive_thread_ = std::thread(&HeartbeatClient::ReceiveLoop, this);
 
     ACP_LOGI("HeartbeatClient::Online() threads started");
@@ -133,6 +138,7 @@ bool HeartbeatClient::IsRunning() const {
 }
 
 void HeartbeatClient::SendHeartbeatLoop() {
+    ACP_LOGI("HeartbeatClient::SendHeartbeatLoop started");
     while (is_sending_ && is_running_) {
         try {
             auto now_ms = static_cast<uint64_t>(
@@ -166,17 +172,22 @@ void HeartbeatClient::SendHeartbeatLoop() {
                 auto data = req.Serialize();
                 if (udp_socket_ && udp_socket_->IsValid()) {
                     udp_socket_->SendTo(data, ip, static_cast<uint16_t>(port));
+                } else {
+                    ACP_LOGE("HeartbeatClient: Cannot send heartbeat - socket invalid!");
                 }
             }
 
             std::this_thread::sleep_for(std::chrono::seconds(1));
         } catch (...) {
+            ACP_LOGE("HeartbeatClient::SendHeartbeatLoop exception");
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
+    ACP_LOGI("HeartbeatClient::SendHeartbeatLoop exited");
 }
 
 void HeartbeatClient::ReceiveLoop() {
+    ACP_LOGI("HeartbeatClient::ReceiveLoop started for agent: %s", agent_id_.c_str());
     uint8_t buffer[1536];
     while (is_running_) {
         try {
@@ -209,10 +220,18 @@ void HeartbeatClient::ReceiveLoop() {
                     }
                 }
             } else if (header.message_type == protocol::MSG_TYPE_INVITE_REQ) {
+                ACP_LOGI("=== HeartbeatClient: Received MSG_TYPE_INVITE_REQ via UDP ===");
                 auto invite_req = protocol::InviteMessageReq::Deserialize(buffer, n);
+                ACP_LOGI("HeartbeatClient: Invite details - session_id=%s, inviter=%s, invite_code=%s",
+                         invite_req.session_id.c_str(), invite_req.inviter_agent_id.c_str(),
+                         invite_req.invite_code.c_str());
 
                 if (invite_callback_) {
+                    ACP_LOGI("HeartbeatClient: Calling invite_callback_");
                     invite_callback_(invite_req);
+                    ACP_LOGI("HeartbeatClient: invite_callback_ returned");
+                } else {
+                    ACP_LOGW("HeartbeatClient: invite_callback_ is NULL!");
                 }
 
                 // Send invite response
@@ -238,7 +257,11 @@ void HeartbeatClient::ReceiveLoop() {
 
                 auto data = resp.Serialize();
                 if (udp_socket_ && udp_socket_->IsValid()) {
+                    ACP_LOGI("HeartbeatClient: Sending invite response to %s:%d", ip.c_str(), port);
                     udp_socket_->SendTo(data, ip, static_cast<uint16_t>(port));
+                    ACP_LOGI("HeartbeatClient: Invite response sent");
+                } else {
+                    ACP_LOGE("HeartbeatClient: Cannot send invite response - socket invalid!");
                 }
             }
         } catch (...) {

@@ -22,7 +22,7 @@
 
 1. 复制 AAR 文件：
    ```bash
-   copy "H:\project\agentcp-so\android\build\outputs\aar\agentcp-android-release.aar" "H:\project\evol_main\evol_app\evol\android\app\libs\"
+   copy "H:\project\evol_main\evol_app\agentcp-so\android\build\outputs\aar\agentcp-android-release.aar" "H:\project\evol_main\evol_app\evol\android\app\libs\"
    ```
 
 2. 编辑 `android/app/build.gradle.kts`，在 `dependencies` 块末尾添加：
@@ -42,7 +42,7 @@
            google()
            mavenCentral()
            maven {
-               url = uri("H:/project/agentcp-so/android/build/repo")
+               url = uri("H:/project/evol_main/evol_app/agentcp-so/android/build/repo")
            }
        }
    }
@@ -384,4 +384,4 @@ flutter run
 
 如遇问题，请参考：
 - [完整文档](README_AGENTCP.md)
-- [AgentCP SDK 接入指南](H:\project\agentcp-so\android\INTEGRATION_GUIDE.md)
+- [AgentCP SDK 接入指南](H:\project\evol_main\evol_app\agentcp-so\android\INTEGRATION_GUIDE.md)

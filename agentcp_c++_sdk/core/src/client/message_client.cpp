@@ -65,12 +65,7 @@ bool MessageClient::Connect() {
 
     if (!ok) {
         state_ = ConnectionState::Disconnected;
-        if (config_.auto_reconnect && !shutdown_requested_) {
-            // Start reconnection in background
-            if (!reconnect_thread_.joinable()) {
-                reconnect_thread_ = std::thread(&MessageClient::ReconnectLoop, this);
-            }
-        }
+        StartReconnectLoopIfNeeded();
     }
 
     return ok;
@@ -88,6 +83,7 @@ void MessageClient::Disconnect() {
     if (reconnect_thread_.joinable()) {
         reconnect_thread_.join();
     }
+    reconnect_loop_running_ = false;
 
     // Notify all ack waiters
     {
@@ -156,6 +152,10 @@ bool MessageClient::IsConnected() const {
 
 bool MessageClient::IsHealthy() const {
     return IsConnected() && !shutdown_requested_;
+}
+
+bool MessageClient::IsReconnectLoopRunning() const {
+    return reconnect_loop_running_.load();
 }
 
 void MessageClient::SetMessageHandler(OnMessageCallback handler) {
@@ -241,17 +241,14 @@ void MessageClient::OnWsClose(int code, const std::string& reason) {
     }
 
     // Auto-reconnect if not shutting down
-    if (config_.auto_reconnect && !shutdown_requested_) {
-        if (!reconnect_thread_.joinable()) {
-            reconnect_thread_ = std::thread(&MessageClient::ReconnectLoop, this);
-        }
-    }
+    StartReconnectLoopIfNeeded();
 }
 
 void MessageClient::OnWsError(const std::string& error) {
     ACP_LOGE("MC::WebSocket ERROR: %s", error.c_str());
     (void)error;
     state_ = ConnectionState::Disconnected;
+    StartReconnectLoopIfNeeded();
 }
 
 void MessageClient::ReconnectLoop() {
@@ -277,6 +274,7 @@ void MessageClient::ReconnectLoop() {
 
         if (ok) {
             // Successfully reconnected
+            reconnect_loop_running_ = false;
             return;
         }
 
@@ -285,6 +283,23 @@ void MessageClient::ReconnectLoop() {
             current_reconnect_interval_ * config_.reconnect_backoff_factor,
             config_.reconnect_max_interval);
         ++reconnect_attempt_count_;
+    }
+
+    reconnect_loop_running_ = false;
+}
+
+void MessageClient::StartReconnectLoopIfNeeded() {
+    if (!config_.auto_reconnect || shutdown_requested_) {
+        return;
+    }
+
+    if (reconnect_thread_.joinable() && !reconnect_loop_running_.load()) {
+        reconnect_thread_.join();
+    }
+
+    bool expected = false;
+    if (reconnect_loop_running_.compare_exchange_strong(expected, true)) {
+        reconnect_thread_ = std::thread(&MessageClient::ReconnectLoop, this);
     }
 }
 

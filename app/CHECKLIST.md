@@ -11,8 +11,8 @@
 
 ### 文件准备
 - [ ] AgentCP AAR 文件已构建
-  - 位置: `H:\project\agentcp-so\android\build\outputs\aar\agentcp-android-release.aar`
-  - 或: `H:\project\agentcp-so\android\build\repo\com\agentcp\agentcp-sdk\0.1.0\`
+  - 位置: `H:\project\evol_main\evol_app\agentcp-so\android\build\outputs\aar\agentcp-android-release.aar`
+  - 或: `H:\project\evol_main\evol_app\agentcp-so\android\build\repo\com\agentcp\agentcp-sdk\0.1.0\`
 
 ---
 
@@ -27,7 +27,7 @@
 
 - [ ] 复制 AAR 文件
   ```bash
-  copy "H:\project\agentcp-so\android\build\outputs\aar\agentcp-android-release.aar" ^
+  copy "H:\project\evol_main\evol_app\agentcp-so\android\build\outputs\aar\agentcp-android-release.aar" ^
        "H:\project\evol_main\evol_app\evol\android\app\libs\"
   ```
 
@@ -47,7 +47,7 @@
           google()
           mavenCentral()
           maven {
-              url = uri("H:/project/agentcp-so/android/build/repo")
+              url = uri("H:/project/evol_main/evol_app/agentcp-so/android/build/repo")
           }
       }
   }

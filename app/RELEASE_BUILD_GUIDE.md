@@ -138,7 +138,7 @@ keytool -printcert -jarfile build/app/outputs/flutter-apk/app-release.apk
 
 ```kotlin
 include(":agentcp-sdk")
-project(":agentcp-sdk").projectDir = file("H:/project/agentcp-so/android")
+project(":agentcp-sdk").projectDir = file("H:/project/evol_main/evol_app/agentcp-so/android")
 ```
 
 SDK 使用 CMake 编译 C++ 原生代码，支持以下 ABI：

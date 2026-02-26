@@ -76,7 +76,7 @@ dependencyResolutionManagement {
         mavenCentral()
         // 添加本地 Maven 仓库
         maven {
-            url = uri("H:/project/agentcp-so/android/build/repo")
+            url = uri("H:/project/evol_main/evol_app/agentcp-so/android/build/repo")
         }
     }
 }
@@ -322,7 +322,7 @@ flutter run
 
 ## 参考文档
 
-- [AgentCP Android SDK 接入指南](H:\project\agentcp-so\android\INTEGRATION_GUIDE.md)
+- [AgentCP Android SDK 接入指南](H:\project\evol_main\evol_app\agentcp-so\android\INTEGRATION_GUIDE.md)
 - [Flutter Platform Channels](https://docs.flutter.dev/development/platform-integration/platform-channels)
 
 ## 版本信息

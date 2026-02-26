@@ -40,6 +40,7 @@ dependencies:
   http: ^1.6.0
   crypto: ^3.0.6
   flutter_markdown: ^0.7.6
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

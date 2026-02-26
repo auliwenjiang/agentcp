@@ -23,6 +23,35 @@ namespace net {
 
 UdpSocket::UdpSocket() : sock_(INVALID_SOCK) {}
 
+namespace {
+
+bool ResolveIpv4(const std::string& host, struct in_addr* out_addr) {
+    if (out_addr == nullptr) return false;
+
+    // Fast path: already an IPv4 literal.
+    if (inet_pton(AF_INET, host.c_str(), out_addr) == 1) {
+        return true;
+    }
+
+    // Fallback: resolve hostname to IPv4.
+    struct addrinfo hints{};
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    struct addrinfo* result = nullptr;
+    int rc = getaddrinfo(host.c_str(), nullptr, &hints, &result);
+    if (rc != 0 || result == nullptr) {
+        return false;
+    }
+
+    auto* ipv4 = reinterpret_cast<struct sockaddr_in*>(result->ai_addr);
+    *out_addr = ipv4->sin_addr;
+    freeaddrinfo(result);
+    return true;
+}
+
+}  // namespace
+
 UdpSocket::~UdpSocket() {
     Close();
 }
@@ -72,7 +101,9 @@ int UdpSocket::SendTo(const uint8_t* data, size_t len,
     struct sockaddr_in dest{};
     dest.sin_family = AF_INET;
     dest.sin_port = htons(dest_port);
-    inet_pton(AF_INET, dest_ip.c_str(), &dest.sin_addr);
+    if (!ResolveIpv4(dest_ip, &dest.sin_addr)) {
+        return -1;
+    }
 
     return (int)sendto((int)sock_, (const char*)data, (int)len, 0,
                        (struct sockaddr*)&dest, sizeof(dest));

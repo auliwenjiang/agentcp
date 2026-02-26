@@ -43,3 +43,23 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android build artifacts
+/android/.gradle/
+/android/app/build/
+/android/build/
+/android/local.properties
+/android/key.properties
+
+# Gradle
+.gradle/
+*.apk
+*.aab
+*.jks
+
+# Generated files
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/
+.packages
+pubspec.lock

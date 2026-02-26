@@ -70,6 +70,22 @@ class AppTexts {
     return 'AgentCP App';
   }
 
+  static String copyMyAidCard(BuildContext context) {
+    return _isZh(context) ? '复制我的身份证' : 'Copy My ID Card';
+  }
+
+  static String myAidCardMessage(BuildContext context, String nickname, String aid) {
+    if (_isZh(context)) {
+      return '我是$nickname，我加入了Agent互联网，https://$aid/agent.md 这是我的"身份证"，快来找我聊天吧！';
+    } else {
+      return 'I am $nickname, I joined the Agent Internet. https://$aid/agent.md is my "ID card", come chat with me!';
+    }
+  }
+
+  static String aidCardCopied(BuildContext context) {
+    return _isZh(context) ? '已复制到剪贴板' : 'Copied to clipboard';
+  }
+
   static String noChatsYet(BuildContext context) {
     return _isZh(context) ? '\u6682\u65e0\u804a\u5929' : 'No chats yet.';
   }
@@ -262,6 +278,18 @@ class AppTexts {
     return _isZh(context) ? '\u5df2\u9000\u51fa\u7fa4\u7ec4' : 'Left group';
   }
 
+  static String groupDisbanded(BuildContext context) {
+    return _isZh(context) ? '\u5df2\u89e3\u6563' : 'Disbanded';
+  }
+
+  static String groupInactive(BuildContext context) {
+    return _isZh(context) ? '\u5df2\u9000\u51fa' : 'Inactive';
+  }
+
+  static String cannotSendGroupDisbanded(BuildContext context) {
+    return _isZh(context) ? '\u7fa4\u7ec4\u5df2\u89e3\u6563\uff0c\u65e0\u6cd5\u53d1\u9001\u6d88\u606f' : 'Group disbanded, cannot send messages';
+  }
+
   static String leaveButton(BuildContext context) {
     return _isZh(context) ? '\u9000\u51fa' : 'Leave';
   }
@@ -310,6 +338,44 @@ class AppTexts {
     return _isZh(context)
         ? '\u53d1\u9001\u5931\u8d25: $reason'
         : 'Send failed: $reason';
+  }
+
+  static String groupIdCopied(BuildContext context) {
+    return _isZh(context) ? '群ID已复制' : 'Group ID copied';
+  }
+
+  static String groupLinkCopied(BuildContext context) {
+    return _isZh(context) ? '群链接已复制' : 'Group link copied';
+  }
+
+  static String copyGroupLink(BuildContext context) {
+    return _isZh(context) ? '复制群链接' : 'Copy Group Link';
+  }
+
+  static String copyWithInviteCode(BuildContext context) {
+    return _isZh(context) ? '带邀请码复制' : 'Copy with invite code';
+  }
+
+  static String copyWithoutInviteCode(BuildContext context) {
+    return _isZh(context) ? '不带邀请码复制' : 'Copy without invite code';
+  }
+
+  static String shareGroupMessage(BuildContext context, String myAid, String groupName, String groupLink) {
+    return _isZh(context)
+        ? '我加入了Agent互联网，访问https://$myAid查看我的个人信息，快来加入$groupName[$groupLink]一起聊天吧'
+        : 'I joined the Agent Internet, visit https://$myAid to see my profile. Come join $groupName[$groupLink] and chat together!';
+  }
+
+  static String onlyOwnerCanCopyLink(BuildContext context) {
+    return _isZh(context) ? '仅群主可以复制群链接' : 'Only the group owner can copy the group link';
+  }
+
+  static String invalidGroupUrl(BuildContext context) {
+    return _isZh(context) ? '无效的群链接' : 'Invalid group URL';
+  }
+
+  static String offlineReconnecting(BuildContext context) {
+    return _isZh(context) ? '离线中，正在重连...' : 'Offline, reconnecting...';
   }
 
   static bool _isZh(BuildContext context) {

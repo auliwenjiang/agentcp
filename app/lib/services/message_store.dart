@@ -42,7 +42,7 @@ class MessageStore {
 
   Future<void> saveMessageWithPeer(String ownerAid, ChatMessage msg, {String? peerAid}) async {
     if (_basePath == null) await init();
-    
+
     // Update Index
     final indexFile = File(_getIndexPath(ownerAid));
     List<Map<String, dynamic>> sessions = [];
@@ -51,7 +51,7 @@ class MessageStore {
         final content = await indexFile.readAsString();
         sessions = List<Map<String, dynamic>>.from(jsonDecode(content));
       } catch (e) {
-        print('[MessageStore] Error reading index: $e');
+        // Error reading index
       }
     } else {
         await _ensureDir(_getSessionsDir(ownerAid));
@@ -60,7 +60,7 @@ class MessageStore {
     final sessionId = msg.sessionId;
     final timestamp = msg.timestamp;
     final incomingPeerAid = _normalizePeerAid(peerAid);
-    
+
     int index = sessions.indexWhere((s) => s['sessionId'] == sessionId);
     if (index != -1) {
       sessions[index]['lastMessageAt'] = timestamp;
@@ -73,12 +73,15 @@ class MessageStore {
           sessions[index]['peerAid'] = msg.sender;
         }
       }
+      // Initialize unreadCount if not present
+      if (!sessions[index].containsKey('unreadCount')) {
+        sessions[index]['unreadCount'] = 0;
+      }
     } else {
       final resolvedPeerAid = incomingPeerAid.isNotEmpty
           ? incomingPeerAid
           : (msg.sender == ownerAid ? '' : msg.sender);
       if (resolvedPeerAid.isEmpty) {
-        print('[MessageStore] Abort: cannot create session without valid peerAid (sessionId=$sessionId)');
         return;
       }
       sessions.add({
@@ -89,10 +92,11 @@ class MessageStore {
         'createdAt': timestamp,
         'lastMessageAt': timestamp,
         'messageCount': 1,
+        'unreadCount': 0,
         'closed': false,
       });
     }
-    
+
     await indexFile.writeAsString(jsonEncode(sessions));
 
     // Append message to JSONL
@@ -123,7 +127,8 @@ class MessageStore {
         for (var s in jsonSessions) {
             final sessionId = s['sessionId'];
             final peerAid = _normalizePeerAid(s['peerAid']?.toString());
-            final sessionItem = SessionItem(sessionId: sessionId, peerAid: peerAid);
+            final unreadCount = s['unreadCount'] as int? ?? 0;
+            final sessionItem = SessionItem(sessionId: sessionId, peerAid: peerAid, unreadCount: unreadCount);
             
             // Load messages
             final msgFile = File(_getSessionFilePath(ownerAid, sessionId));
@@ -145,18 +150,17 @@ class MessageStore {
                             isMine: m['type'] == 'sent',
                         ));
                     } catch (e) {
-                        print('[MessageStore] Error parsing message line: $e');
+                        // Error parsing message line
                     }
                 }
               } catch (e) {
-                print('[MessageStore] Error reading session file $sessionId: $e');
+                // Error reading session file
               }
             }
             sessions.add(sessionItem);
         }
         return sessions;
     } catch (e) {
-        print('[MessageStore] Error loading sessions: $e');
         return [];
     }
   }
@@ -173,7 +177,7 @@ class MessageStore {
         sessions.removeWhere((s) => s['sessionId'] == sessionId);
         await indexFile.writeAsString(jsonEncode(sessions));
       } catch (e) {
-        print('[MessageStore] Error deleting session from index: $e');
+        // Error deleting session from index
       }
     }
 
@@ -205,7 +209,7 @@ class MessageStore {
       sessions[index]['peerAid'] = normalizedPeerAid;
       await indexFile.writeAsString(jsonEncode(sessions));
     } catch (e) {
-      print('[MessageStore] Error updating peerAid: $e');
+      // Error updating peerAid
     }
   }
 
@@ -213,6 +217,54 @@ class MessageStore {
     final trimmed = (value ?? '').trim();
     if (trimmed.isEmpty) return '';
     return trimmed;
+  }
+
+  /// Increment unread count for a P2P session by 1.
+  Future<void> incrementUnread(String ownerAid, String sessionId) async {
+    if (_basePath == null) await init();
+    await _ensureDir(_getSessionsDir(ownerAid));
+    final indexFile = File(_getIndexPath(ownerAid));
+    try {
+      List<Map<String, dynamic>> sessions = [];
+      if (await indexFile.exists()) {
+        final content = await indexFile.readAsString();
+        sessions = List<Map<String, dynamic>>.from(jsonDecode(content));
+      }
+      final idx = sessions.indexWhere((s) => s['sessionId'] == sessionId);
+      if (idx == -1) {
+        final now = DateTime.now().millisecondsSinceEpoch;
+        sessions.add({
+          'sessionId': sessionId,
+          'peerAid': '',
+          'ownerAid': ownerAid,
+          'type': 'incoming',
+          'createdAt': now,
+          'lastMessageAt': now,
+          'messageCount': 0,
+          'unreadCount': 1,
+          'closed': false,
+        });
+      } else {
+        sessions[idx]['unreadCount'] = (sessions[idx]['unreadCount'] as int? ?? 0) + 1;
+      }
+      await indexFile.writeAsString(jsonEncode(sessions));
+    } catch (_) {}
+  }
+
+  /// Mark all messages in a P2P session as read (reset unread count to 0).
+  Future<void> markSessionRead(String ownerAid, String sessionId) async {
+    if (_basePath == null) await init();
+    final indexFile = File(_getIndexPath(ownerAid));
+    if (!await indexFile.exists()) return;
+    try {
+      final content = await indexFile.readAsString();
+      final sessions = List<Map<String, dynamic>>.from(jsonDecode(content));
+      final idx = sessions.indexWhere((s) => s['sessionId'] == sessionId);
+      if (idx == -1) return;
+      if ((sessions[idx]['unreadCount'] as int? ?? 0) == 0) return;
+      sessions[idx]['unreadCount'] = 0;
+      await indexFile.writeAsString(jsonEncode(sessions));
+    } catch (_) {}
   }
 
   // ── Group list cache ──
@@ -236,7 +288,6 @@ class MessageStore {
       final content = await file.readAsString();
       return List<Map<String, dynamic>>.from(jsonDecode(content));
     } catch (e) {
-      print('[MessageStore] Error loading group list: $e');
       return [];
     }
   }

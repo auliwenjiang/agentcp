@@ -584,10 +584,15 @@ class AgentCPPlugin(private val context: Context) : MethodCallHandler {
             return
         }
 
+        Log.i(TAG, "Setting up handlers for agent: ${agent.getAID()}")
+
         agent.setMessageHandler(object : MessageCallback {
             override fun onMessage(messageId: String, sessionId: String, sender: String, timestamp: Long, blocksJson: String) {
+                Log.d(TAG, "=== onMessage CALLBACK TRIGGERED ===")
                 Log.d(TAG, "onMessage: session=$sessionId, sender=$sender, msgId=$messageId")
+                Log.d(TAG, "onMessage: timestamp=$timestamp, blocksJson=$blocksJson")
                 android.os.Handler(context.mainLooper).post {
+                    Log.d(TAG, "onMessage: Invoking Flutter method channel")
                     methodChannel?.invokeMethod("onMessage", mapOf(
                         "messageId" to messageId,
                         "sessionId" to sessionId,
@@ -595,24 +600,29 @@ class AgentCPPlugin(private val context: Context) : MethodCallHandler {
                         "timestamp" to timestamp,
                         "blocksJson" to blocksJson
                     ))
+                    Log.d(TAG, "onMessage: Flutter method invoked")
                 }
             }
         })
 
         agent.setInviteHandler(object : InviteCallback {
             override fun onInvite(sessionId: String, inviterId: String) {
+                Log.d(TAG, "=== onInvite CALLBACK TRIGGERED ===")
                 Log.d(TAG, "onInvite: session=$sessionId, inviter=$inviterId")
                 android.os.Handler(context.mainLooper).post {
+                    Log.d(TAG, "onInvite: Invoking Flutter method channel")
                     methodChannel?.invokeMethod("onInvite", mapOf(
                         "sessionId" to sessionId,
                         "inviterId" to inviterId
                     ))
+                    Log.d(TAG, "onInvite: Flutter method invoked")
                 }
             }
         })
 
         agent.setStateChangeHandler(object : StateChangeCallback {
             override fun onStateChange(oldState: Int, newState: Int) {
+                Log.d(TAG, "=== onStateChange CALLBACK TRIGGERED ===")
                 Log.d(TAG, "onStateChange: $oldState -> $newState")
                 android.os.Handler(context.mainLooper).post {
                     methodChannel?.invokeMethod("onStateChange", mapOf(
@@ -623,7 +633,7 @@ class AgentCPPlugin(private val context: Context) : MethodCallHandler {
             }
         })
 
-        Log.i(TAG, "Handlers registered for ${agent.getAID()}")
+        Log.i(TAG, "Handlers registered successfully for ${agent.getAID()}")
         result.success(mapOf("success" to true, "message" to "Handlers registered"))
     }
 

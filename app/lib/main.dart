@@ -51,8 +51,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
     final online = await AgentCPService.isOnline();
     if (!online) {
-      debugPrint('[MyApp] App resumed, WebSocket disconnected. Reconnecting...');
-      await AgentCPService.online();
+      final result = await AgentCPService.online();
+      if (result['success'] == true) {
+        await AgentCPService.setHandlers();
+        await AgentCPService.setGroupHandlers();
+      }
     }
   }
 

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import '../services/agentcp_service.dart';
@@ -58,26 +57,17 @@ class _AgentCPPageState extends State<AgentCPPage> {
     });
 
     try {
-      // 设置日志级别为 trace，输出最详细的日志
-      debugPrint('[ACP] Setting log level to trace...');
       await AgentCPService.setLogLevel('trace');
 
-      // 设置默认服务器地址
-      debugPrint('[ACP] Setting base URLs: CA=https://ca.$_defaultAP, AP=https://ap.$_defaultAP');
       await AgentCPService.setBaseUrls(
         caBaseUrl: 'https://ca.$_defaultAP',
         apBaseUrl: 'https://ap.$_defaultAP',
       );
 
-      // 设置存储路径
-      debugPrint('[ACP] Setting storage path...');
       final appDocDir = await getApplicationDocumentsDirectory();
       await AgentCPService.setStoragePath(path: appDocDir.path);
 
-      // 初始化 SDK
-      debugPrint('[ACP] Initializing SDK...');
       final initResult = await AgentCPService.initialize();
-      debugPrint('[ACP] Init result: $initResult');
       if (initResult['success'] != true) {
         setState(() {
           _errorMessage = '初始化失败: ${initResult['message']}';
@@ -123,7 +113,6 @@ class _AgentCPPageState extends State<AgentCPPage> {
 
   /// 根据 AP 域名设置 SDK 的 base URLs
   Future<void> _setBaseUrlsForAP(String ap) async {
-    debugPrint('[ACP] Setting base URLs for AP: $ap');
     await AgentCPService.setBaseUrls(
       caBaseUrl: 'https://ca.$ap',
       apBaseUrl: 'https://ap.$ap',
@@ -161,16 +150,12 @@ class _AgentCPPageState extends State<AgentCPPage> {
     });
 
     try {
-      // 根据 AP 域名设置 base URLs
       await _setBaseUrlsForAP(ap);
 
-      // 创建 AID（SDK 内部会自动生成密钥对）
-      debugPrint('[ACP] Creating AID: $aid with password');
       final result = await AgentCPService.createAID(
         aid: aid,
         password: '123456',
       );
-      debugPrint('[ACP] Create result: $result');
 
       if (result['success'] == true) {
         _showMessage('AID 创建成功: $aid');
@@ -194,7 +179,7 @@ class _AgentCPPageState extends State<AgentCPPage> {
           // Initialize group client
           _initGroupClient(aid);
         } catch (e) {
-          debugPrint('[ACP] auto-login after create failed: $e');
+          // Auto-login failed, continue
         }
 
         _nameController.clear();
@@ -216,8 +201,6 @@ class _AgentCPPageState extends State<AgentCPPage> {
 
   /// 选择并登录 AID
   Future<void> _loginWithAID(String aid) async {
-    debugPrint('[ACP] loginWithAID: $aid');
-    
     // 如果已经是当前在线的 AID，直接进入聊天
     if (_currentAid == aid && _currentState == 'Online') {
       Navigator.pushNamed(context, '/chat');
@@ -231,32 +214,25 @@ class _AgentCPPageState extends State<AgentCPPage> {
     try {
       // 如果当前有在线的，先下线
       if (_currentState == 'Online') {
-        debugPrint('[ACP] Switching AID, going offline first...');
         await AgentCPService.offline();
       }
 
-      // 根据 AID 的 AP 域名设置 base URLs
       await _setBaseUrlsForAP(_extractAP(aid));
 
-      // 加载 AID
-      debugPrint('[ACP] Loading AID: $aid');
       final loadResult = await AgentCPService.loadAID(aid, password: '123456');
-      debugPrint('[ACP] Load result: $loadResult');
       if (loadResult['success'] != true) {
         _showMessage('加载失败: ${loadResult['message']}', isError: true);
         return;
       }
 
-      // 上线
-      debugPrint('[ACP] Going online...');
       final onlineResult = await AgentCPService.online();
-      debugPrint('[ACP] Online result: $onlineResult');
       await _refreshState();
-      debugPrint('[ACP] After refresh: state=$_currentState, aid=$_currentAid');
       if (onlineResult['success'] == true) {
         // Register native callbacks for messages/invites/state changes
         await AgentCPService.setHandlers();
-        AgentInfoService.syncOnOnline(aid); // fire-and-forget
+        // Wait a bit for signature to be available after online
+        await Future.delayed(const Duration(milliseconds: 500));
+        AgentInfoService.syncOnOnline(aid);
         // Initialize group client
         _initGroupClient(aid);
         _showMessage('登录成功');
@@ -349,23 +325,18 @@ class _AgentCPPageState extends State<AgentCPPage> {
   /// 初始化群组客户端
   void _initGroupClient(String aid) async {
     try {
-      // Extract issuer from AID: e.g. "alice.aid.pub" → issuer = "aid.pub" → target = "group.aid.pub"
       final dotIndex = aid.indexOf('.');
       if (dotIndex < 0) return;
       final issuer = aid.substring(dotIndex + 1);
       final groupTarget = 'group.$issuer';
 
-      debugPrint('[ACP] Initializing group client: target=$groupTarget');
       final sessionResult = await AgentCPService.createSession([groupTarget]);
       if (sessionResult['success'] == true) {
         final sessionId = sessionResult['sessionId'] as String;
         await AgentCPService.initGroupClient(sessionId: sessionId, targetAid: groupTarget);
-        debugPrint('[ACP] Group client initialized: session=$sessionId');
-      } else {
-        debugPrint('[ACP] Failed to create group session: ${sessionResult['message']}');
       }
     } catch (e) {
-      debugPrint('[ACP] initGroupClient failed: $e');
+      // Group client initialization failed
     }
   }
 
@@ -457,27 +428,39 @@ class _AgentCPPageState extends State<AgentCPPage> {
         if (_currentState == 'Online' && _currentAid != null)
           Container(
             color: Colors.green.shade50,
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.green),
-                const SizedBox(width: 12),
+                const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('当前在线: $_currentAid',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
+                      const Text('当前在线',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
                               color: Colors.green)),
-                      const Text('点击下方列表切换身份',
-                          style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text(_currentAid!,
+                          style: const TextStyle(fontSize: 11, color: Colors.grey)),
                     ],
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/chat'),
+                  icon: const Icon(Icons.chat_bubble, size: 16),
+                  label: const Text('聊天'),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   ),
                 ),
                 TextButton(
                   onPressed: _logout,
                   child: const Text('下线'),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  ),
                 ),
               ],
             ),
@@ -492,7 +475,7 @@ class _AgentCPPageState extends State<AgentCPPage> {
               final isOnline = isCurrent && _currentState == 'Online';
 
               return Card(
-                elevation: isCurrent ? 4 : 1,
+                elevation: isCurrent ? 3 : 1,
                 margin: const EdgeInsets.only(bottom: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -500,49 +483,92 @@ class _AgentCPPageState extends State<AgentCPPage> {
                       ? BorderSide(color: Theme.of(context).primaryColor, width: 2)
                       : BorderSide.none,
                 ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: isOnline ? Colors.green : Colors.grey,
-                    child: const Icon(Icons.person, color: Colors.white),
-                  ),
-                  title: Text(
-                    aid,
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                child: InkWell(
+                  onTap: () => _loginWithAID(aid),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        // Human avatar
+                        CircleAvatar(
+                          radius: 24,
+                          backgroundImage: const AssetImage('assets/human.png'),
+                          backgroundColor: Colors.grey[200],
+                        ),
+                        const SizedBox(width: 12),
+                        // AID and status
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      aid,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (isOnline) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green[100],
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: const Text(
+                                        '在线',
+                                        style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                isOnline ? '点击进入聊天' : '点击登录',
+                                style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Action buttons
+                        if (isOnline)
+                          IconButton(
+                            icon: const Icon(Icons.chat_bubble_outline),
+                            onPressed: () => Navigator.pushNamed(context, '/chat'),
+                            color: Theme.of(context).primaryColor,
+                            tooltip: '聊天',
+                            iconSize: 22,
+                          )
+                        else
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () => _deleteAID(aid),
+                            color: Colors.red[300],
+                            tooltip: '删除',
+                            iconSize: 22,
+                          ),
+                      ],
                     ),
                   ),
-                  subtitle: Text(isOnline ? '在线' : '离线'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (!isOnline)
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () => _deleteAID(aid),
-                          tooltip: '删除',
-                        ),
-                      if (isOnline)
-                        IconButton(
-                          icon: const Icon(Icons.chat),
-                          onPressed: () => Navigator.pushNamed(context, '/chat'),
-                          color: Theme.of(context).primaryColor,
-                          tooltip: '聊天',
-                        ),
-                    ],
-                  ),
-                  onTap: () => _loginWithAID(aid),
                 ),
               );
             },
           ),
         ),
         // 底部提示
-        Padding(
-          padding: const EdgeInsets.all(16.0),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
           child: Text(
             '已注册 ${_aidList.length}/10 个身份',
-            style: const TextStyle(color: Colors.grey),
+            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
           ),
         ),
       ],

@@ -43,10 +43,56 @@ Result AgentID::Online() {
     }
 
     AgentState old_state = state_;
-    if (state_ == AgentState::Online || state_ == AgentState::Connecting) {
-        ACP_LOGW("Online() skipped: already online or connecting (state=%d)", (int)state_);
+    if (state_ == AgentState::Connecting) {
+        ACP_LOGW("Online() skipped: already connecting (state=%d)", (int)state_);
         return MakeError(ErrorCode::INVALID_ARGUMENT, "already online");
     }
+    if (state_ == AgentState::Online || state_ == AgentState::Reconnecting) {
+        if (message_client_ && message_client_->IsConnected()) {
+            if (state_ == AgentState::Online) {
+                ACP_LOGW("Online() skipped: already online and websocket connected");
+                return MakeError(ErrorCode::INVALID_ARGUMENT, "already online");
+            }
+
+            state_ = AgentState::Online;
+            if (state_change_handler_) {
+                state_change_handler_(AgentState::Reconnecting, AgentState::Online);
+            }
+            ACP_LOGI("Online() recovered to Online because websocket is already connected");
+            return Result::Ok();
+        }
+
+        if (message_client_) {
+            if (message_client_->IsReconnectLoopRunning()) {
+                ACP_LOGI("Online() short reconnect already in progress");
+                return Result::Ok();
+            }
+
+            ACP_LOGW("Online() detected websocket disconnected, triggering short reconnect");
+            if (state_ != AgentState::Reconnecting) {
+                state_ = AgentState::Reconnecting;
+                if (state_change_handler_) {
+                    state_change_handler_(old_state, AgentState::Reconnecting);
+                }
+            }
+
+            bool reconnect_started = message_client_->Connect();
+            if (reconnect_started) {
+                state_ = AgentState::Online;
+                if (state_change_handler_) {
+                    state_change_handler_(AgentState::Reconnecting, AgentState::Online);
+                }
+                ACP_LOGI("Online() short reconnect succeeded immediately");
+            } else {
+                ACP_LOGW("Online() short reconnect not immediately connected (background reconnect loop may continue)");
+            }
+            return Result::Ok();
+        }
+
+        ACP_LOGW("Online() state is Online/Reconnecting but message client is missing, fallback to full online flow");
+        state_ = AgentState::Offline;
+    }
+
     state_ = AgentState::Connecting;
 
     if (state_change_handler_) {
@@ -176,16 +222,29 @@ Result AgentID::Online() {
     // Set invite handler on heartbeat client
     heartbeat_client_->SetInviteCallback(
         [this](const protocol::InviteMessageReq& invite) {
+            ACP_LOGI("=== INVITE RECEIVED VIA HEARTBEAT ===");
+            ACP_LOGI("Invite: session_id=%s, inviter=%s, invite_code=%s",
+                     invite.session_id.c_str(), invite.inviter_agent_id.c_str(),
+                     invite.invite_code.c_str());
             if (invite_handler_) {
+                ACP_LOGI("Calling invite_handler_ callback");
                 invite_handler_(invite.session_id, invite.inviter_agent_id);
+            } else {
+                ACP_LOGW("invite_handler_ is NULL!");
             }
             // Auto-join session via message client
             if (message_client_ && message_client_->IsConnected()) {
+                ACP_LOGI("Auto-joining session via message_client");
                 std::string request_id = std::to_string(protocol::NowMs());
                 std::string msg = protocol::BuildJoinSessionReq(
                     invite.session_id, request_id,
                     invite.inviter_agent_id, invite.invite_code);
+                ACP_LOGI("Sending join_session_req: %s", msg.c_str());
                 message_client_->SendMessage(msg);
+                ACP_LOGI("join_session_req sent successfully");
+            } else {
+                ACP_LOGE("Cannot auto-join: message_client not connected! client=%p, connected=%d",
+                         message_client_.get(), message_client_ ? message_client_->IsConnected() : 0);
             }
         });
 
@@ -215,7 +274,42 @@ Result AgentID::Online() {
     message_client_ = std::make_unique<client::MessageClient>(
         aid_, message_server_, auth_client_.get());
 
+    message_client_->SetDisconnectCallback(
+        [this](int /*code*/, const std::string& /*reason*/) {
+            AgentState old_state;
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (state_ != AgentState::Online) {
+                    return;
+                }
+                old_state = state_;
+                state_ = AgentState::Reconnecting;
+            }
+            ACP_LOGW("AgentID state: Online -> Reconnecting (ws disconnected)");
+            if (state_change_handler_) {
+                state_change_handler_(old_state, AgentState::Reconnecting);
+            }
+        });
+
+    message_client_->SetReconnectCallback(
+        [this]() {
+            AgentState old_state;
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (state_ != AgentState::Reconnecting) {
+                    return;
+                }
+                old_state = state_;
+                state_ = AgentState::Online;
+            }
+            ACP_LOGI("AgentID state: Reconnecting -> Online (ws resumed)");
+            if (state_change_handler_) {
+                state_change_handler_(old_state, AgentState::Online);
+            }
+        });
+
     // Set message handler
+    ACP_LOGI("AgentID: WebSocket invite fallback is ENABLED");
     message_client_->SetMessageHandler(
         [this](const std::string& cmd, const std::string& data_json) {
             ACP_LOGI("AgentID::MessageHandler: cmd=%s, data_len=%zu", cmd.c_str(), data_json.size());
@@ -280,6 +374,45 @@ Result AgentID::Online() {
                 }
             } else if (cmd == "session_message") {
                 ACP_LOGW("AgentID: Received session_message but message_handler_ is null");
+            } else if (cmd == "invite_agent_req") {
+                // Fallback path: some networks may drop UDP invite push, but still deliver invite via WebSocket.
+                ACP_LOGI("AgentID: Processing invite_agent_req from WebSocket fallback");
+                try {
+                    auto j = json::parse(data_json);
+                    std::string session_id = j.value("session_id", std::string());
+                    std::string inviter_id = j.value("inviter_id", std::string());
+                    std::string invite_code = j.value("invite_code", std::string());
+
+                    ACP_LOGI("AgentID: invite_agent_req details: session=%s, inviter=%s, has_code=%d",
+                             session_id.c_str(), inviter_id.c_str(), invite_code.empty() ? 0 : 1);
+
+                    if (session_id.empty()) {
+                        ACP_LOGW("AgentID: invite_agent_req missing session_id, ignore");
+                        return;
+                    }
+
+                    if (invite_handler_) {
+                        ACP_LOGI("AgentID: Calling invite_handler_ from WebSocket fallback");
+                        invite_handler_(session_id, inviter_id);
+                    } else {
+                        ACP_LOGW("AgentID: invite_handler_ is null for WebSocket fallback invite");
+                    }
+
+                    if (message_client_ && message_client_->IsConnected()) {
+                        std::string request_id = std::to_string(protocol::NowMs());
+                        std::string msg = protocol::BuildJoinSessionReq(
+                            session_id, request_id, inviter_id, invite_code);
+                        bool sent = message_client_->SendMessage(msg);
+                        ACP_LOGI("AgentID: WebSocket fallback join_session_req sent=%d, request_id=%s",
+                                 sent ? 1 : 0, request_id.c_str());
+                    } else {
+                        ACP_LOGW("AgentID: Cannot send fallback join_session_req, message client not connected");
+                    }
+                } catch (const std::exception& e) {
+                    ACP_LOGE("AgentID: Failed to parse invite_agent_req: %s", e.what());
+                } catch (...) {
+                    ACP_LOGE("AgentID: Failed to parse invite_agent_req: unknown error");
+                }
             } else if (cmd == "system_message") {
                 // Handle system messages if needed
             }
@@ -348,7 +481,13 @@ void AgentID::Offline() {
 
 bool AgentID::IsOnline() const {
     std::lock_guard<std::mutex> lock(mutex_);
-    return !invalidated_ && state_ == AgentState::Online;
+    if (invalidated_) {
+        return false;
+    }
+    if (!message_client_) {
+        return false;
+    }
+    return message_client_->IsConnected();
 }
 
 bool AgentID::IsValid() const {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../i18n/app_language.dart';
 import '../i18n/app_texts.dart';
 import '../services/app_lifecycle_service.dart';
@@ -52,6 +53,8 @@ class _ChatPageState extends State<ChatPage> {
   
   String? _currentAid;
   bool _isSyncing = false;
+  bool _isConnected = false;
+  int _reconnectAttempts = 0;
   
   AgentInfo? _currentAgentInfo;
   final Map<String, AgentInfo> _peerAgentInfoCache = {};
@@ -81,7 +84,11 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     if (aid != null) {
-      // Set SDK handlers for both P2P and Group
+      // Check initial connection status
+      _checkConnectionStatus();
+
+      // Set SDK handlers for both P2P and Group.
+      await AgentCPService.setHandlers();
       await AgentCPService.setGroupHandlers();
 
       // Load from local cache first (fast)
@@ -102,30 +109,113 @@ class _ChatPageState extends State<ChatPage> {
 
     // P2P Listeners
     AgentCPService.onMessageReceived = (msg) async {
-      setState(() {
-        var session = _findOrCreateSession(msg.sessionId, msg.sender);
+      print('[ChatPage] onMessageReceived: sessionId=${msg.sessionId}, sender=${msg.sender}, text=${msg.text}');
+      var session = _findOrCreateSession(msg.sessionId, msg.sender);
+
+      // If user is currently viewing this session, don't increment unread
+      if (ChatDetailPage.activeSessionId == msg.sessionId) {
         session.addMessage(msg);
-      });
+      } else {
+        // User is not viewing this session, increment unread count
+        if (_currentAid != null) {
+          await MessageStore().incrementUnread(_currentAid!, msg.sessionId);
+          session.unreadCount++;
+        }
+        session.addMessage(msg);
+      }
+
+      setState(() {});
     };
 
     AgentCPService.onInviteReceived = (sessionId, inviterId) async {
-      debugPrint('[ChatList] Invite received: session=$sessionId, inviter=$inviterId');
+      print('[ChatPage] onInviteReceived: sessionId=$sessionId, inviterId=$inviterId');
+      // Create session entry immediately so incoming messages can attach to it.
+      // Use inviterId as peerAid; if empty, onMessageReceived will fill it later.
+      _findOrCreateSession(sessionId, inviterId);
+      setState(() {});
+
+      // Join the session so the SDK starts delivering messages for it.
+      print('[ChatPage] Calling joinSession for sessionId=$sessionId');
       await AgentCPService.joinSession(sessionId);
-      setState(() {
-        _findOrCreateSession(sessionId, inviterId);
-      });
+      print('[ChatPage] joinSession completed for sessionId=$sessionId');
+
+      // After joining, try to resolve peerAid from session info if still empty.
+      final session = _p2pSessions.firstWhere(
+        (s) => s.sessionId == sessionId,
+        orElse: () => SessionItem(sessionId: '', peerAid: ''),
+      );
+      if (session.sessionId.isNotEmpty && session.peerAid.isEmpty) {
+        // Attempt to load messages to discover the peer
+        final msgResult = await AgentCPService.getMessages(sessionId, limit: 10);
+        if (msgResult['success'] == true && msgResult['messages'] != null) {
+          final messages = msgResult['messages'] as List;
+          for (final m in messages) {
+            final msgMap = Map<String, dynamic>.from(m);
+            final direction = msgMap['direction'] as int? ?? 0;
+            final sender = _normalizePeerAid(msgMap['sender'] as String? ?? '');
+            if (direction != 1 && sender.isNotEmpty && sender != _currentAid) {
+              session.peerAid = sender;
+              if (!_peerAgentInfoCache.containsKey(sender)) {
+                AgentInfoService().getAgentInfo(sender).then((info) {
+                  if (mounted) setState(() { _peerAgentInfoCache[sender] = info; });
+                });
+              }
+              break;
+            }
+          }
+        }
+        // Also try conversation list as fallback
+        if (session.peerAid.isEmpty) {
+          final convResult = await AgentCPService.getAllConversations();
+          if (convResult['success'] == true && convResult['conversations'] != null) {
+            for (final conv in (convResult['conversations'] as List)) {
+              final map = Map<String, dynamic>.from(conv);
+              if (map['sessionId'] == sessionId) {
+                final peer = _normalizePeerAid(map['peerAid'] as String? ?? '');
+                if (peer.isNotEmpty) {
+                  session.peerAid = peer;
+                  if (!_peerAgentInfoCache.containsKey(peer)) {
+                    AgentInfoService().getAgentInfo(peer).then((info) {
+                      if (mounted) setState(() { _peerAgentInfoCache[peer] = info; });
+                    });
+                  }
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+      if (mounted) setState(() {});
     };
 
     AgentCPService.onStateChanged = (oldState, newState) {
-      // Auto-reconnect: if state changed from Online(3) to Offline(0),
-      // attempt to reconnect after a short delay
+      // Update connection status indicator
+      // State 3 = Online, State 4 = Reconnecting
+      if (mounted) {
+        setState(() {
+          _isConnected = newState == 3;
+          if (newState == 3) {
+            _reconnectAttempts = 0; // Reset on successful connection
+          }
+        });
+      }
+
+      // Auto-reconnect with exponential backoff: if state changed from Online(3) to Offline(0)
       if (oldState == 3 && newState == 0) {
-        debugPrint('[ChatPage] Connection lost, attempting auto-reconnect...');
-        Future.delayed(const Duration(seconds: 2), () async {
+        _reconnectAttempts++;
+        final delaySeconds = (2 * _reconnectAttempts).clamp(2, 30);
+
+        Future.delayed(Duration(seconds: delaySeconds), () async {
+          if (!mounted) return;
           final stillOffline = !(await AgentCPService.isOnline());
           if (stillOffline && _currentAid != null) {
-            debugPrint('[ChatPage] Still offline, calling online()...');
-            await AgentCPService.online();
+            final onlineResult = await AgentCPService.online();
+            if (onlineResult['success'] == true) {
+              // Re-register callbacks after reconnect to avoid stale native handlers.
+              await AgentCPService.setHandlers();
+              await AgentCPService.setGroupHandlers();
+            }
           }
         });
       }
@@ -160,8 +250,9 @@ class _ChatPageState extends State<ChatPage> {
       final sessionIds = List<String>.from(sessResult['sessions']);
       for (final sid in sessionIds) {
         final existing = _p2pSessions.where((s) => s.sessionId == sid);
-        if (existing.isNotEmpty) continue;
-        _findOrCreateSession(sid, '');
+        if (existing.isEmpty) {
+          _findOrCreateSession(sid, '');
+        }
       }
     }
   }
@@ -174,13 +265,17 @@ class _ChatPageState extends State<ChatPage> {
     if (conversations == null || conversations is! List) return;
 
     final loadedSessions = <SessionItem>[];
+    final unreadMap = _currentAid == null
+        ? const <String, int>{}
+        : await _loadPersistedUnreadMap(_currentAid!);
     for (final conv in conversations) {
       final map = Map<String, dynamic>.from(conv);
       final sessionId = map['sessionId'] as String? ?? '';
       var peerAid = _normalizePeerAid(map['peerAid'] as String? ?? '');
       if (sessionId.isEmpty) continue;
 
-      final session = SessionItem(sessionId: sessionId, peerAid: peerAid);
+      final persistedUnread = unreadMap[sessionId] ?? 0;
+      final session = SessionItem(sessionId: sessionId, peerAid: peerAid, unreadCount: persistedUnread);
 
       final msgResult = await AgentCPService.getMessages(sessionId, limit: 200);
       if (msgResult['success'] == true && msgResult['messages'] != null) {
@@ -218,6 +313,19 @@ class _ChatPageState extends State<ChatPage> {
       });
     }
   }
+
+  Future<Map<String, int>> _loadPersistedUnreadMap(String ownerAid) async {
+    try {
+      final sessions = await MessageStore().loadSessions(ownerAid);
+      final unread = <String, int>{};
+      for (final s in sessions) {
+        unread[s.sessionId] = s.unreadCount;
+      }
+      return unread;
+    } catch (_) {
+      return const <String, int>{};
+    }
+  }
   
   /// Load group list from local cache only (fast, no network).
   Future<void> _loadGroupSessionsFromCache() async {
@@ -231,6 +339,7 @@ class _ChatPageState extends State<ChatPage> {
       unreadCount: g['unreadCount'] ?? 0,
       lastMsgPreview: g['lastMsgPreview'] ?? '',
       memberAids: List<String>.from(g['memberAids'] ?? []),
+      isActive: g['isActive'] ?? true,
     )).where((g) => g.groupId.isNotEmpty).toList();
     if (mounted) {
       setState(() { _groupSessions = groups; });
@@ -245,6 +354,7 @@ class _ChatPageState extends State<ChatPage> {
 
     final localGroupIds = <String>{};
     final allGroups = <GroupItem>[];
+    final serverGroupIds = <String>{};
 
     // 1. Load from local message store (has message history)
     final result = await AgentCPService.groupGetGroupList();
@@ -259,9 +369,27 @@ class _ChatPageState extends State<ChatPage> {
             groupName: map['groupName'] ?? '',
             lastMsgTime: map['lastMsgTime'] ?? 0,
             unreadCount: map['unreadCount'] ?? 0,
+            isActive: false, // Mark as inactive by default, will be updated if found on server
           ));
         }
       }
+    }
+
+    // 1.5 Merge previously cached groups (preserves disbanded groups that SDK may have removed)
+    final cachedGroups = await MessageStore().loadGroupList(_currentAid!);
+    for (final g in cachedGroups) {
+      final groupId = g['groupId'] ?? '';
+      if (groupId.isEmpty || localGroupIds.contains(groupId)) continue;
+      localGroupIds.add(groupId);
+      allGroups.add(GroupItem(
+        groupId: groupId,
+        groupName: g['groupName'] ?? '',
+        lastMsgTime: g['lastMsgTime'] ?? 0,
+        unreadCount: g['unreadCount'] ?? 0,
+        lastMsgPreview: g['lastMsgPreview'] ?? '',
+        memberAids: List<String>.from(g['memberAids'] ?? []),
+        isActive: false, // Not in SDK store, definitely inactive
+      ));
     }
 
     // 2. Merge server-side groups (catches groups with no local messages yet)
@@ -280,21 +408,23 @@ class _ChatPageState extends State<ChatPage> {
               const ['group_id', 'groupId'],
             );
             if (groupId.isEmpty) continue;
+            serverGroupIds.add(groupId);
             final serverName = _firstNonEmptyValue(
               map,
               const ['name', 'group_name', 'groupName'],
             );
             if (localGroupIds.contains(groupId)) {
               final idx = allGroups.indexWhere((item) => item.groupId == groupId);
-              if (idx >= 0 &&
-                  _shouldResolveGroupName(allGroups[idx].groupName, groupId) &&
-                  serverName.isNotEmpty) {
+              if (idx >= 0) {
                 final old = allGroups[idx];
                 allGroups[idx] = GroupItem(
                   groupId: old.groupId,
-                  groupName: serverName,
+                  groupName: serverName.isNotEmpty && _shouldResolveGroupName(old.groupName, groupId)
+                      ? serverName
+                      : old.groupName,
                   lastMsgTime: old.lastMsgTime,
                   unreadCount: old.unreadCount,
+                  isActive: true, // Found on server, mark as active
                 );
               }
             } else {
@@ -303,13 +433,14 @@ class _ChatPageState extends State<ChatPage> {
                 groupName: serverName,
                 lastMsgTime: 0,
                 unreadCount: 0,
+                isActive: true,
               ));
             }
           }
         }
       }
     } catch (e) {
-      debugPrint('[ChatList] groupListMyGroups failed: $e');
+      // groupListMyGroups failed
     }
 
     // 3. Fetch last message preview and member avatars for each group
@@ -318,43 +449,64 @@ class _ChatPageState extends State<ChatPage> {
       String preview = '';
       int lastTime = g.lastMsgTime;
       List<String> memberAids = [];
-      try {
-        final msgResult = await AgentCPService.groupGetMessages(g.groupId, limit: 1);
-        if (msgResult['success'] == true && msgResult['messages'] != null) {
-          final messages = msgResult['messages'] as List;
-          if (messages.isNotEmpty) {
-            final lastMsg = Map<String, dynamic>.from(messages.last);
-            preview = lastMsg['content'] as String? ?? '';
-            final msgTime = lastMsg['timestamp'] as int? ?? 0;
-            if (msgTime > lastTime) lastTime = msgTime;
+
+      // Only fetch live data for active groups to avoid unnecessary API calls
+      if (g.isActive) {
+        try {
+          final msgResult = await AgentCPService.groupGetMessages(g.groupId, limit: 1);
+          if (msgResult['success'] == true && msgResult['messages'] != null) {
+            final messages = msgResult['messages'] as List;
+            if (messages.isNotEmpty) {
+              final lastMsg = Map<String, dynamic>.from(messages.last);
+              preview = lastMsg['content'] as String? ?? '';
+              final msgTime = lastMsg['timestamp'] as int? ?? 0;
+              if (msgTime > lastTime) lastTime = msgTime;
+            }
           }
+        } catch (e) {
+          // Fetch group last msg failed
         }
-      } catch (e) {
-        debugPrint('[ChatList] fetch group last msg failed for ${g.groupId}: $e');
-      }
-      try {
-        final membersResult = await AgentCPService.groupGetMembers(g.groupId);
-        if (membersResult['success'] == true && membersResult['data'] != null) {
-          final membersList = _extractList(
-            membersResult['data'],
-            listKeys: const ['members'],
-          );
-          for (final m in membersList) {
-            if (memberAids.length >= 9) break;
-            final aid = m is Map
-                ? _firstNonEmptyValue(
-                    m,
-                    const ['aid', 'agent_id', 'agentId'],
-                  )
-                : m.toString();
-            if (aid.isNotEmpty) memberAids.add(aid);
+        try {
+          final membersResult = await AgentCPService.groupGetMembers(g.groupId);
+          if (membersResult['success'] == true && membersResult['data'] != null) {
+            final membersList = _extractList(
+              membersResult['data'],
+              listKeys: const ['members'],
+            );
+            for (final m in membersList) {
+              if (memberAids.length >= 9) break;
+              final aid = m is Map
+                  ? _firstNonEmptyValue(
+                      m,
+                      const ['aid', 'agent_id', 'agentId'],
+                    )
+                  : m.toString();
+              if (aid.isNotEmpty) memberAids.add(aid);
+            }
           }
+        } catch (e) {
+          // Fetch group members failed
         }
-      } catch (e) {
-        debugPrint('[ChatList] fetch group members failed for ${g.groupId}: $e');
+      } else {
+        // For inactive groups, try to get last message from local store only
+        try {
+          final msgResult = await AgentCPService.groupGetMessages(g.groupId, limit: 1);
+          if (msgResult['success'] == true && msgResult['messages'] != null) {
+            final messages = msgResult['messages'] as List;
+            if (messages.isNotEmpty) {
+              final lastMsg = Map<String, dynamic>.from(messages.last);
+              preview = lastMsg['content'] as String? ?? '';
+              final msgTime = lastMsg['timestamp'] as int? ?? 0;
+              if (msgTime > lastTime) lastTime = msgTime;
+            }
+          }
+        } catch (e) {
+          // Fetch group last msg failed
+        }
       }
+
       String groupName = g.groupName;
-      if (_shouldResolveGroupName(groupName, g.groupId)) {
+      if (g.isActive && _shouldResolveGroupName(groupName, g.groupId)) {
         try {
           final infoResult = await AgentCPService.groupGetInfo(g.groupId);
           if (infoResult['success'] == true && infoResult['data'] != null) {
@@ -366,7 +518,7 @@ class _ChatPageState extends State<ChatPage> {
             if (name.isNotEmpty) groupName = name;
           }
         } catch (e) {
-          debugPrint('[ChatList] groupGetInfo failed for ${g.groupId}: $e');
+          // groupGetInfo failed
         }
       }
       groupsWithPreview.add(GroupItem(
@@ -376,6 +528,7 @@ class _ChatPageState extends State<ChatPage> {
         unreadCount: g.unreadCount,
         lastMsgPreview: preview,
         memberAids: memberAids,
+        isActive: g.isActive,
       ));
     }
 
@@ -387,6 +540,7 @@ class _ChatPageState extends State<ChatPage> {
       'unreadCount': g.unreadCount,
       'lastMsgPreview': g.lastMsgPreview,
       'memberAids': g.memberAids,
+      'isActive': g.isActive,
     }).toList();
     await MessageStore().saveGroupList(_currentAid!, cacheList);
 
@@ -405,6 +559,16 @@ class _ChatPageState extends State<ChatPage> {
       final current = existing.first;
       if (current.peerAid.isEmpty && normalizedPeerAid.isNotEmpty) {
         current.peerAid = normalizedPeerAid;
+        // Also load agent info for the newly resolved peer
+        if (!_peerAgentInfoCache.containsKey(normalizedPeerAid)) {
+          AgentInfoService().getAgentInfo(normalizedPeerAid).then((info) {
+            if (mounted) {
+              setState(() {
+                _peerAgentInfoCache[normalizedPeerAid] = info;
+              });
+            }
+          });
+        }
       }
       return current;
     }
@@ -432,6 +596,15 @@ class _ChatPageState extends State<ChatPage> {
             _peerAgentInfoCache[peer] = info;
           });
         }
+      });
+    }
+  }
+
+  Future<void> _checkConnectionStatus() async {
+    final online = await AgentCPService.isOnline();
+    if (mounted) {
+      setState(() {
+        _isConnected = online;
       });
     }
   }
@@ -535,6 +708,38 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  String _parseGroupUrl(String input) {
+    if (input.isEmpty) return '';
+
+    // Pattern 1: Direct URL like "https://group.agentcp.io/9g9orhzs3tyw"
+    final urlPattern = RegExp(r'https?://[^\s\[\]]+');
+    final urlMatches = urlPattern.allMatches(input);
+
+    for (final match in urlMatches) {
+      final url = match.group(0) ?? '';
+      // Check if it's a group URL (contains "group." or looks like a group link)
+      if (url.contains('group.') || url.contains('/') && url.split('/').last.isNotEmpty) {
+        return url;
+      }
+    }
+
+    // Pattern 2: URL in brackets like "[https://group.agentcp.io/9g9orhzs3tyw]"
+    final bracketPattern = RegExp(r'\[(https?://[^\]]+)\]');
+    final bracketMatch = bracketPattern.firstMatch(input);
+    if (bracketMatch != null) {
+      return bracketMatch.group(1) ?? '';
+    }
+
+    // Pattern 3: Just a group ID (alphanumeric string)
+    final groupIdPattern = RegExp(r'^[a-zA-Z0-9_-]+$');
+    if (groupIdPattern.hasMatch(input)) {
+      return input;
+    }
+
+    // If no pattern matches, return the input as-is and let the server handle it
+    return input;
+  }
+
   void _showJoinGroupDialog() {
     final urlCtrl = TextEditingController();
     showDialog(
@@ -548,14 +753,24 @@ class _ChatPageState extends State<ChatPage> {
             border: const OutlineInputBorder(),
           ),
           autofocus: true,
+          maxLines: 3,
+          minLines: 1,
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppTexts.cancel(context))),
           ElevatedButton(
             onPressed: () async {
-              final url = urlCtrl.text.trim();
-              if (url.isEmpty) return;
+              final input = urlCtrl.text.trim();
+              if (input.isEmpty) return;
               Navigator.pop(ctx);
+
+              // Parse group URL from input (supports plain URL or share message)
+              final url = _parseGroupUrl(input);
+              if (url.isEmpty) {
+                _showSnack(AppTexts.invalidGroupUrl(context));
+                return;
+              }
+
               final result = await AgentCPService.groupJoinByUrl(groupUrl: url);
               if (result['success'] == true) {
                 final groupId = result['groupId'] ?? '';
@@ -600,6 +815,16 @@ class _ChatPageState extends State<ChatPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
     );
+  }
+
+  void _copyMyAidCard() {
+    if (_currentAid == null) return;
+    final nickname = (_currentAgentInfo?.name.isNotEmpty == true)
+        ? _currentAgentInfo!.name
+        : _currentAid!;
+    final text = AppTexts.myAidCardMessage(context, nickname, _currentAid!);
+    Clipboard.setData(ClipboardData(text: text));
+    _showSnack(AppTexts.aidCardCopied(context));
   }
 
   void _deleteSession(String sessionId) async {
@@ -692,6 +917,14 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _navigateToChatDetail(SessionItem session) async {
+    // Mark session as read before entering
+    if (_currentAid != null && session.unreadCount > 0) {
+      await MessageStore().markSessionRead(_currentAid!, session.sessionId);
+      setState(() {
+        session.unreadCount = 0;
+      });
+    }
+
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
@@ -703,6 +936,9 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     if (!mounted) return;
+
+    // Check connection status when returning to this page
+    _checkConnectionStatus();
 
     if (result != null) {
       final action = result['action'] as String?;
@@ -747,6 +983,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     ).then((_) {
+      _checkConnectionStatus();
       _loadGroupSessionsFromCache(); // Refresh group state when popping back
     });
   }
@@ -758,6 +995,7 @@ class _ChatPageState extends State<ChatPage> {
     for (final s in _p2pSessions) {
       final peer = _normalizePeerAid(s.peerAid);
       if (peer.isEmpty) continue; // Hide dirty sessions (Unknown/empty peer).
+      if (s.messages.isEmpty) continue; // Only show sessions that already have messages.
       final info = _peerAgentInfoCache[peer];
       final displayName = (info?.name.isNotEmpty == true) ? info!.name : (peer.isNotEmpty ? peer : 'Unknown');
       
@@ -770,7 +1008,7 @@ class _ChatPageState extends State<ChatPage> {
         name: displayName,
         lastMsgTime: lastMsgTime,
         lastMsgText: lastMsgText,
-        unreadCount: 0, // Unread count logic not fully implemented for P2P yet
+        unreadCount: s.unreadCount,
         data: s,
       ));
     }
@@ -796,6 +1034,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     final unifiedSessions = _getUnifiedList();
+    final totalUnread = unifiedSessions.fold<int>(0, (sum, item) => sum + item.unreadCount);
 
     return PopScope(
       canPop: false,
@@ -810,9 +1049,52 @@ class _ChatPageState extends State<ChatPage> {
           icon: const Icon(Icons.menu),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
-        title: Text(AppTexts.chatsTitle(context)),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              AppTexts.chatsTitle(context),
+              style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.2),
+            ),
+            if (totalUnread > 0) ...[
+              const SizedBox(width: 8),
+              Container(
+                constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  totalUnread > 99 ? '99+' : '$totalUnread',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    height: 1.1,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          if (_isConnected)
+            Padding(
+              padding: const EdgeInsets.only(right: 2),
+              child: Center(
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.language),
             onPressed: _showLanguageDialog,
@@ -833,7 +1115,35 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
       drawer: _buildDrawer(),
-      body: _buildSessionList(unifiedSessions),
+      body: Column(
+        children: [
+          if (!_isConnected)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+              color: Colors.orange.shade100,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(strokeWidth: 1.5),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    AppTexts.offlineReconnecting(context),
+                    style: TextStyle(
+                      color: Colors.orange.shade900,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          Expanded(child: _buildSessionList(unifiedSessions)),
+        ],
+      ),
       ),
     );
   }
@@ -950,6 +1260,14 @@ class _ChatPageState extends State<ChatPage> {
               );
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.card_membership),
+            title: Text(AppTexts.copyMyAidCard(context)),
+            onTap: () {
+              Navigator.pop(context);
+              _copyMyAidCard();
+            },
+          ),
           const Spacer(),
           const Divider(),
           Padding(
@@ -1045,10 +1363,29 @@ class _ChatPageState extends State<ChatPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  item.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis,
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        item.name,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (item.type == ChatType.group && !(item.data as GroupItem).isActive)
+                      Container(
+                        margin: const EdgeInsets.only(left: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          AppTexts.groupDisbanded(context),
+                          style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               if (lastTimeStr.isNotEmpty)
@@ -1073,7 +1410,36 @@ class _ChatPageState extends State<ChatPage> {
           },
           onLongPress: () {
             if (item.type == ChatType.group) {
-              _confirmLeaveGroup(item.id);
+              final group = item.data as GroupItem;
+              if (group.isActive) {
+                _confirmLeaveGroup(item.id);
+              } else {
+                // Inactive group: offer to delete local history
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text(AppTexts.deleteChatTitle(context)),
+                    content: Text(AppTexts.deleteChatConfirm(context)),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text(AppTexts.cancel(context)),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.pop(ctx);
+                          await MessageStore().removeGroup(_currentAid!, item.id);
+                          setState(() {
+                            _groupSessions.removeWhere((g) => g.groupId == item.id);
+                          });
+                        },
+                        style: TextButton.styleFrom(foregroundColor: Colors.red),
+                        child: Text(AppTexts.deleteButton(context)),
+                      ),
+                    ],
+                  ),
+                );
+              }
             } else {
               showDialog(
                 context: context,

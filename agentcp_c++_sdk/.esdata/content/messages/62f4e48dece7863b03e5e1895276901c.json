@@ -1,0 +1,102 @@
+[
+  {
+    "type": "content",
+    "content": "我来为您搜索如何通过命令添加已知的MCP服务器JSON配置。",
+    "status": "success",
+    "timestamp": 1769846017693
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"keywords\": \"claude mcp add json配置命令,Claude Code命令行添加MCP服务器,已知MCP JSON配置如何添加\", \"original_query\": \"我如何已知一个MCP serverd的json我应该如何通过命令添加\"}",
+    "status": "success",
+    "timestamp": 1769846020490,
+    "tool_call": {
+      "name": "prepare_search",
+      "id": "call_00_EROCrJEWzsGJvWZTGY8lo6fd",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"keywords\": \"claude mcp add json配置命令,Claude Code命令行添加MCP服务器,已知MCP JSON配置如何添加\", \"original_query\": \"我如何已知一个MCP serverd的json我应该如何通过命令添加\"}",
+              "name": "prepare_search"
+            },
+            "type": "function",
+            "id": "call_00_EROCrJEWzsGJvWZTGY8lo6fd"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"status\": \"ready\",\n  \"keywords\": [\n    \"claude mcp add json配置命令\",\n    \"Claude Code命令行添加MCP服务器\",\n    \"已知MCP JSON配置如何添加\"\n  ],\n  \"keyword_count\": 3,\n  \"search_type\": \"web\",\n  \"original_query\": \"我如何已知一个MCP serverd的json我应该如何通过命令添加\",\n  \"message\": \"已生成 3 个搜索关键词，正在搜索...\"\n}"
+        }
+      ],
+      "mcpServerId": "59b4525f-7ec5-4200-b2c7-6f55d82b420d",
+      "mcpServerName": "云搜索",
+      "start_time": 1769846022687,
+      "end_time": 1769846023019
+    }
+  },
+  {
+    "type": "tool_call",
+    "content": "{\"keywords\": \"claude mcp add json配置命令,Claude Code命令行添加MCP服务器,已知MCP JSON配置如何添加\", \"search_type\": \"web\", \"max_results_per_keyword\": 5}",
+    "status": "success",
+    "timestamp": 1769846025329,
+    "tool_call": {
+      "name": "web_search",
+      "id": "call_00_VrHQ6aBY85rfzewyZZuQEis2",
+      "status": "calling",
+      "_waitingForArgs": false,
+      "_pendingJsonError": false
+    },
+    "extra": {
+      "message": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"keywords\": \"claude mcp add json配置命令,Claude Code命令行添加MCP服务器,已知MCP JSON配置如何添加\", \"search_type\": \"web\", \"max_results_per_keyword\": 5}",
+              "name": "web_search"
+            },
+            "type": "function",
+            "id": "call_00_VrHQ6aBY85rfzewyZZuQEis2"
+          }
+        ]
+      },
+      "response": [
+        {
+          "type": "text",
+          "text": "{\n  \"success\": true,\n  \"keywords\": [\n    \"claude mcp add json配置命令\",\n    \"Claude Code命令行添加MCP服务器\",\n    \"已知MCP JSON配置如何添加\"\n  ],\n  \"keyword_results\": {\n    \"claude mcp add json配置命令\": 5,\n    \"Claude Code命令行添加MCP服务器\": 5,\n    \"已知MCP JSON配置如何添加\": 3\n  },\n  \"providers_used\": [\n    \"metaso\"\n  ],\n  \"total\": 13,\n  \"results\": [\n    {\n      \"title\": \"Claude Code配置记录\",\n      \"url\": \"https://www.cnblogs.com/timothy020/p/19164112\",\n      \"rank\": 1,\n      \"snippet\": \"可以通过 Claude 的命令添加mcp，可以选择添加为项目或者用户级，用户级的mcp 后续会保存在 ~/.calude.json 文件夹中（不过注意json 的格式和cursor 中的不是完全一致）。\\n添加方式：把cursor 中的json文件传递给AI，让AI 生成claude code 命令来添加mcp，最终在 ~/.claude.json 中生成的json 片段如下，配置了：\\n- Serena\\n- DeepWiki-Mcp\",\n      \"description\": \"\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025年10月24日\",\n      \"authors\": [],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"claude mcp add json配置命令\"\n    },\n    {\n      \"title\": \"模型上下文协议 (MCP) 服务器\",\n      \"url\": \"https://cloud.tencent.com/developer/mcp/server/10684\",\n      \"rank\": 2,\n      \"snippet\": \"将以下 JSON 块添加到您的 claude_desktop_config.json 文件中：\\n{\\n\\\"mcpServers\\\": {\\n\\\"semgrep\\\": {\\n...\\\"args\\\": [\\\"semgrep-mcp\\\"]\\n}\\n}\\n}\\n...> claude mcp add semgrep uvx semgrep-mcp\",\n      \"description\": \"\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025年12月01日\",\n      \"authors\": [],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"claude mcp add json配置命令\"\n    },\n    {\n      \"title\": \"Claude Code与MCP：让AI拥有超能力的完全指南\",\n      \"url\": \"https://www.cnblogs.com/token-ai/p/18987079#%3A~%3Atext%3DClaude%20Code%E6%94%AF%E6%8C%81%E5%9C%A8%20.mcp%2C%E4%BF%9D%E6%8C%81%E7%81%B5%E6%B4%BB%E6%80%A7%283%29%E3%80%82%26text%3D%E6%89%A9%E5%B1%95%E4%BD%8D%E7%BD%AE%EF%BC%9A%283%29%20%E7%8E%AF%E5%A2%83%2C-%20%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%283%29\",\n      \"rank\": 3,\n      \"snippet\": \"claude mcp add-json <name> '<json>'\\n...claude mcp add-json weather-api '{\\\"type\\\":\\\"stdio\\\",\\\"command\\\":\\\"/path/to/weather-cli\\\",\\\"args\\\":[\\\"--api-key\\\",\\\"abc123\\\"],\\\"env\\\":{\\\"CACHE_DIR\\\":\\\"/tmp\\\"}}'\\n...claude mcp get weather-api\\n小贴士：\\n...假设你已经在Claude Desktop中配置了MCP服务器，想在Claude Code中使用相同的服务器而不需要手动重新配置(2)。\",\n      \"description\": \"\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025年07月16日\",\n      \"authors\": [],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"claude mcp add json配置命令\"\n    },\n    {\n      \"title\": \"CData's Model Context Protocol (MCP) Server for JSON\",\n      \"url\": \"https://github.com/CDataSoftware/json-mcp-server-by-cdata\",\n      \"rank\": 4,\n      \"snippet\": \"Create the config file for Claude Desktop ( claude_desktop_config.json) to add the new MCP server, using the format below.\\nIf the file already exists, add the entry to the mcpServersin the config file.Windows { \\\"mcpServers\\\": { \\\"{classname_dash}\\\": { \\\"command\\\": \\\"PATH\\\\\\\\TO\\\\\\\\java.exe\\\", \\\"args\\\": [ \\\"-jar\\\", \\\"PATH\\\\\\\\TO\\\\\\\\CDataMCP-jar-with-dependencies.jar\\\", \\\"PATH\\\\\\\\TO\\\\\\\\json.prp\\\" ] }, \\n...\",\n      \"description\": \"\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025年05月15日\",\n      \"authors\": [],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"claude mcp add json配置命令\"\n    },\n    {\n      \"title\": \"MCP（Model Context Protocol）教程系列的第二阶段\",\n      \"url\": \"https://developer.aliyun.com/article/1678481\",\n      \"rank\": 5,\n      \"snippet\": \"创建配置文件： 在 ~/.anthropic/（macOS/Linux）或 %USERPROFILE%.anthropic\\\\（Windows）目录下创建或编辑 claude_desktop_config.json。\\n配置你的 Server： 将你的服务器路径添加到配置文件中。\\n{\\n\\\"mcpServers\\\": {\\n...\\\"command\\\": \\\"/path/to/your/venv/bin/python\\\",\",\n      \"description\": \"\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025年08月21日\",\n      \"authors\": [],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"claude mcp add json配置命令\"\n    },\n    {\n      \"title\": \"Claude App 的 MCP 服务器管理命令行工具\",\n      \"url\": \"https://github.com/MCP-Club/mcpm/blob/main/README.zh.md\",\n      \"rank\": 6,\n      \"snippet\": \"add [选项] [名称] 手动添加新的 MCP 服务器到 Claude App\\nremove [名称] 从 Claude App 移除 MCP 服务器\\ndisable [名称] 禁用 MCP 服务器（将其从 Claude 移动到存储）\\n...mcp 启动 MCPM MCP 服务器\",\n      \"description\": \"\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2024-12-17\",\n      \"authors\": [],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"Claude Code命令行添加MCP服务器\"\n    },\n    {\n      \"title\": \"Claude Code agent to work with MCP · jomynn/claude-code-agent-mcp-server@bde5fc3\",\n      \"url\": \"https://github.com/jomynn/claude-code-agent-mcp-server/commit/bde5fc3a4330de9c11db31de4e0165ee56c3cccc\",\n      \"rank\": 7,\n      \"snippet\": \"\",\n      \"description\": \"该内容介绍了如何配置Claude Code与MCP的集成，包括快速设置环境、手动配置和使用Claude内置的目录管理功能...还可以通过Claude Code命令行添加目录。测试时可使用Claude命令启动MCP服务器、查看目录内容、生成代码...通过这些步骤，可以实现有组织的代码生成，结合Claude Code和MCP系统进行自动化开发。\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025年08月13日\",\n      \"authors\": [],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"Claude Code命令行添加MCP服务器\"\n    },\n    {\n      \"title\": \"docs: 更新 MCP_README.md，增强 Claude Desktop 和 Cursor 的配置说明 (#15) · T-bagwell/xiaohongshu-mcp@b64b241\",\n      \"url\": \"https://github.com/T-bagwell/xiaohongshu-mcp/commit/b64b24165102dd4e40a9138ffb6baaabeca135e4\",\n      \"rank\": 8,\n      \"snippet\": \"\",\n      \"description\": \"Claude Desktop 主要支持 stdio 类型的 MCP 服务器，建议使用 VSCode 或 Cursor 连接 HTTP 服务器。需通过代理方式在 Claude Desktop 配置文件中添加 MCP 服务器信息...VSCode 1.102 版本原生支持 MCP，可通过命令面板或直接编辑配置文件添加服务器。配置时需指定命令和参数，如 curl 命令及参数。\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025年08月17日\",\n      \"authors\": [],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"Claude Code命令行添加MCP服务器\"\n    },\n    {\n      \"title\": \"详细讲解如何在Claude Code中添加MCP服务器\",\n      \"url\": \"https://www.bilibili.com/opus/1095021557322874883\",\n      \"rank\": 9,\n      \"snippet\": \"MCP是Anthropic推出的开源通信标准，它就像是AI助手的\\\"手脚\\\"，让Claude Code可以：\\n...<mark>Claude Code提供了简单的命令行工具来添加MCP服务器：</mark>\",\n      \"description\": \"\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2022年06月14日\",\n      \"authors\": [\n        \"作者\"\n      ],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"Claude Code命令行添加MCP服务器\"\n    },\n    {\n      \"title\": \"Claude能直连MCP了##一条命令接入MCP#\",\n      \"url\": \"https://k.sina.cn/article_6105753431_m16bee675703301a8r8.html\",\n      \"rank\": 10,\n      \"snippet\": \"\",\n      \"description\": \"Claude Code现已支持直连MCP服务器，开发者可通过一条命令接入。Claude Code是Anthropic开发的AI编码工具，集成在终端中，可理解代码库并用自然语言编写代码。新增的MCP服务器功能使用简单：用户在命令行输入`claude mcp add my-server -t sse`，其中`my-server`为服务器别名，`-t sse`表示使用Server-Sent Events协议...随后可启动Claude Code查看服务器状态。\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025年06月20日\",\n      \"authors\": [],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"Claude Code命令行添加MCP服务器\"\n    },\n    {\n      \"title\": \"MCP来了，让我们用它来自动化测试吧\",\n      \"url\": \"https://cloud.tencent.com/developer/article/2575366\",\n      \"rank\": 11,\n      \"snippet\": \"方法二：通过 settings.json 文件手动配置\\n若希望进行更灵活或个性化的设置，可直接修改 VS Code 的 settings.json 文件来添加 MCP 配置。\\n- 打开设置界面（快捷键 Ctrl + ,或Cmd + ,），点击右上角的“Open Settings (JSON)”按钮。\\n- 在 JSON 文件中添加如下结构内容：\\n{\\n\\\"mcp\\\":{\",\n      \"description\": \"\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025年10月11日\",\n      \"authors\": [\n        \"作者\"\n      ],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"已知MCP JSON配置如何添加\"\n    },\n    {\n      \"title\": \"对话效果预览（项目早期）\",\n      \"url\": \"https://github.com/OneCuriousLearner/MCPAgentRE\",\n      \"rank\": 12,\n      \"snippet\": \"- \\n打开 Chatbox\\n- \\n配置 MCP 服务器\\n- 在 Chatbox 的 设置中，找到MCP标签页\\n...复制以下 JSON 配置： { \\\"mcpServers\\\": { \\\"tapd_mcp_server\\\": { \\\"command\\\": \\\"uv\\\", \\\"args\\\": [ \\\"--directory\\\", \\\"D:\\\\\\\\MiniProject\\\\\\\\MCPAgentRE\\\", \\\"run\\\", \\\"tapd_mcp_server.py\\\" ] } } }\\n- \\n确保 --directory指向的是MCP服务器所在的目录，即D:\\\\MiniProject\\\\MCPAgentRE（请按照实际目录修改）\\n-\",\n      \"description\": \"\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025年06月10日\",\n      \"authors\": [\n        \"punkpeye (Frank Fiegel)\"\n      ],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"已知MCP JSON配置如何添加\"\n    },\n    {\n      \"title\": \"部署 MCP Server\",\n      \"url\": \"https://cloud.tencent.com/document/product/1207/118879\",\n      \"rank\": 13,\n      \"snippet\": \"2. 以正确的结构插入 MCP Server 的 JSON 内容，此处以微信读书 MCP Server 为例，将 JSON 配置插入编辑弹窗中，调整环境变量值后单击确定即可完成添加。\\n!\",\n      \"description\": \"\",\n      \"content\": \"\",\n      \"icon\": \"\",\n      \"site_name\": \"\",\n      \"date_published\": \"2025-05-28\",\n      \"authors\": [],\n      \"image_url\": \"\",\n      \"thumbnail_url\": \"\",\n      \"video_duration\": \"\",\n      \"image_width\": 0,\n      \"image_height\": 0,\n      \"cover_image\": \"\",\n      \"provider\": \"metaso\",\n      \"score\": \"high\",\n      \"source_keyword\": \"已知MCP JSON配置如何添加\"\n    }\n  ],\n  \"credits_used\": 9,\n  \"search_type\": \"web\",\n  \"usage\": {\n    \"total_evol_credits\": 18,\n    \"total_api_credits\": 9,\n    \"providers_used\": [\n      \"metaso\"\n    ],\n    \"details\": [\n      {\n        \"keyword\": \"claude mcp add json配置命令\",\n        \"provider\": \"metaso\",\n        \"api_credits\": 3,\n        \"evol_credits\": 6\n      },\n      {\n        \"keyword\": \"Claude Code命令行添加MCP服务器\",\n        \"provider\": \"metaso\",\n        \"api_credits\": 3,\n        \"evol_credits\": 6\n      },\n      {\n        \"keyword\": \"已知MCP JSON配置如何添加\",\n        \"provider\": \"metaso\",\n        \"api_credits\": 3,\n        \"evol_credits\": 6\n      }\n    ],\n    \"workspace_name\": null,\n    \"conversation_id\": null,\n    \"user_aid\": null\n  }\n}"
+        }
+      ],
+      "mcpServerId": "59b4525f-7ec5-4200-b2c7-6f55d82b420d",
+      "mcpServerName": "云搜索",
+      "start_time": 1769846028232,
+      "end_time": 1769846030105
+    }
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1769846023025
+  },
+  {
+    "type": "content",
+    "content": "",
+    "status": "success",
+    "timestamp": 1769846030044
+  },
+  {
+    "type": "content",
+    "content": "根据搜索结果，我为您详细介绍如何通过命令添加已知的MCP服务器JSON配置。\n\n## 方法一：使用 `claude mcp add-json` 命令（推荐）\n\nClaude Code提供了一个专门的命令来直接添加JSON配置[1]：\n\n```bash\n# 基本语法\nclaude mcp add-json <服务器名称> '<JSON配置>'\n\n# 实际示例\nclaude mcp add-json weather-api '{\"type\":\"stdio\",\"command\":\"/path/to/weather-cli\",\"args\":[\"--api-key\",\"abc123\"],\"env\":{\"CACHE_DIR\":\"/tmp\"}}'\n```\n\n### 详细参数说明：\n- **`<服务器名称>`**：您为这个MCP服务器指定的名称（如 `weather-api`）\n- **`<JSON配置>`**：完整的MCP服务器配置JSON，需要用单引号包裹\n\n## 方法二：使用标准 `claude mcp add` 命令\n\n如果您有MCP服务器的安装命令，可以使用标准格式：\n\n```bash\n# 基本语法\nclaude mcp add <服务器名称> <命令> [参数]\n\n# 示例1：添加NotebookLM MCP服务器\nclaude mcp add --scope user notebooklm-mcp notebooklm-mcp\n\n# 示例2：添加Semgrep MCP服务器\nclaude mcp add semgrep uvx semgrep-mcp\n\n# 示例3：添加Claude Context MCP服务器（带环境变量）\nclaude mcp add claude-context -e OPENAI_API_KEY=your-key -e MILVUS_TOKEN=your-token -- npx @zilliz/claude-context-mcp@latest\n```\n\n### 常用选项：\n- **`--scope user`**：添加到用户级配置（默认）\n- **`--scope project`**：添加到项目级配置\n- **`-e KEY=VALUE`**：设置环境变量\n\n## 方法三：手动编辑配置文件\n\n如果您更喜欢手动编辑，可以将JSON配置添加到配置文件中：\n\n### 1. 用户级配置（`~/.claude.json`）：\n```json\n{\n  \"mcpServers\": {\n    \"my-server\": {\n      \"command\": \"node\",\n      \"args\": [\"./my-mcp-server.js\"],\n      \"env\": {\n        \"API_KEY\": \"your-api-key\"\n      }\n    }\n  }\n}\n```\n\n### 2. 项目级配置（项目目录中的 `.mcp.json`）：\n```json\n{\n  \"mcpServers\": {\n    \"project-server\": {\n      \"command\": \"python\",\n      \"args\": [\"mcp_server.py\"]\n    }\n  }\n}\n```\n\n## 从已知JSON配置生成命令的步骤\n\n如果您有一个已知的MCP服务器JSON配置，可以按照以下步骤操作：\n\n### 步骤1：分析JSON配置结构\n常见的MCP服务器JSON配置格式：\n```json\n{\n  \"type\": \"stdio\",  // 传输类型：stdio或sse\n  \"command\": \"node\", // 执行的命令\n  \"args\": [\"server.js\", \"--port\", \"3000\"], // 命令参数\n  \"env\": { // 环境变量\n    \"API_KEY\": \"your-key\",\n    \"DEBUG\": \"true\"\n  }\n}\n```\n\n### 步骤2：转换为命令行\n根据JSON配置类型选择相应命令：\n\n**对于stdio类型：**\n```bash\n# 如果JSON是：{\"command\": \"node\", \"args\": [\"server.js\"]}\nclaude mcp add-json my-server '{\"command\":\"node\",\"args\":[\"server.js\"]}'\n\n# 或者使用标准格式\nclaude mcp add my-server node server.js\n```\n\n**对于带环境变量的配置：**\n```bash\n# 如果JSON是：{\"command\": \"node\", \"args\": [\"server.js\"], \"env\": {\"API_KEY\": \"abc123\"}}\nclaude mcp add-json my-server '{\"command\":\"node\",\"args\":[\"server.js\"],\"env\":{\"API_KEY\":\"abc123\"}}'\n\n# 或者使用标准格式\nclaude mcp add my-server -e API_KEY=abc123 node server.js\n```\n\n### 步骤3：验证添加结果\n```bash\n# 查看所有已添加的MCP服务器\nclaude mcp list\n\n# 查看特定服务器的配置\nclaude mcp get <服务器名称>\n```\n\n## 实际案例演示\n\n假设您有以下MCP服务器JSON配置：\n```json\n{\n  \"command\": \"npx\",\n  \"args\": [\"-y\", \"@modelcontextprotocol/server-filesystem\", \"~/Documents\"],\n  \"env\": {\n    \"LOG_LEVEL\": \"info\"\n  }\n}\n```\n\n### 转换方法：\n```bash\n# 方法1：使用add-json命令\nclaude mcp add-json filesystem-server '{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-filesystem\",\"~/Documents\"],\"env\":{\"LOG_LEVEL\":\"info\"}}'\n\n# 方法2：使用标准add命令\nclaude mcp add filesystem-server -e LOG_LEVEL=info npx -y @modelcontextprotocol/server-filesystem ~/Documents\n```\n\n## 注意事项\n\n1. **JSON格式**：使用 `add-json` 命令时，JSON必须用单引号包裹，内部双引号需要转义[1]\n2. **作用域选择**：\n   - 用户级：保存在 `~/.claude.json`，对所有项目生效\n   - 项目级：保存在项目目录的 `.mcp.json`，仅对当前项目生效\n3. **环境变量**：敏感信息（如API密钥）建议通过环境变量传递\n4. **路径处理**：文件路径需要使用绝对路径或相对于配置文件的路径\n\n## 调试技巧\n\n```bash\n# 启用调试模式\nclaude --mcp-debug\n\n# 测试MCP服务器连接\nclaude mcp test <服务器名称>\n\n# 查看详细日志\nclaude mcp logs <服务器名称>\n```\n\n通过以上方法，您可以轻松地将已知的MCP服务器JSON配置添加到Claude Code中。最推荐使用 `claude mcp add-json` 命令，因为它最直接且能完整保留JSON配置结构[1]。",
+    "status": "success",
+    "timestamp": 1769846032150
+  }
+]

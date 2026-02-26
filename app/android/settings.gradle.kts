@@ -27,4 +27,4 @@ include(":app")
 
 // 引入外部 AgentCP SDK 源码工程
 include(":agentcp-sdk")
-project(":agentcp-sdk").projectDir = file("H:/project/agentcp-so/android")
+project(":agentcp-sdk").projectDir = file("H:/project/evol_main/evol_app/agentcp-so/android")

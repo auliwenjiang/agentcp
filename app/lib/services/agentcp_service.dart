@@ -23,11 +23,12 @@ class ChatMessage {
 class SessionItem extends ChangeNotifier {
   final String sessionId;
   String peerAid;
+  int unreadCount;
   final List<ChatMessage> _messages = [];
 
   List<ChatMessage> get messages => _messages;
 
-  SessionItem({required this.sessionId, required this.peerAid});
+  SessionItem({required this.sessionId, required this.peerAid, this.unreadCount = 0});
 
   void addMessage(ChatMessage msg) {
     _messages.add(msg);
@@ -67,6 +68,7 @@ class GroupItem {
   final int unreadCount;
   final String lastMsgPreview;
   final List<String> memberAids;
+  final bool isActive; // false if group is disbanded or user left
 
   GroupItem({
     required this.groupId,
@@ -75,6 +77,7 @@ class GroupItem {
     required this.unreadCount,
     this.lastMsgPreview = '',
     this.memberAids = const [],
+    this.isActive = true,
   });
 }
 
@@ -104,9 +107,11 @@ class AgentCPService {
   /// Must be called before runApp.
   static void initCallbackHandler() {
     _channel.setMethodCallHandler((call) async {
+      print('[AgentCPService] Received method call from native: ${call.method}');
       switch (call.method) {
         case 'onMessage':
           final args = Map<String, dynamic>.from(call.arguments);
+          print('[AgentCPService] onMessage: sessionId=${args['sessionId']}, sender=${args['sender']}');
           String text = '';
           try {
             final blocks = jsonDecode(args['blocksJson'] ?? '[]') as List;
@@ -124,33 +129,31 @@ class AgentCPService {
             text: text,
             isMine: false,
           );
-          debugPrint('[ACP] onMessage: session=${msg.sessionId}, sender=${msg.sender}, text=${msg.text}');
+          print('[AgentCPService] Calling onMessageReceived callback');
           onMessageReceived?.call(msg);
           break;
         case 'onInvite':
           final args = Map<String, dynamic>.from(call.arguments);
           final sessionId = args['sessionId'] ?? '';
           final inviterId = args['inviterId'] ?? '';
-          debugPrint('[ACP] onInvite: session=$sessionId, inviter=$inviterId');
+          print('[AgentCPService] onInvite: sessionId=$sessionId, inviterId=$inviterId');
+          print('[AgentCPService] Calling onInviteReceived callback');
           onInviteReceived?.call(sessionId, inviterId);
           break;
         case 'onStateChange':
           final args = Map<String, dynamic>.from(call.arguments);
           final oldState = args['oldState'] ?? 0;
           final newState = args['newState'] ?? 0;
-          debugPrint('[ACP] onStateChange: $oldState -> $newState');
           onStateChanged?.call(oldState, newState);
           break;
         case 'onGroupMessageBatch':
           final args = Map<String, dynamic>.from(call.arguments);
           final groupId = args['groupId'] ?? '';
           final batchJson = args['batchJson'] ?? '';
-          debugPrint('[ACP] onGroupMessageBatch: group=$groupId');
           onGroupMessageBatch?.call(groupId, batchJson);
           break;
         case 'onGroupNewMessage':
           final args = Map<String, dynamic>.from(call.arguments);
-          debugPrint('[ACP] onGroupNewMessage: group=${args['groupId']}, sender=${args['sender']}');
           onGroupNewMessage?.call(
             args['groupId'] ?? '',
             args['latestMsgId'] ?? 0,
@@ -160,7 +163,6 @@ class AgentCPService {
           break;
         case 'onGroupNewEvent':
           final args = Map<String, dynamic>.from(call.arguments);
-          debugPrint('[ACP] onGroupNewEvent: group=${args['groupId']}, type=${args['eventType']}');
           onGroupNewEvent?.call(
             args['groupId'] ?? '',
             args['latestEventId'] ?? 0,
@@ -170,7 +172,6 @@ class AgentCPService {
           break;
         case 'onGroupInvite':
           final args = Map<String, dynamic>.from(call.arguments);
-          debugPrint('[ACP] onGroupInvite: group=${args['groupId']}, invitedBy=${args['invitedBy']}');
           onGroupInvite?.call(
             args['groupId'] ?? '',
             args['groupAddress'] ?? '',
@@ -179,17 +180,14 @@ class AgentCPService {
           break;
         case 'onGroupJoinApproved':
           final args = Map<String, dynamic>.from(call.arguments);
-          debugPrint('[ACP] onGroupJoinApproved: group=${args['groupId']}');
           onGroupJoinApproved?.call(args['groupId'] ?? '', args['groupAddress'] ?? '');
           break;
         case 'onGroupJoinRejected':
           final args = Map<String, dynamic>.from(call.arguments);
-          debugPrint('[ACP] onGroupJoinRejected: group=${args['groupId']}, reason=${args['reason']}');
           onGroupJoinRejected?.call(args['groupId'] ?? '', args['reason'] ?? '');
           break;
         case 'onGroupJoinRequestReceived':
           final args = Map<String, dynamic>.from(call.arguments);
-          debugPrint('[ACP] onGroupJoinRequestReceived: group=${args['groupId']}, agent=${args['agentId']}');
           onGroupJoinRequestReceived?.call(
             args['groupId'] ?? '',
             args['agentId'] ?? '',
@@ -198,7 +196,6 @@ class AgentCPService {
           break;
         case 'onGroupEvent':
           final args = Map<String, dynamic>.from(call.arguments);
-          debugPrint('[ACP] onGroupEvent: group=${args['groupId']}');
           onGroupEvent?.call(args['groupId'] ?? '', args['eventJson'] ?? '');
           break;
       }
@@ -837,6 +834,17 @@ class AgentCPService {
   static Future<Map<String, dynamic>> setGroupHandlers() async {
     try {
       final result = await _channel.invokeMethod('setGroupHandlers');
+      return Map<String, dynamic>.from(result);
+    } on PlatformException catch (e) {
+      return {'success': false, 'error': e.code, 'message': e.message ?? 'Unknown error'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> groupGenerateInviteCode(String groupId) async {
+    try {
+      final result = await _channel.invokeMethod('groupGenerateInviteCode', {
+        'groupId': groupId,
+      });
       return Map<String, dynamic>.from(result);
     } on PlatformException catch (e) {
       return {'success': false, 'error': e.code, 'message': e.message ?? 'Unknown error'};

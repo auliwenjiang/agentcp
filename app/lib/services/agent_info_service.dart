@@ -87,7 +87,7 @@ class AgentInfoService {
           }
         });
       } catch (e) {
-        print('[AgentInfo] Error loading cache: $e');
+        // Error loading cache
       }
     }
   }
@@ -98,7 +98,7 @@ class AgentInfoService {
       final file = File(_cacheFilePath!);
       await file.writeAsString(jsonEncode(_cache));
     } catch (e) {
-      print('[AgentInfo] Error saving cache: $e');
+      // Error saving cache
     }
   }
 
@@ -118,7 +118,6 @@ class AgentInfoService {
       await _saveCache();
       return info;
     } catch (e) {
-      print('[AgentInfo] Fetch failed for $aid: $e');
       final fallback = _cache[aid] ?? AgentInfo(name: aid, cachedAt: DateTime.now().millisecondsSinceEpoch);
       _cache[aid] = fallback;
       await _saveCache();
@@ -244,9 +243,8 @@ class AgentInfoService {
       }
       final file = File(path.join(agentMdDir.path, '$aid.md'));
       await file.writeAsString(mdContent);
-      debugPrint('[AgentInfo] saveLocalAgentMd: saved for $aid');
     } catch (e) {
-      debugPrint('[AgentInfo] saveLocalAgentMd error: $e');
+      // saveLocalAgentMd error
     }
   }
 
@@ -259,7 +257,7 @@ class AgentInfoService {
         return await file.readAsString();
       }
     } catch (e) {
-      debugPrint('[AgentInfo] getLocalAgentMd error: $e');
+      // getLocalAgentMd error
     }
     return null;
   }
@@ -267,20 +265,21 @@ class AgentInfoService {
   /// Sync local agent.md to AP after going online. Fire-and-forget.
   /// 每次 online 都向 AP 确认 agent.md 是否存在，不存在则补传。
   static void syncOnOnline(String aid) {
+    debugPrint('[AgentInfo] syncOnOnline: called for $aid');
     () async {
       try {
+        final signature = await AgentCPService.getSignature();
+        debugPrint('[AgentInfo] syncOnOnline: signature=${signature != null && signature.isNotEmpty ? "OK (${signature.length} chars)" : "EMPTY/NULL"}');
+
         var mdContent = await getLocalAgentMd(aid);
         if (mdContent == null) {
-          // 本地没有则自动生成
           debugPrint('[AgentInfo] syncOnOnline: auto-generating agent.md for $aid');
           mdContent = await createDefaultHumanAgentMd(aid: aid);
         }
 
-        // 每次都调用 syncAgentMd，由 AP 的 sync_public_files 接口判断是否需要上传
         final ok = await syncAgentMd(aid, mdContent);
-        if (ok) {
-          debugPrint('[AgentInfo] syncOnOnline: agent.md ensured on AP for $aid');
-        } else {
+        debugPrint('[AgentInfo] syncOnOnline: syncAgentMd result=$ok');
+        if (!ok) {
           debugPrint('[AgentInfo] syncOnOnline: failed to sync agent.md for $aid');
         }
       } catch (e) {
@@ -294,7 +293,6 @@ class AgentInfoService {
     try {
       final signature = await AgentCPService.getSignature();
       if (signature == null || signature.isEmpty) {
-        debugPrint('[AgentInfo] forceUploadAgentMd: no signature available');
         return false;
       }
 
@@ -304,26 +302,26 @@ class AgentInfoService {
 
       final contentBytes = utf8.encode(mdContent);
       final uploadUrl = Uri.parse('https://ap.$domain/api/accesspoint/upload_file');
-      final uploadResponse = await http.post(
-        uploadUrl,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'agent_id': aid,
-          'signature': signature,
-          'file_name': 'agent.md',
-          'content': base64Encode(contentBytes),
-        }),
-      ).timeout(const Duration(seconds: 10));
+
+      final request = http.MultipartRequest('POST', uploadUrl);
+      request.fields['agent_id'] = aid;
+      request.fields['signature'] = signature;
+      request.fields['file_name'] = 'agent.md';
+      request.files.add(http.MultipartFile.fromBytes(
+        'file',
+        contentBytes,
+        filename: 'agent.md',
+      ));
+
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 10));
+      final uploadResponse = await http.Response.fromStream(streamedResponse);
 
       if (uploadResponse.statusCode != 200) {
-        debugPrint('[AgentInfo] forceUploadAgentMd: failed HTTP ${uploadResponse.statusCode}');
         return false;
       }
 
-      debugPrint('[AgentInfo] forceUploadAgentMd: agent.md uploaded for $aid');
       return true;
     } catch (e) {
-      debugPrint('[AgentInfo] forceUploadAgentMd error: $e');
       return false;
     }
   }
@@ -333,20 +331,20 @@ class AgentInfoService {
     try {
       final signature = await AgentCPService.getSignature();
       if (signature == null || signature.isEmpty) {
-        print('[AgentInfo] syncAgentMd: no signature available');
+        debugPrint('[AgentInfo] syncAgentMd: no signature available');
         return false;
       }
 
-      // Extract AP domain from AID (e.g., "alice.aid.pub" -> "aid.pub")
       final dotIndex = aid.indexOf('.');
       if (dotIndex < 0) {
-        print('[AgentInfo] syncAgentMd: invalid AID format');
+        debugPrint('[AgentInfo] syncAgentMd: invalid AID format');
         return false;
       }
       final domain = aid.substring(dotIndex + 1);
 
       final contentBytes = utf8.encode(mdContent);
       final contentHash = sha256.convert(contentBytes).toString();
+      debugPrint('[AgentInfo] syncAgentMd: aid=$aid, domain=$domain, hash=$contentHash, size=${contentBytes.length}');
 
       // Step 1: sync_public_files to check what needs uploading
       final syncUrl = Uri.parse('https://ap.$domain/api/accesspoint/sync_public_files');
@@ -357,51 +355,65 @@ class AgentInfoService {
           'size': contentBytes.length,
         }
       ];
+      final syncBody = jsonEncode({
+        'agent_id': aid,
+        'signature': signature,
+        'file_list': fileList,
+      });
+      debugPrint('[AgentInfo] syncAgentMd: POST $syncUrl');
       final syncResponse = await http.post(
         syncUrl,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'agent_id': aid,
-          'signature': signature,
-          'file_list': fileList,
-        }),
+        body: syncBody,
       ).timeout(const Duration(seconds: 10));
 
+      debugPrint('[AgentInfo] syncAgentMd: sync_public_files status=${syncResponse.statusCode}, body=${syncResponse.body}');
+
       if (syncResponse.statusCode != 200) {
-        print('[AgentInfo] syncAgentMd: sync_public_files failed HTTP ${syncResponse.statusCode}');
+        debugPrint('[AgentInfo] syncAgentMd: sync_public_files failed HTTP ${syncResponse.statusCode}');
         return false;
       }
 
       final syncData = jsonDecode(syncResponse.body);
-      final needUpload = List<String>.from(syncData['need_upload_files'] ?? []);
+      final needUploadRaw = List<String>.from(syncData['need_upload_files'] ?? []);
+      // Filter out empty strings - server may return [""] meaning all files need upload
+      final needUpload = needUploadRaw.where((f) => f.isNotEmpty).toList();
+      debugPrint('[AgentInfo] syncAgentMd: need_upload_files(raw)=$needUploadRaw, filtered=$needUpload');
 
-      if (!needUpload.contains('agent.md')) {
-        print('[AgentInfo] syncAgentMd: agent.md already up to date');
+      // Upload if: agent.md is in the list, OR server returned non-empty list with empty strings (ambiguous response)
+      if (!needUpload.contains('agent.md') && needUploadRaw.isEmpty) {
+        debugPrint('[AgentInfo] syncAgentMd: agent.md already up to date on server');
         return true;
       }
 
       // Step 2: upload the file
       final uploadUrl = Uri.parse('https://ap.$domain/api/accesspoint/upload_file');
-      final uploadResponse = await http.post(
-        uploadUrl,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'agent_id': aid,
-          'signature': signature,
-          'file_name': 'agent.md',
-          'content': base64Encode(contentBytes),
-        }),
-      ).timeout(const Duration(seconds: 10));
+      debugPrint('[AgentInfo] syncAgentMd: POST $uploadUrl (multipart/form-data)');
+
+      final request = http.MultipartRequest('POST', uploadUrl);
+      request.fields['agent_id'] = aid;
+      request.fields['signature'] = signature;
+      request.fields['file_name'] = 'agent.md';
+      request.files.add(http.MultipartFile.fromBytes(
+        'file',
+        contentBytes,
+        filename: 'agent.md',
+      ));
+
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 10));
+      final uploadResponse = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('[AgentInfo] syncAgentMd: upload_file status=${uploadResponse.statusCode}, body=${uploadResponse.body}');
 
       if (uploadResponse.statusCode != 200) {
-        print('[AgentInfo] syncAgentMd: upload_file failed HTTP ${uploadResponse.statusCode}');
+        debugPrint('[AgentInfo] syncAgentMd: upload_file failed HTTP ${uploadResponse.statusCode}');
         return false;
       }
 
-      print('[AgentInfo] syncAgentMd: agent.md synced successfully');
+      debugPrint('[AgentInfo] syncAgentMd: agent.md synced successfully');
       return true;
     } catch (e) {
-      print('[AgentInfo] syncAgentMd error: $e');
+      debugPrint('[AgentInfo] syncAgentMd error: $e');
       return false;
     }
   }

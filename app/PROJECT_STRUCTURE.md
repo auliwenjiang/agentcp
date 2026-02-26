@@ -125,7 +125,7 @@ evol/
 ### ⏳ 待添加的文件
 
 1. **android/app/libs/agentcp-android-release.aar**
-   - 来源: `H:\project\agentcp-so\android\build\outputs\aar\`
+   - 来源: `H:\project\evol_main\evol_app\agentcp-so\android\build\outputs\aar\`
    - 操作: 复制到项目
 
 ## 代码流程图
@@ -287,7 +287,7 @@ currentAgent.online()  ← 待集成
 
 ```bash
 # 复制 AAR 文件
-copy "H:\project\agentcp-so\android\build\outputs\aar\agentcp-android-release.aar" ^
+copy "H:\project\evol_main\evol_app\agentcp-so\android\build\outputs\aar\agentcp-android-release.aar" ^
      "H:\project\evol_main\evol_app\evol\android\app\libs\"
 ```
 

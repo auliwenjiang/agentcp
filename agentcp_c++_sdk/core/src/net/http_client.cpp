@@ -87,7 +87,7 @@ public:
         host_ = host;
         use_ssl_ = use_ssl;
 
-        ACP_LOGD("SocketConnection::Connect() host=%s, port=%d, ssl=%d, verify=%d", host.c_str(), port, use_ssl, verify);
+        // ACP_LOGD("SocketConnection::Connect() host=%s, port=%d, ssl=%d, verify=%d", host.c_str(), port, use_ssl, verify);
 
         struct addrinfo hints{}, *result = nullptr;
         hints.ai_family = AF_INET;

@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../i18n/app_texts.dart';
 import '../services/agentcp_service.dart';
 import '../services/agent_info_service.dart';
 import '../widgets/group_avatar_widget.dart';
 import 'group_members_page.dart';
+import 'chat_detail_page.dart';
 
 class GroupChatDetailPage extends StatefulWidget {
   final GroupItem group;
@@ -40,6 +44,13 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
   bool _isLoading = true;
   bool _isSending = false;
   Timer? _refreshTimer;
+
+  int _memberCount = 0;
+  String _visibility = '';
+  String _ownerAid = '';
+  String _groupAddress = '';
+
+  String get _groupName => widget.group.groupName.isNotEmpty ? widget.group.groupName : widget.group.groupId;
 
   // Save original callbacks so we can restore them on dispose
   Function(String, String)? _prevOnGroupMessageBatch;
@@ -101,10 +112,35 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
   }
 
   Future<void> _init() async {
-    await AgentCPService.joinGroupSession(widget.group.groupId);
-    await AgentCPService.groupMarkRead(widget.group.groupId);
+    if (widget.group.isActive) {
+      await AgentCPService.joinGroupSession(widget.group.groupId);
+      await AgentCPService.groupMarkRead(widget.group.groupId);
+      await _loadGroupMeta();
+    }
     await _loadMessages(scrollToBottom: false);
     await _autoScrollToLatestOnEnter();
+  }
+
+  Future<void> _loadGroupMeta() async {
+    try {
+      final infoResult = await AgentCPService.groupGetInfo(widget.group.groupId);
+      if (infoResult['success'] == true && infoResult['data'] != null) {
+        final info = _extractMap(infoResult['data']);
+        final membersResult = await AgentCPService.groupGetMembers(widget.group.groupId);
+        List<dynamic> members = [];
+        if (membersResult['success'] == true && membersResult['data'] != null) {
+          members = _extractList(membersResult['data'], listKeys: const ['members']);
+        }
+        if (mounted) {
+          setState(() {
+            _memberCount = members.length;
+            _visibility = (info['visibility'] ?? '').toString();
+            _ownerAid = (info['owner'] ?? info['owner_aid'] ?? info['ownerAid'] ?? info['created_by'] ?? '').toString();
+            _groupAddress = (info['group_address'] ?? info['groupAddress'] ?? info['address'] ?? info['url'] ?? '').toString();
+          });
+        }
+      }
+    } catch (_) {}
   }
 
   Future<void> _autoScrollToLatestOnEnter() async {
@@ -332,6 +368,79 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
     if (mounted) _scheduleRefresh(delay: const Duration(milliseconds: 500));
   }
 
+  Future<void> _copyGroupLink() async {
+    final isPrivate = _visibility == 'private';
+    final isOwner = _ownerAid.isNotEmpty && _ownerAid == widget.currentAid;
+
+    // Private group: only owner can copy
+    if (isPrivate && !isOwner) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppTexts.onlyOwnerCanCopyLink(context)), duration: const Duration(seconds: 2)),
+      );
+      return;
+    }
+
+    // Build group link: https://group.{owner_ap}/{group_id}
+    String groupLink;
+    if (_groupAddress.isNotEmpty) {
+      groupLink = _groupAddress;
+    } else if (_ownerAid.isNotEmpty) {
+      // Extract AP from owner AID (e.g., "alice.agentcp.io" -> "agentcp.io")
+      final parts = _ownerAid.split('.');
+      final ownerAp = parts.length >= 2 ? parts.sublist(1).join('.') : _ownerAid;
+      groupLink = 'https://group.$ownerAp/${widget.group.groupId}';
+    } else {
+      groupLink = widget.group.groupId;
+    }
+
+    if (isPrivate) {
+      // Owner of private group: choose with or without invite code
+      final choice = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(AppTexts.copyGroupLink(context)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.link),
+                title: Text(AppTexts.copyWithoutInviteCode(context)),
+                onTap: () => Navigator.pop(ctx, 'no_code'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.vpn_key),
+                title: Text(AppTexts.copyWithInviteCode(context)),
+                onTap: () => Navigator.pop(ctx, 'with_code'),
+              ),
+            ],
+          ),
+        ),
+      );
+      if (choice == null || !mounted) return;
+
+      if (choice == 'with_code') {
+        final codeResult = await AgentCPService.groupGenerateInviteCode(widget.group.groupId);
+        final inviteCode = (codeResult['inviteCode'] ?? codeResult['invite_code'] ?? '').toString();
+        final linkWithCode = inviteCode.isNotEmpty ? '$groupLink?invite_code=$inviteCode' : groupLink;
+        final text = AppTexts.shareGroupMessage(context, widget.currentAid, _groupName, linkWithCode);
+        await Clipboard.setData(ClipboardData(text: text));
+      } else {
+        final text = AppTexts.shareGroupMessage(context, widget.currentAid, _groupName, groupLink);
+        await Clipboard.setData(ClipboardData(text: text));
+      }
+    } else {
+      // Public group: copy directly without invite code
+      final text = AppTexts.shareGroupMessage(context, widget.currentAid, _groupName, groupLink);
+      await Clipboard.setData(ClipboardData(text: text));
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppTexts.groupLinkCopied(context)), duration: const Duration(seconds: 1)),
+      );
+    }
+  }
+
   void _showGroupInfoDialog() async {
     final infoResult = await AgentCPService.groupGetInfo(widget.group.groupId);
     final membersResult = await AgentCPService.groupGetMembers(widget.group.groupId);
@@ -391,6 +500,36 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
     );
   }
 
+  Future<void> _openMembersPage() async {
+    // Fetch latest member list from server
+    final membersResult = await AgentCPService.groupGetMembers(widget.group.groupId);
+    List<String> memberAids = [];
+
+    if (membersResult['success'] == true && membersResult['data'] != null) {
+      final members = _extractList(membersResult['data'], listKeys: const ['members']);
+      for (final m in members) {
+        final aid = m is Map
+            ? (m['aid'] ?? m['agent_id'] ?? m['agentId'] ?? '').toString()
+            : m.toString();
+        if (aid.isNotEmpty) {
+          memberAids.add(aid);
+        }
+      }
+    }
+
+    if (!mounted) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => GroupMembersPage(
+          groupName: widget.group.groupName,
+          memberAids: memberAids,
+        ),
+      ),
+    );
+  }
+
   dynamic _decodeJsonLike(dynamic value) {
     if (value is String) {
       final trimmed = value.trim();
@@ -436,34 +575,66 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(widget.group.groupName.isNotEmpty ? widget.group.groupName : 'Group Chat', style: const TextStyle(fontSize: 16)),
-              Text(widget.group.groupId.substring(0, 8) + '...', 
-                  style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      widget.group.groupName.isNotEmpty ? widget.group.groupName : 'Group Chat',
+                      style: const TextStyle(fontSize: 16),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (_memberCount > 0)
+                    Text(
+                      ' ($_memberCount)',
+                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                    ),
+                ],
+              ),
+              GestureDetector(
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: widget.group.groupId));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(AppTexts.groupIdCopied(context)), duration: const Duration(seconds: 1)),
+                  );
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        widget.group.groupId,
+                        style: const TextStyle(fontSize: 10, color: Colors.black54),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.copy, size: 10, color: Colors.black54),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadMessages,
-            tooltip: AppTexts.groupRefreshTooltip(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.group),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => GroupMembersPage(
-                    groupName: widget.group.groupName,
-                    memberAids: widget.group.memberAids,
-                  ),
-                ),
-              );
-            },
-            tooltip: AppTexts.groupMembersTooltip(context),
-          ),
+          if (widget.group.isActive) ...[
+            IconButton(
+              icon: const Icon(Icons.link),
+              onPressed: _copyGroupLink,
+              tooltip: AppTexts.copyGroupLink(context),
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _loadMessages,
+              tooltip: AppTexts.groupRefreshTooltip(context),
+            ),
+            IconButton(
+              icon: const Icon(Icons.group),
+              onPressed: _openMembersPage,
+              tooltip: AppTexts.groupMembersTooltip(context),
+            ),
+          ],
         ],
       ),
       body: GestureDetector(
@@ -471,8 +642,25 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
         behavior: HitTestBehavior.translucent,
         child: Column(
           children: [
+            if (!widget.group.isActive)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                color: Colors.grey[200],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.info_outline, size: 14, color: Colors.grey[600]),
+                    const SizedBox(width: 6),
+                    Text(
+                      AppTexts.groupDisbanded(context),
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
             Expanded(child: _buildChatArea()),
-            _buildMessageInput(),
+            if (widget.group.isActive) _buildMessageInput(),
           ],
         ),
       ),
@@ -534,18 +722,45 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
             if (!isMine)
               Padding(
                 padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                child: CircleAvatar(backgroundImage: AssetImage(avatarPath), radius: 16),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => AgentMdPage(aid: msg.sender)),
+                    );
+                  },
+                  child: CircleAvatar(backgroundImage: AssetImage(avatarPath), radius: 16),
+                ),
               ),
             Flexible(
               child: Column(
                 crossAxisAlignment: isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
-                  if (!isMine)
-                    Padding(
+                  GestureDetector(
+                    onTap: !isMine ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => AgentMdPage(aid: msg.sender)),
+                      );
+                    } : null,
+                    child: Padding(
                       padding: const EdgeInsets.only(bottom: 2, left: 4, right: 4),
-                      child: Text(displayName,
-                          style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.bold)),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (!isMine)
+                            Text(displayName,
+                                style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.bold)),
+                          if (!isMine)
+                            const SizedBox(width: 6),
+                          Text(
+                            DateTime.fromMillisecondsSinceEpoch(msg.timestamp).toString().substring(11, 16),
+                            style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                          ),
+                        ],
+                      ),
                     ),
+                  ),
                   Container(
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -557,16 +772,28 @@ class _GroupChatDetailPageState extends State<GroupChatDetailPage> {
                         BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 2, offset: const Offset(0, 1)),
                       ],
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(msg.content, style: TextStyle(color: isMine ? Colors.white : Colors.black87, fontSize: 15)),
-                        const SizedBox(height: 2),
-                        Text(
-                          DateTime.fromMillisecondsSinceEpoch(msg.timestamp).toString().substring(11, 16),
-                          style: TextStyle(fontSize: 10, color: isMine ? Colors.white70 : Colors.grey[400]),
+                    child: MarkdownBody(
+                      data: msg.content,
+                      onTapLink: (text, href, title) {
+                        if (href != null) {
+                          launchUrl(Uri.parse(href), mode: LaunchMode.externalApplication);
+                        }
+                      },
+                      styleSheet: MarkdownStyleSheet(
+                        p: TextStyle(color: isMine ? Colors.white : Colors.black87, fontSize: 15),
+                        a: TextStyle(
+                          color: isMine ? Colors.lightBlueAccent : Colors.blue,
+                          decoration: TextDecoration.underline,
                         ),
-                      ],
+                        code: TextStyle(
+                          backgroundColor: isMine ? Colors.white.withValues(alpha: 0.2) : Colors.grey[200],
+                          color: isMine ? Colors.white : Colors.black87,
+                        ),
+                        codeblockDecoration: BoxDecoration(
+                          color: isMine ? Colors.white.withValues(alpha: 0.1) : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
                     ),
                   ),
                 ],

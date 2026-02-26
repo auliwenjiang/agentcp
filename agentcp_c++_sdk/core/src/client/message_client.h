@@ -77,6 +77,7 @@ public:
     ConnectionState GetState() const;
     bool IsConnected() const;
     bool IsHealthy() const;
+    bool IsReconnectLoopRunning() const;
 
     // Callbacks
     void SetMessageHandler(OnMessageCallback handler);
@@ -95,6 +96,7 @@ private:
 
     void ReconnectLoop();
     void FlushPendingMessages();
+    void StartReconnectLoopIfNeeded();
 
     std::string BuildWebSocketUrl() const;
 
@@ -128,6 +130,7 @@ private:
 
     // Reconnection
     std::thread reconnect_thread_;
+    std::atomic<bool> reconnect_loop_running_{false};
     float current_reconnect_interval_ = 0.5f;
     int reconnect_attempt_count_ = 0;
 

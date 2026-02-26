@@ -2,10 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import '../services/agentcp_service.dart';
 import '../services/agent_info_service.dart';
+import '../services/message_store.dart';
 
 class ChatDetailPage extends StatefulWidget {
+  static String? activeSessionId; // Track which session is currently being viewed
+
   final SessionItem session;
   final String currentAid;
 
@@ -37,6 +41,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   @override
   void initState() {
     super.initState();
+    ChatDetailPage.activeSessionId = widget.session.sessionId;
+    _markSessionAsRead();
     _loadPeerAgentInfo();
     // Scroll to bottom after layout
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -55,6 +61,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   @override
   void dispose() {
+    ChatDetailPage.activeSessionId = null;
     widget.session.removeListener(_onSessionUpdated);
     _messageController.removeListener(_onInputChanged);
     _inputFocusNode.dispose();
@@ -102,6 +109,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       setState(() {});
       _scrollToBottom();
     }
+  }
+
+  Future<void> _markSessionAsRead() async {
+    final currentAid = await AgentCPService.getCurrentAID();
+    if (currentAid == null || currentAid.isEmpty) return;
+    await MessageStore().markSessionRead(currentAid, widget.session.sessionId);
+    widget.session.unreadCount = 0;
   }
 
   void _loadPeerAgentInfo() async {
@@ -166,11 +180,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     widget.session.addMessage(msg);
 
     // Ensure peer is invited to this session before sending
-    debugPrint('[Chat] Inviting ${widget.session.peerAid} to session ${widget.session.sessionId}');
     final inviteResult = await AgentCPService.inviteAgent(widget.session.sessionId, widget.session.peerAid);
-    debugPrint('[Chat] Invite result: $inviteResult');
 
-    debugPrint('[Chat] Sending message to session=${widget.session.sessionId}, peer=${widget.session.peerAid}');
     final result = await AgentCPService.sendMessage(
       widget.session.sessionId,
       widget.session.peerAid,
@@ -178,7 +189,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     );
 
     if (result['success'] != true) {
-      debugPrint('[Chat] Send failed: ${result['message']}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Send failed: ${result['message']}')),
@@ -499,12 +509,23 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               child: Column(
                 crossAxisAlignment: isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
-                  if (!isMine)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 2, left: 4),
-                      child: Text(displayName, 
-                          style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.bold)),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2, left: 4, right: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (!isMine)
+                          Text(displayName,
+                              style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.bold)),
+                        if (!isMine)
+                          const SizedBox(width: 6),
+                        Text(
+                          DateTime.fromMillisecondsSinceEpoch(msg.timestamp).toString().substring(11, 16),
+                          style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                        ),
+                      ],
                     ),
+                  ),
                   Container(
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -520,22 +541,31 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         )
                       ],
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(msg.text,
-                            style: TextStyle(
-                                color: isMine ? Colors.white : Colors.black87,
-                                fontSize: 15)),
-                        const SizedBox(height: 2),
-                        Text(
-                          DateTime.fromMillisecondsSinceEpoch(msg.timestamp).toString().substring(11, 16),
-                          style: TextStyle(
-                            fontSize: 10, 
-                            color: isMine ? Colors.white70 : Colors.grey[400]
-                          ),
+                    child: MarkdownBody(
+                      data: msg.text,
+                      onTapLink: (text, href, title) {
+                        if (href != null) {
+                          launchUrl(Uri.parse(href), mode: LaunchMode.externalApplication);
+                        }
+                      },
+                      styleSheet: MarkdownStyleSheet(
+                        p: TextStyle(
+                          color: isMine ? Colors.white : Colors.black87,
+                          fontSize: 15,
                         ),
-                      ],
+                        a: TextStyle(
+                          color: isMine ? Colors.lightBlueAccent : Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                        code: TextStyle(
+                          backgroundColor: isMine ? Colors.white.withOpacity(0.2) : Colors.grey[200],
+                          color: isMine ? Colors.white : Colors.black87,
+                        ),
+                        codeblockDecoration: BoxDecoration(
+                          color: isMine ? Colors.white.withOpacity(0.1) : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
                     ),
                   ),
                 ],
